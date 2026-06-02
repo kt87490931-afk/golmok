@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -30,9 +30,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 /* ───── TOPNAV ───── */
 .topnav{height:56px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100;}
 .logo-row{display:flex;align-items:center;gap:8px;min-width:180px;text-decoration:none;}
-.logo-cat{width:36px;height:36px;border-radius:50%;background:var(--chl);border:2px solid var(--ch);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.logo-cat{width:36px;height:36px;border-radius:50%;background:var(--chl);border:2px solid var(--ch);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
 .logo-name{font-size:17px;font-weight:700;color:var(--chd);}
 .logo-sub{font-size:11px;color:var(--chd);opacity:.7;margin-top:1px;}
+.logo-cat img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .tnav-links{display:flex;gap:2px;flex:1;justify-content:center;}
 .tnl{padding:6px 16px;border-radius:20px;font-size:14px;cursor:pointer;color:var(--text2);text-decoration:none;transition:background .15s,color .15s;}
 .tnl:hover,.tnl.act{background:var(--chl);color:var(--chd);font-weight:500;}
@@ -153,7 +154,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 /* ───── AI PANEL ───── */
 .aipanel{background:var(--chl);border-bottom:1px solid var(--chb);flex-shrink:0;}
 .aihead{background:var(--ch);padding:12px 14px;display:flex;align-items:center;gap:8px;}
-.aicat{font-size:22px;}
+.aicat{width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.aicat img{width:100%;height:100%;object-fit:contain;}
 .aitit{font-size:14px;font-weight:700;color:#fff;}
 .aisub{font-size:11px;color:rgba(255,255,255,.85);}
 .aimsgs{padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:120px;}
@@ -218,7 +220,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <!-- TOPNAV -->
 <nav class="topnav">
   <a class="logo-row" href="#">
-    <div class="logo-cat">😼</div>
+    <div class="logo-cat"><img src="assets/gmlogo.png" alt="골목대장 로고" width="36" height="36"></div>
     <div>
       <div class="logo-name">골목대장</div>
       <div class="logo-sub">소상공인 상권 커뮤니티</div>
@@ -240,7 +242,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="icobtn nbadge"><i class="ti ti-bell"></i></div>
     <div class="pchip">
       <div class="pav">김</div>
-      <span class="pname">김사장님</span>
+      <span class="pname">김대장님</span>
       <i class="ti ti-chevron-down" style="font-size:12px;color:#999;"></i>
     </div>
   </div>
@@ -268,7 +270,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="sb-bot">
       <div class="sb-pr">
         <div class="sbav">김</div>
-        <div><div class="sbname">김사장님</div><div class="sbtype">음식 · 동탄</div></div>
+        <div><div class="sbname">김대장님</div><div class="sbtype">음식 · 동탄</div></div>
         <i class="ti ti-dots" style="margin-left:auto;font-size:16px;color:#999;cursor:pointer;"></i>
       </div>
     </div>
@@ -300,7 +302,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <!-- 이벤트 섹션 -->
       <div class="evsec" id="event-section">
         <div class="evh">
-          <span class="evtitle"><i class="ti ti-speakerphone"></i> 이번 주 우리동네 이벤트·애로사항</span>
+          <span class="evtitle"><i class="ti ti-speakerphone"></i> 이번 주 우리동네 이벤트·이슈</span>
           <span class="evmore">전체보기</span>
         </div>
         <div class="evcards">
@@ -314,13 +316,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <div class="evc">
             <span class="evbdg" style="background:#1D9E75;">모집</span>
             <div class="evtype"><i class="ti ti-shopping-cart"></i> 공동구매</div>
-            <div class="evname">식자재 공동구매 사장님 모집</div>
-            <div class="evshop">동탄 사장님 모임</div>
+            <div class="evname">식자재 공동구매 대장님 모집</div>
+            <div class="evshop">동탄 대장님 모임</div>
             <div class="evdate">~06.08(토)</div>
           </div>
           <div class="evc">
             <span class="evbdg" style="background:#E24B4A;">긴급</span>
-            <div class="evtype"><i class="ti ti-alert-circle"></i> 애로사항</div>
+            <div class="evtype"><i class="ti ti-alert-circle"></i> 이슈</div>
             <div class="evname">도로공사로 인한 접근성 차단 문제</div>
             <div class="evshop">동탄 센트럴 상가 일대</div>
             <div class="evdate">진행 중</div>
@@ -358,7 +360,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="wbox">
         <div class="wrow">
           <div class="wav">김</div>
-          <div class="winp" id="open-write">사장님들과 이야기를 나눠보세요...</div>
+          <div class="winp" id="open-write">대장님들과 이야기를 나눠보세요...</div>
         </div>
         <div class="wacts">
           <button class="wab"><i class="ti ti-photo"></i> 사진</button>
@@ -376,7 +378,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <div class="ct" data-cat="qna">질문·고민</div>
           <div class="ct" data-cat="info">정보공유</div>
           <div class="ct" data-cat="startup">창업준비</div>
-          <div class="ct" data-cat="issue">애로사항</div>
+          <div class="ct" data-cat="issue">이슈</div>
           <div class="ct" data-cat="event">이벤트</div>
         </div>
         <div class="plist" id="post-list">
@@ -385,7 +387,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
             <div class="pctop">
               <div class="pcav" style="background:#FAEEDA;color:#633806;">김</div>
               <div>
-                <span class="pcname">김사장님</span>
+                <span class="pcname">김대장님</span>
                 <span class="pcbdg" style="background:#FAEEDA;color:#633806;">음식·요리주점</span>
                 <div class="pcinfo">경기 화성 동탄 · 팔로워 128명</div>
               </div>
@@ -409,7 +411,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
             <div class="pctop">
               <div class="pcav" style="background:#E1F5EE;color:#085041;">박</div>
               <div>
-                <span class="pcname">박사장님</span>
+                <span class="pcname">박대장님</span>
                 <span class="pcbdg" style="background:#E1F5EE;color:#085041;">카페·디저트</span>
                 <div class="pcinfo">경기 화성 동탄 · 팔로워 89명</div>
               </div>
@@ -433,7 +435,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
             <div class="pctop">
               <div class="pcav" style="background:#E6F1FB;color:#0C447C;">이</div>
               <div>
-                <span class="pcname">이사장님</span>
+                <span class="pcname">이대장님</span>
                 <span class="pcbdg" style="background:#E6F1FB;color:#0C447C;">소매·편의점</span>
                 <div class="pcinfo">경기 수원 팔달 · 팔로워 214명</div>
               </div>
@@ -457,7 +459,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
             <div class="pctop">
               <div class="pcav" style="background:#FAEEDA;color:#633806;">최</div>
               <div>
-                <span class="pcname">최사장님</span>
+                <span class="pcname">최대장님</span>
                 <span class="pcbdg" style="background:#FAEEDA;color:#633806;">음식·치킨</span>
                 <div class="pcinfo">경기 화성 동탄 · 팔로워 67명</div>
               </div>
@@ -467,7 +469,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
               </div>
             </div>
             <div class="pctit">도로공사로 손님이 반토막 났어요 😭</div>
-            <div class="pcbody">앞 도로 공사가 두 달째인데 매출이 거의 반으로 줄었어요. 구청에 민원 넣어봤는데 묵묵부답이고... 같은 상황 사장님들 어떻게 대응하셨나요?</div>
+            <div class="pcbody">앞 도로 공사가 두 달째인데 매출이 거의 반으로 줄었어요. 구청에 민원 넣어봤는데 묵묵부답이고... 같은 상황 대장님들 어떻게 대응하셨나요?</div>
             <div class="pcbot">
               <span class="pca like-btn"><i class="ti ti-heart"></i> 공감 <span class="cnt">76</span></span>
               <span class="pca"><i class="ti ti-message-circle"></i> 댓글 33</span>
@@ -510,14 +512,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <aside class="rcol">
     <div class="aipanel">
       <div class="aihead">
-        <div class="aicat">😼</div>
+        <div class="aicat"><img src="assets/gmlogo.png" alt="골목대장 로고" width="22" height="22"></div>
         <div>
           <div class="aitit">골목대장 AI 검색</div>
           <div class="aisub">상권·창업 무엇이든 물어보세요</div>
         </div>
       </div>
       <div class="aimsgs" id="ai-messages">
-        <div class="mbot">안녕하세요 사장님! 동탄 상권이나 창업에 대해 궁금한 것 편하게 물어보세요.</div>
+        <div class="mbot">안녕하세요 대장님! 동탄 상권이나 창업에 대해 궁금한 것 편하게 물어보세요.</div>
         <div class="musr">유동인구 많은 곳 찾아줘</div>
         <div class="mbot">업종이 어떻게 되세요? 음식점, 카페, 소매 중 선택해 주시면 맞춤 분석 드릴게요!</div>
       </div>
@@ -539,26 +541,26 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
     <div class="rcs">
       <div class="rct"><i class="ti ti-flame"></i> 지금 뜨는 글 <span class="rcm">전체보기</span></div>
-      <div class="hoti"><span class="hotn">01</span><div><div class="hott">식자재 공동구매 함께 할 사장님 모집해요</div><div class="hotc">공감 88 · 댓글 34</div></div></div>
+      <div class="hoti"><span class="hotn">01</span><div><div class="hott">식자재 공동구매 함께 할 대장님 모집해요</div><div class="hotc">공감 88 · 댓글 34</div></div></div>
       <div class="hoti"><span class="hotn">02</span><div><div class="hott">소상공인 전기료 지원 신청 기간 연장</div><div class="hotc">공감 71 · 댓글 19</div></div></div>
       <div class="hoti"><span class="hotn">03</span><div><div class="hott">배달앱 수수료 협상 성공 후기 공유합니다</div><div class="hotc">공감 64 · 댓글 52</div></div></div>
     </div>
 
     <div class="rcs">
-      <div class="rct"><i class="ti ti-user-plus"></i> 이웃 사장님 <span class="rcm">더보기</span></div>
+      <div class="rct"><i class="ti ti-user-plus"></i> 이웃 대장님 <span class="rcm">더보기</span></div>
       <div class="foli">
         <div class="flav" style="background:#FAEEDA;color:#633806;">최</div>
-        <div><div class="flnm">최사장님</div><div class="fltp">치킨 · 동탄</div></div>
+        <div><div class="flnm">최대장님</div><div class="fltp">치킨 · 동탄</div></div>
         <button class="flbtn">팔로우</button>
       </div>
       <div class="foli">
         <div class="flav" style="background:#E1F5EE;color:#085041;">정</div>
-        <div><div class="flnm">정사장님</div><div class="fltp">미용 · 봉담</div></div>
+        <div><div class="flnm">정대장님</div><div class="fltp">미용 · 봉담</div></div>
         <button class="flbtn">팔로우</button>
       </div>
       <div class="foli">
         <div class="flav" style="background:#EEEDFE;color:#3C3489;">한</div>
-        <div><div class="flnm">한사장님</div><div class="fltp">카페 · 수원</div></div>
+        <div><div class="flnm">한대장님</div><div class="fltp">카페 · 수원</div></div>
         <button class="flbtn">팔로우</button>
       </div>
     </div>
@@ -572,7 +574,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <span class="modal-title">게시글 작성</span>
       <button class="modal-close" id="close-modal"><i class="ti ti-x"></i></button>
     </div>
-    <textarea id="post-content" placeholder="사장님들과 이야기를 나눠보세요...&#10;&#10;위치, 업종 태그를 추가하면 더 많은 사장님들이 볼 수 있어요!"></textarea>
+    <textarea id="post-content" placeholder="대장님들과 이야기를 나눠보세요...&#10;&#10;위치, 업종 태그를 추가하면 더 많은 대장님들이 볼 수 있어요!"></textarea>
     <div class="modal-acts">
       <button class="mab"><i class="ti ti-photo"></i> 사진</button>
       <button class="mab"><i class="ti ti-map-pin"></i> 위치</button>
