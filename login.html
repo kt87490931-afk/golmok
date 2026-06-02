@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>골목대장 — 로그인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:#F7F3EB;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.card{background:#fff;border:1px solid #E8E4DC;border-radius:16px;padding:28px;width:100%;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.logo img{width:44px;height:44px;border-radius:50%;}
+h1{font-size:20px;color:#C17F24;}
+.sub{font-size:12px;color:#555;margin-top:4px;}
+.btn{width:100%;padding:12px;border-radius:12px;border:1px solid #E8E4DC;background:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-google{background:#fff;}
+.btn-kakao{background:#FEE500;border-color:#FEE500;}
+.btn-naver{background:#03C75A;border-color:#03C75A;color:#fff;}
+.note{font-size:11px;color:#999;margin-top:16px;line-height:1.5;}
+.back{display:inline-block;margin-top:16px;font-size:13px;color:#C17F24;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <img src="assets/gmlogo.png" alt="골목대장">
+    <div><h1>골목대장</h1><p class="sub">우리는 모두 골목대장, 데이터로 보는 상권의 힘</p></div>
+  </div>
+  <button type="button" class="btn btn-google" id="btn-google-login"><i class="ti ti-brand-google"></i> Google로 시작하기</button>
+  <button type="button" class="btn btn-kakao" id="btn-kakao-login">카카오 (준비중)</button>
+  <button type="button" class="btn btn-naver" id="btn-naver-login">네이버 (준비중)</button>
+  <p class="note">Supabase 대시보드에서 Google Provider를 활성화해야 로그인이 동작합니다.</p>
+  <a class="back" href="index.html">← 홈으로 돌아가기</a>
+</div>
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>
