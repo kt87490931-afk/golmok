@@ -287,8 +287,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .flbtn:hover{background:var(--ch);color:#fff;}
 
 /* ───── MODAL OVERLAY (글쓰기) ───── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;}
-.modal-bg.open{display:flex;}
+.modal-bg{display:none!important;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px;pointer-events:none;}
+.modal-bg.open{display:flex!important;pointer-events:auto;z-index:210;}
+.modal-bg.open > .modal,.modal-bg.open > .auth-modal-sheet{pointer-events:auto;max-height:90vh;overflow-y:auto;}
 .modal{background:var(--white);border-radius:16px;width:560px;padding:24px;position:relative;}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .modal-title{font-size:16px;font-weight:700;color:var(--text1);}
@@ -305,7 +306,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .lbtn:hover{background:var(--chl);}
 .lbtn-kakao{background:#FEE500;border-color:#FEE500;}
 .lbtn-naver{background:#03C75A;border-color:#03C75A;color:#fff;}
-.auth-note{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5;}
 #logged-panel{text-align:center;}
 #logged-panel .lbtn-logout{margin-top:12px;background:var(--chl);color:var(--chdd);}
 .cat-select-btn{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;}
@@ -336,6 +336,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .auth-agree-box label{display:flex;align-items:center;gap:8px;cursor:pointer;}
 .auth-label{font-size:12px;color:var(--text2);font-weight:500;margin-top:4px;}
 .auth-forgot-desc{font-size:13px;color:var(--text2);text-align:center;margin-bottom:8px;}
+.auth-intro{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;}
 
 /* ───── TOAST ───── */
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text1);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:all .3s;z-index:300;}
@@ -645,28 +646,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </aside>
 </div>
 
-<!-- 로그인 모달 -->
-<div class="modal-bg" id="login-modal">
-  <div class="modal" style="width:400px;">
-    <div class="modal-head">
-      <span class="modal-title">대장님 로그인</span>
-      <button type="button" class="modal-close" id="close-login-modal"><i class="ti ti-x"></i></button>
-    </div>
-    <div id="login-panel">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">소상공인 커뮤니티 이용을 위해 로그인해주세요.</p>
-      <div class="login-btns">
-        <button type="button" class="lbtn" id="btn-google-login"><i class="ti ti-brand-google"></i> Google로 시작하기</button>
-        <button type="button" class="lbtn lbtn-kakao" id="btn-kakao-login">카카오 (준비중)</button>
-        <button type="button" class="lbtn lbtn-naver" id="btn-naver-login">네이버 (준비중)</button>
-      </div>
-      <p class="auth-note">Supabase → Authentication → Providers에서 Google을 활성화해야 합니다.</p>
-    </div>
-    <div id="logged-panel" style="display:none;">
-      <p style="font-size:14px;font-weight:500;color:var(--text1);" id="logged-email"></p>
-      <button type="button" class="lbtn lbtn-logout" id="btn-logout">로그아웃</button>
-    </div>
-  </div>
-</div>
+<!-- 로그인 모달: js/auth_modals.js 가 #login-overlay 주입 -->
 
 <!-- 글쓰기 모달 -->
 <div class="modal-bg" id="write-modal">
@@ -754,7 +734,7 @@ document.querySelectorAll('.ni').forEach(ni=>{
   });
 });
 </script>
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/community_ui.js"></script>
+<script type="module" src="js/auth.js?v=20260604"></script>
+<script type="module" src="js/community_ui.js?v=20260604"></script>
 </body>
 </html>

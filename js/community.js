@@ -1,4 +1,4 @@
-import { supabase } from './auth.js';
+import { supabase } from './supabase_client.js';
 
 const POST_SELECT = `
   *,

@@ -296,7 +296,7 @@ function createPostCard(post, likedSet, savedSet) {
     const res = await toggleLike(post.id);
     if (res?.error === 'login') {
       toast('로그인이 필요합니다');
-      document.getElementById('login-modal')?.classList.add('open');
+      window.openLoginModal?.('login');
       return;
     }
     const btn = e.currentTarget;
@@ -543,7 +543,7 @@ async function submitNewPost() {
 
     if (res?.error === 'login') {
       toast('로그인이 필요합니다');
-      document.getElementById('login-modal')?.classList.add('open');
+      window.openLoginModal?.('login');
       return;
     }
 

@@ -1,9 +1,9 @@
 /** 로그인·회원가입 모달 DOM (login_instructions.md) */
 export function mountAuthModals() {
-  if (document.getElementById('login-overlay')) return;
+  if (document.getElementById('login-overlay')) return true;
 
-  const wrap = document.createElement('div');
-  wrap.innerHTML = `
+  const tpl = document.createElement('template');
+  tpl.innerHTML = `
 <div class="modal-bg" id="login-overlay">
   <div class="modal auth-modal-sheet">
     <div class="auth-handle"></div>
@@ -20,10 +20,11 @@ export function mountAuthModals() {
     </div>
     <div class="auth-modal-body">
       <div id="tab-login-content">
+        <p class="auth-intro">소상공인 커뮤니티 이용을 위해 로그인해주세요.</p>
         <div class="auth-social-col">
-          <button type="button" class="auth-btn-google" id="btn-google-login">Google로 시작하기</button>
-          <button type="button" class="auth-btn-kakao" id="btn-kakao-login">카카오로 시작하기</button>
-          <button type="button" class="auth-btn-naver" id="btn-naver-login">네이버로 시작하기</button>
+          <button type="button" class="auth-btn-google" id="btn-google-login"><i class="ti ti-brand-google"></i> Google로 시작하기</button>
+          <button type="button" class="auth-btn-kakao" id="btn-kakao-login">카카오 (준비중)</button>
+          <button type="button" class="auth-btn-naver" id="btn-naver-login">네이버 (준비중)</button>
         </div>
         <div class="auth-divider"><span>또는 이메일로</span></div>
         <input id="login-email" type="email" class="auth-input" placeholder="이메일 주소">
@@ -95,5 +96,6 @@ export function mountAuthModals() {
     <button type="button" class="auth-link-btn" id="btn-skip-profile">나중에 설정하기</button>
   </div>
 </div>`;
-  document.body.appendChild(wrap);
+  tpl.content.querySelectorAll('.modal-bg').forEach((el) => document.body.appendChild(el));
+  return true;
 }

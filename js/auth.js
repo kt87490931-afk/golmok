@@ -1,8 +1,10 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, getAuthRedirectUrl } from './supabase_config.js';
+import { getAuthRedirectUrl, getPasswordResetRedirectUrl } from './supabase_config.js';
+import { supabase } from './supabase_client.js';
 import { mountAuthModals } from './auth_modals.js';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export { supabase };
+
+let handlingSignIn = false;
 
 function toast(msg) {
   if (typeof window.showToast === 'function') window.showToast(msg);
@@ -30,15 +32,33 @@ function hideError(id) {
   if (el) el.style.display = 'none';
 }
 
+/** 현재 보이는 로그인/회원가입 탭에 맞는 에러 영역에 표시 */
+function showAuthError(msg) {
+  const signupVisible = document.getElementById('tab-signup-content')?.style.display !== 'none';
+  const forgotVisible = document.getElementById('tab-forgot-content')?.style.display !== 'none';
+  if (forgotVisible) showError('forgot-error', msg);
+  else if (signupVisible) showError('signup-error', msg);
+  else showError('login-error', msg);
+}
+
+function setButtonLoading(btn, loading, idleText) {
+  if (!btn) return;
+  btn.disabled = loading;
+  if (loading) btn.dataset.idleText = btn.textContent;
+  btn.textContent = loading ? '처리 중...' : btn.dataset.idleText || idleText || btn.textContent;
+}
+
 export function openLoginModal(tab = 'login') {
-  const ov = document.getElementById('login-overlay') || document.getElementById('login-modal');
+  mountAuthModals();
+  setupAuthClickDelegate();
+  const ov = document.getElementById('login-overlay');
   ov?.classList.add('open');
   if (tab === 'signup') showSignupTab();
   else showLoginTab();
 }
 
 export function closeAllModals() {
-  document.querySelectorAll('.modal-bg.open, #login-modal.open').forEach((o) => o.classList.remove('open'));
+  document.querySelectorAll('.modal-bg.open').forEach((o) => o.classList.remove('open'));
 }
 
 function showLoginTab() {
@@ -71,6 +91,8 @@ function showForgotPassword() {
   if (l) l.style.display = 'none';
   if (s) s.style.display = 'none';
   if (f) f.style.display = 'block';
+  hideError('login-error');
+  hideError('signup-error');
 }
 
 async function upsertUserRow(user, extra = {}) {
@@ -152,25 +174,20 @@ export function updateAuthUI(profile, session) {
 }
 
 export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: getAuthRedirectUrl() },
   });
   if (error) throw error;
+  if (data?.url) window.location.assign(data.url);
 }
 
 export async function signInWithKakao() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'kakao',
-    options: { redirectTo: getAuthRedirectUrl() },
-  });
-  if (error) {
-    showError('login-error', '카카오 로그인 준비 중입니다. 이메일 가입을 이용해주세요.');
-  }
+  showAuthError('카카오 로그인 준비 중입니다. 이메일 가입을 이용해주세요.');
 }
 
 export async function signInWithNaver() {
-  showError('login-error', '네이버 로그인 준비 중입니다. 이메일 또는 Google을 이용해주세요.');
+  showAuthError('네이버 로그인 준비 중입니다. 이메일 또는 Google을 이용해주세요.');
 }
 
 export async function signOut() {
@@ -181,6 +198,16 @@ export async function signOut() {
 }
 
 async function handleSignedIn(user) {
+  if (handlingSignIn) return;
+  handlingSignIn = true;
+  try {
+    await handleSignedInCore(user);
+  } finally {
+    handlingSignIn = false;
+  }
+}
+
+async function handleSignedInCore(user) {
   const { data: existing } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle();
 
   if (!existing) {
@@ -233,30 +260,181 @@ export async function initAuth() {
   });
 }
 
-function bindEmailSignup() {
-  document.getElementById('btn-email-signup')?.addEventListener('click', async () => {
-    hideError('signup-error');
+/** 모달 내부 클릭 — document 위임(한 번만 등록, 요소별 bind 실패 방지) */
+function setupAuthClickDelegate() {
+  if (window.__golmokAuthDelegate) return;
+  window.__golmokAuthDelegate = true;
 
-    const nickname = document.getElementById('signup-nickname')?.value?.trim();
-    const email = document.getElementById('signup-email')?.value?.trim();
-    const password = document.getElementById('signup-password')?.value;
-    const passwordConfirm = document.getElementById('signup-password-confirm')?.value;
-    const agreeTerms = document.getElementById('agree-terms')?.checked;
-    const agreePrivacy = document.getElementById('agree-privacy')?.checked;
-    const agreeMarketing = document.getElementById('agree-marketing')?.checked;
-
-    if (!nickname || nickname.length < 2) return showError('signup-error', '닉네임은 2자 이상 입력해주세요.');
-    if (!email || !email.includes('@')) return showError('signup-error', '올바른 이메일을 입력해주세요.');
-    if (!password || password.length < 8) return showError('signup-error', '비밀번호는 8자 이상이어야 합니다.');
-    if (password !== passwordConfirm) return showError('signup-error', '비밀번호가 일치하지 않습니다.');
-    if (!agreeTerms || !agreePrivacy) return showError('signup-error', '필수 약관에 동의해주세요.');
-
-    const btn = document.getElementById('btn-email-signup');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = '가입 중...';
+  document.addEventListener('click', async (e) => {
+    const loginOverlay = document.getElementById('login-overlay');
+    const chip = e.target.closest?.('#user-chip');
+    if (chip) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) openLoginModal('login');
+      else toast(`${session.user.email || '대장님'} 로그인 중`);
+      return;
     }
 
+    if (e.target.closest?.('#open-login')) {
+      openLoginModal('login');
+      return;
+    }
+
+    const btn = e.target.closest?.('button[id]');
+
+    if (e.target.closest?.('#verify-email-overlay')) {
+      if (btn?.id === 'btn-close-verify') closeAllModals();
+      if (btn?.id === 'btn-resend-email') {
+        const email = document.getElementById('verify-email-address')?.textContent?.trim();
+        if (!email) return;
+        const { error } = await supabase.auth.resend({ type: 'signup', email });
+        if (!error) toast('인증 메일을 다시 보냈습니다.');
+      }
+      return;
+    }
+
+    if (e.target.closest?.('#profile-setup-overlay')) {
+      if (btn?.id === 'btn-save-profile') await runSaveProfile();
+      if (btn?.id === 'btn-skip-profile') {
+        document.getElementById('profile-setup-overlay')?.classList.remove('open');
+        toast('프로필은 내정보에서 나중에 설정할 수 있습니다.');
+      }
+      return;
+    }
+
+    if (!loginOverlay?.classList.contains('open')) return;
+
+    if (e.target.id === 'login-overlay' || e.target === loginOverlay) {
+      closeAllModals();
+      return;
+    }
+
+    if (!e.target.closest?.('#login-overlay')) return;
+
+    const tab = e.target.closest?.('.auth-tab');
+    if (tab) {
+      e.preventDefault();
+      if (tab.dataset.tab === 'signup') showSignupTab();
+      else showLoginTab();
+      return;
+    }
+
+    if (!btn) return;
+
+    switch (btn.id) {
+      case 'close-login':
+        closeAllModals();
+        return;
+      case 'btn-forgot-open':
+        e.preventDefault();
+        showForgotPassword();
+        return;
+      case 'btn-back-login':
+        e.preventDefault();
+        showLoginTab();
+        return;
+      case 'btn-google-login':
+      case 'btn-google-signup':
+        await runSocialClick(btn, signInWithGoogle);
+        return;
+      case 'btn-kakao-login':
+      case 'btn-kakao-signup':
+        await runSocialClick(btn, signInWithKakao);
+        return;
+      case 'btn-naver-login':
+      case 'btn-naver-signup':
+        await runSocialClick(btn, signInWithNaver);
+        return;
+      case 'btn-email-login':
+        await runEmailLogin(btn);
+        return;
+      case 'btn-email-signup':
+        await runEmailSignup(btn);
+        return;
+      case 'btn-send-reset':
+        await runForgotSend(btn);
+        return;
+      default:
+        break;
+    }
+  });
+
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'agree-all') {
+      const c = e.target.checked;
+      ['agree-terms', 'agree-privacy', 'agree-marketing'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = c;
+      });
+    }
+  });
+}
+
+async function runSocialClick(btn, fn) {
+  hideError('login-error');
+  hideError('signup-error');
+  setButtonLoading(btn, true);
+  try {
+    await fn();
+  } catch (err) {
+    console.error(err);
+    const msg = err?.message?.includes('not enabled')
+      ? 'Google 로그인 설정이 완료되지 않았습니다. 이메일 로그인을 이용해주세요.'
+      : '소셜 로그인에 실패했습니다.';
+    showAuthError(msg);
+  } finally {
+    setButtonLoading(btn, false);
+  }
+}
+
+async function runEmailLogin(btn) {
+  hideError('login-error');
+  const email = document.getElementById('login-email')?.value?.trim();
+  const password = document.getElementById('login-password')?.value;
+  if (!email) return showError('login-error', '이메일을 입력해주세요.');
+  if (!password) return showError('login-error', '비밀번호를 입력해주세요.');
+  setButtonLoading(btn, true, '로그인');
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      if (error.message.includes('Email not confirmed')) {
+        showError('login-error', '이메일 인증이 필요합니다. 메일함의 링크를 클릭해주세요.');
+      } else {
+        showError('login-error', '이메일 또는 비밀번호가 올바르지 않습니다.');
+      }
+      return;
+    }
+    closeAllModals();
+    await handleSignedIn(data.user);
+    toast('로그인되었습니다.');
+  } catch (err) {
+    console.error(err);
+    showError('login-error', '로그인 요청 중 오류가 발생했습니다.');
+  } finally {
+    setButtonLoading(btn, false, '로그인');
+  }
+}
+
+async function runEmailSignup(btn) {
+  hideError('signup-error');
+  const nickname = document.getElementById('signup-nickname')?.value?.trim();
+  const email = document.getElementById('signup-email')?.value?.trim();
+  const password = document.getElementById('signup-password')?.value;
+  const passwordConfirm = document.getElementById('signup-password-confirm')?.value;
+  const agreeTerms = document.getElementById('agree-terms')?.checked;
+  const agreePrivacy = document.getElementById('agree-privacy')?.checked;
+  const agreeMarketing = document.getElementById('agree-marketing')?.checked;
+
+  if (!nickname || nickname.length < 2) return showError('signup-error', '닉네임은 2자 이상 입력해주세요.');
+  if (!email || !email.includes('@')) return showError('signup-error', '올바른 이메일을 입력해주세요.');
+  if (!password || password.length < 8) return showError('signup-error', '비밀번호는 8자 이상이어야 합니다.');
+  if (password !== passwordConfirm) return showError('signup-error', '비밀번호가 일치하지 않습니다.');
+  if (!agreeTerms || !agreePrivacy) return showError('signup-error', '필수 약관에 동의해주세요.');
+
+  setButtonLoading(btn, true, '이메일로 가입하기');
+  try {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -265,16 +443,10 @@ function bindEmailSignup() {
         data: { nickname, full_name: nickname },
       },
     });
-
     if (error) {
       showError('signup-error', error.message.includes('already') ? '이미 가입된 이메일입니다.' : '회원가입에 실패했습니다.');
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '이메일로 가입하기';
-      }
       return;
     }
-
     if (data.user) {
       await upsertUserRow(data.user, {
         nickname,
@@ -283,18 +455,68 @@ function bindEmailSignup() {
         is_active: true,
       });
     }
-
     closeAllModals();
     const addr = document.getElementById('verify-email-address');
     if (addr) addr.textContent = email;
     document.getElementById('verify-email-overlay')?.classList.add('open');
     toast('인증 메일을 발송했습니다. 메일함을 확인해주세요.');
+  } catch (err) {
+    console.error(err);
+    showError('signup-error', '회원가입 요청 중 오류가 발생했습니다.');
+  } finally {
+    setButtonLoading(btn, false, '이메일로 가입하기');
+  }
+}
 
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = '이메일로 가입하기';
+async function runForgotSend(btn) {
+  hideError('forgot-error');
+  const ok = document.getElementById('forgot-success');
+  if (ok) ok.style.display = 'none';
+  const email = document.getElementById('forgot-email')?.value?.trim();
+  if (!email) return showError('forgot-error', '이메일을 입력해주세요.');
+  setButtonLoading(btn, true, '재설정 링크 보내기');
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getPasswordResetRedirectUrl(),
+    });
+    if (error) {
+      showError('forgot-error', '이메일 발송에 실패했습니다.');
+      return;
     }
-  });
+    if (ok) {
+      ok.textContent = `${email}으로 재설정 링크를 보냈습니다.`;
+      ok.style.display = 'block';
+    }
+  } catch (err) {
+    console.error(err);
+    showError('forgot-error', '요청 중 오류가 발생했습니다.');
+  } finally {
+    setButtonLoading(btn, false, '재설정 링크 보내기');
+  }
+}
+
+async function runSaveProfile() {
+  const nickname = document.getElementById('profile-nickname')?.value?.trim();
+  const region = document.getElementById('profile-region')?.value?.trim();
+  const upjong = document.getElementById('profile-upjong')?.value;
+  if (!nickname) return toast('닉네임을 입력해주세요.');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from('users')
+    .update({
+      nickname,
+      upjong1cd: upjong || null,
+      ...parseRegion(region),
+    })
+    .eq('id', user.id);
+  document.getElementById('profile-setup-overlay')?.classList.remove('open');
+  const profile = await fetchUserProfile(user.id);
+  updateAuthUI(profile, { user });
+  toast('회원가입이 완료되었습니다.');
+  window.golmokCommunity?.loadFeed?.(true);
 }
 
 function parseRegion(region) {
@@ -308,190 +530,25 @@ function parseRegion(region) {
   };
 }
 
-function bindEmailLogin() {
-  document.getElementById('btn-email-login')?.addEventListener('click', async () => {
-    hideError('login-error');
-    const email = document.getElementById('login-email')?.value?.trim();
-    const password = document.getElementById('login-password')?.value;
-    if (!email) return showError('login-error', '이메일을 입력해주세요.');
-    if (!password) return showError('login-error', '비밀번호를 입력해주세요.');
-
-    const btn = document.getElementById('btn-email-login');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = '로그인 중...';
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      if (error.message.includes('Email not confirmed')) {
-        showError('login-error', '이메일 인증이 필요합니다. 메일함의 링크를 클릭해주세요.');
-      } else {
-        showError('login-error', '이메일 또는 비밀번호가 올바르지 않습니다.');
+function bindLogoutButtons() {
+  ['btn-logout', 'pm-logout'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.bound === '1') return;
+    el.dataset.bound = '1';
+    el.addEventListener('click', async () => {
+      try {
+        await signOut();
+      } catch {
+        toast('로그아웃 실패');
       }
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '로그인';
-      }
-      return;
-    }
-
-    closeAllModals();
-    await handleSignedIn(data.user);
-    toast('로그인되었습니다.');
-
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = '로그인';
-    }
-  });
-}
-
-function bindForgotPassword() {
-  document.getElementById('btn-send-reset')?.addEventListener('click', async () => {
-    hideError('forgot-error');
-    const ok = document.getElementById('forgot-success');
-    if (ok) ok.style.display = 'none';
-
-    const email = document.getElementById('forgot-email')?.value?.trim();
-    if (!email) return showError('forgot-error', '이메일을 입력해주세요.');
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password.html`,
     });
-
-    if (error) {
-      showError('forgot-error', '이메일 발송에 실패했습니다.');
-      return;
-    }
-
-    if (ok) {
-      ok.textContent = `${email}으로 재설정 링크를 보냈습니다.`;
-      ok.style.display = 'block';
-    }
-  });
-}
-
-function bindProfileSetup() {
-  document.getElementById('btn-save-profile')?.addEventListener('click', async () => {
-    const nickname = document.getElementById('profile-nickname')?.value?.trim();
-    const region = document.getElementById('profile-region')?.value?.trim();
-    const upjong = document.getElementById('profile-upjong')?.value;
-    if (!nickname) return toast('닉네임을 입력해주세요.');
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    await supabase
-      .from('users')
-      .update({
-        nickname,
-        upjong1cd: upjong || null,
-        ...parseRegion(region),
-      })
-      .eq('id', user.id);
-
-    document.getElementById('profile-setup-overlay')?.classList.remove('open');
-    const profile = await fetchUserProfile(user.id);
-    updateAuthUI(profile, { user });
-    toast('회원가입이 완료되었습니다.');
-    window.golmokCommunity?.loadFeed?.(true);
-  });
-
-  document.getElementById('btn-skip-profile')?.addEventListener('click', () => {
-    document.getElementById('profile-setup-overlay')?.classList.remove('open');
-    toast('프로필은 내정보에서 나중에 설정할 수 있습니다.');
   });
 }
 
 export function bindAuthUI() {
-  document.querySelectorAll('.auth-tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      if (tab.dataset.tab === 'signup') showSignupTab();
-      else showLoginTab();
-    });
-  });
-
-  document.getElementById('close-login')?.addEventListener('click', closeAllModals);
-  document.getElementById('close-login-modal')?.addEventListener('click', closeAllModals);
-  document.getElementById('login-overlay')?.addEventListener('click', (e) => {
-    if (e.target.id === 'login-overlay') closeAllModals();
-  });
-  document.getElementById('login-modal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'login-modal') closeAllModals();
-  });
-
-  document.getElementById('btn-forgot-open')?.addEventListener('click', showForgotPassword);
-  document.getElementById('btn-back-login')?.addEventListener('click', showLoginTab);
-  document.getElementById('btn-close-verify')?.addEventListener('click', closeAllModals);
-
-  document.getElementById('btn-resend-email')?.addEventListener('click', async () => {
-    const email = document.getElementById('verify-email-address')?.textContent?.trim();
-    if (!email) return;
-    const { error } = await supabase.auth.resend({ type: 'signup', email });
-    if (!error) toast('인증 메일을 다시 보냈습니다.');
-  });
-
-  document.getElementById('agree-all')?.addEventListener('change', (e) => {
-    const c = e.target.checked;
-    ['agree-terms', 'agree-privacy', 'agree-marketing'].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.checked = c;
-    });
-  });
-
-  const social = [
-    ['btn-google-login', signInWithGoogle],
-    ['btn-google-signup', signInWithGoogle],
-    ['btn-kakao-login', signInWithKakao],
-    ['btn-kakao-signup', signInWithKakao],
-    ['btn-naver-login', signInWithNaver],
-    ['btn-naver-signup', signInWithNaver],
-  ];
-
-  social.forEach(([id, fn]) => {
-    document.getElementById(id)?.addEventListener('click', async () => {
-      try {
-        await fn();
-      } catch (e) {
-        console.error(e);
-        showError('login-error', '소셜 로그인에 실패했습니다.');
-      }
-    });
-  });
-
-  bindEmailLogin();
-  bindEmailSignup();
-  bindForgotPassword();
-  bindProfileSetup();
-
-  document.getElementById('open-login')?.addEventListener('click', () => openLoginModal('login'));
-
-  document.getElementById('user-chip')?.addEventListener('click', () => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) openLoginModal('login');
-      else toast(`${session.user.email || '대장님'} 로그인 중`);
-    });
-  });
-
-  document.getElementById('btn-logout')?.addEventListener('click', async () => {
-    try {
-      await signOut();
-    } catch {
-      toast('로그아웃 실패');
-    }
-  });
-
-  document.getElementById('pm-logout')?.addEventListener('click', async () => {
-    try {
-      await signOut();
-    } catch {
-      toast('로그아웃 실패');
-    }
-  });
+  mountAuthModals();
+  setupAuthClickDelegate();
+  bindLogoutButtons();
 }
 
 window.openLoginModal = openLoginModal;
@@ -501,6 +558,7 @@ window.showLoginTab = showLoginTab;
 window.signOut = signOut;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  mountAuthModals();
   bindAuthUI();
   await initAuth();
 });

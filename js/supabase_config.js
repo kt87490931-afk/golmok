@@ -5,6 +5,8 @@ export const SUPABASE_ANON_KEY =
 
 /**
  * Supabase 대시보드 → Authentication → URL Configuration 에 등록:
+ * - https://golmokmaster.com/reset-password.html
+ * - https://m.golmokmaster.com/reset-password.html
  * - https://golmokmaster.com/ , /index.html , /login.html
  * - https://m.golmokmaster.com/ , /index.html , /login.html
  * - (레거시) github.io/golmok , github.io/golmok-mobile 경로
@@ -12,4 +14,9 @@ export const SUPABASE_ANON_KEY =
 export function getAuthRedirectUrl() {
   const path = window.location.pathname.replace(/login\.html$/i, 'index.html');
   return `${window.location.origin}${path}`;
+}
+
+/** 비밀번호 재설정 메일 링크 리다이렉트 (Supabase Redirect URLs에 등록 필수) */
+export function getPasswordResetRedirectUrl() {
+  return `${window.location.origin}/reset-password.html`;
 }
