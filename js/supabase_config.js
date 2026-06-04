@@ -5,11 +5,9 @@ export const SUPABASE_ANON_KEY =
 
 /**
  * Supabase 대시보드 → Authentication → URL Configuration 에 등록:
- * - https://kt87490931-afk.github.io/golmok/
- * - https://kt87490931-afk.github.io/golmok/index.html
- * - https://kt87490931-afk.github.io/golmok/login.html
- * - (모바일) https://kt87490931-afk.github.io/golmok-mobile/
- * - (모바일) https://kt87490931-afk.github.io/golmok-mobile/index.html
+ * - https://golmokmaster.com/ , /index.html , /login.html
+ * - https://m.golmokmaster.com/ , /index.html , /login.html
+ * - (레거시) github.io/golmok , github.io/golmok-mobile 경로
  */
 export function getAuthRedirectUrl() {
   const path = window.location.pathname.replace(/login\.html$/i, 'index.html');
