@@ -1,4 +1,5 @@
 # 골목대장 웹 (GitHub Pages)
 
-- URL: https://kt87490931-afk.github.io/golmok/
+- PC: https://golmokmaster.com/
+- 모바일: https://m.golmokmaster.com/
 - `index.html`: 정적 프로토타입 UI
