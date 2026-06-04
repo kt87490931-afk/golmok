@@ -125,6 +125,7 @@ export async function initAuth() {
         await createUserIfNotExists(nextSession.user);
         const profile = await fetchUserProfile(nextSession.user.id);
         updateAuthUI(profile, nextSession);
+        window.golmokCommunity?.loadFeed?.(true);
         toast('로그인되었습니다.');
       } catch (e) {
         console.error(e);

@@ -1,0 +1,700 @@
+import {
+  getCurrentUser,
+  getUserProfile,
+  getAllPosts,
+  getDongPosts,
+  getSigunguPosts,
+  getEventPosts,
+  getPost,
+  createPost,
+  toggleLike,
+  toggleBookmark,
+  getComments,
+  createComment,
+  toggleFollow,
+  getLikedPostIds,
+  getBookmarkedPostIds,
+  isLiked,
+} from './community.js';
+
+const DEFAULT_REGION = {
+  region_sido: '경기',
+  region_sigungu: '화성시',
+  region_dong: '동탄2동',
+  region_full: '경기 화성시 동탄2동',
+};
+
+let currentFeedType = 'dong';
+let currentCategory = 'all';
+let currentPage = 0;
+let isLoading = false;
+let hasMore = true;
+let selectedWriteCategory = 'qna';
+let replyTargetId = null;
+let userRegion = { ...DEFAULT_REGION };
+
+function toast(msg) {
+  if (typeof window.showToast === 'function') window.showToast(msg);
+  else alert(msg);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
+function getTimeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60) return '방금 전';
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}일 전`;
+  return new Date(dateStr).toLocaleDateString('ko-KR');
+}
+
+function getCategoryLabel(category) {
+  const labels = {
+    all: '전체',
+    qna: '질문·고민',
+    info: '정보공유',
+    startup: '창업준비',
+    issue: '이슈',
+    event: '이벤트',
+  };
+  return labels[category] || '전체';
+}
+
+function getCategoryStyle(category) {
+  const styles = {
+    qna: 'background:#FAEEDA;color:#633806;',
+    info: 'background:#E1F5EE;color:#085041;',
+    startup: 'background:#EEEDFE;color:#3C3489;',
+    issue: 'background:#FFF1F1;color:#E24B4A;',
+    event: 'background:#EBF4FF;color:#0C447C;',
+  };
+  return styles[category] || 'background:#F5F1E8;color:#555;';
+}
+
+function parseRangeLabel(label) {
+  const t = (label || '').replace(/\s/g, '');
+  if (t.includes('인근')) return 'sigungu';
+  if (t.includes('전체')) return 'all';
+  return 'dong';
+}
+
+function getPostListEl() {
+  return document.getElementById('post-list') || document.querySelector('.plist');
+}
+
+function getWriteOverlay() {
+  const el = document.getElementById('write-modal') || document.getElementById('wr-overlay');
+  if (el?.classList.contains('overlay')) return el;
+  return el;
+}
+
+function openWriteOverlay() {
+  const ov = getWriteOverlay();
+  if (!ov) return;
+  ov.classList.add('open');
+}
+
+function getPostContentInput() {
+  return document.getElementById('post-content') || document.getElementById('post-txt');
+}
+
+function getSubmitPostBtn() {
+  return document.getElementById('submit-post') || document.getElementById('post-sub');
+}
+
+async function resolveUserRegion() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      userRegion = { ...DEFAULT_REGION };
+      return userRegion;
+    }
+    const profile = await getUserProfile(user.id);
+    userRegion = {
+      region_sido: profile?.region_sido || DEFAULT_REGION.region_sido,
+      region_sigungu: profile?.region_sigungu || DEFAULT_REGION.region_sigungu,
+      region_dong: profile?.region_dong || DEFAULT_REGION.region_dong,
+      region_full: profile?.region_full || DEFAULT_REGION.region_full,
+    };
+  } catch (e) {
+    userRegion = { ...DEFAULT_REGION };
+  }
+  return userRegion;
+}
+
+async function fetchPostsPage(page) {
+  const opts = { category: currentCategory, page, limit: 20 };
+
+  if (currentFeedType === 'all') return getAllPosts(opts);
+  if (currentFeedType === 'dong') {
+    return getDongPosts({ regionDong: userRegion.region_dong, ...opts });
+  }
+  if (currentFeedType === 'sigungu') {
+    return getSigunguPosts({ regionSigungu: userRegion.region_sigungu, ...opts });
+  }
+  return getAllPosts(opts);
+}
+
+export async function loadFeed(reset = true) {
+  if (isLoading) return;
+  isLoading = true;
+
+  const list = getPostListEl();
+  if (!list) {
+    isLoading = false;
+    return;
+  }
+
+  if (reset) {
+    currentPage = 0;
+    hasMore = true;
+    list.innerHTML = '<div class="feed-loading" style="padding:24px;text-align:center;color:#999;">불러오는 중...</div>';
+  }
+
+  await resolveUserRegion();
+
+  try {
+    const posts = await fetchPostsPage(currentPage);
+    if (reset) list.innerHTML = '';
+
+    if (!posts.length && currentPage === 0) {
+      list.innerHTML =
+        '<div style="padding:40px 16px;text-align:center;color:#999;"><p>아직 게시글이 없습니다.</p><p>첫 번째 대장님이 되어보세요!</p></div>';
+      hasMore = false;
+    } else {
+      const liked = await getLikedPostIds(posts.map((p) => p.id));
+      const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
+      posts.forEach((post) => list.appendChild(createPostCard(post, liked, saved)));
+      hasMore = posts.length >= 20;
+      currentPage += 1;
+    }
+
+    await loadEventSection();
+  } catch (e) {
+    console.error(e);
+    if (reset) {
+      list.innerHTML =
+        '<div style="padding:32px;text-align:center;color:#E24B4A;">게시글을 불러오지 못했습니다.<br>로그인 후 다시 시도해주세요.</div>';
+    }
+    toast('피드 로드 실패');
+  }
+
+  isLoading = false;
+}
+
+async function loadEventSection() {
+  const grid = document.getElementById('event-grid') || document.querySelector('.ev-scroll-wrap');
+  const badge = document.querySelector('.event-count-badge') || document.querySelector('.ev-cnt-badge');
+  if (!grid || currentFeedType === 'all') return;
+
+  try {
+    const events = await getEventPosts({
+      regionDong: currentFeedType === 'dong' ? userRegion.region_dong : null,
+      regionSigungu: currentFeedType === 'sigungu' ? userRegion.region_sigungu : null,
+      limit: 6,
+    });
+
+    if (badge) badge.textContent = String(events.length);
+
+    if (!events.length) return;
+
+    const isMobile = !!document.querySelector('.ev-scroll-wrap');
+    grid.innerHTML = events
+      .map((ev) => {
+        const title = escapeHtml(ev.title || ev.content?.slice(0, 40) || '이벤트');
+        const shop = escapeHtml(ev.users?.nickname || '대장님');
+        const date = ev.event_end_date ? `~${ev.event_end_date}` : getTimeAgo(ev.created_at);
+        if (isMobile) {
+          return `<div class="ev-card-m" data-post-id="${ev.id}">
+            <div class="ev-card-m-top discount">
+              <div class="ev-type-row-m"><span class="ev-chip-m discount"><i class="ti ti-speakerphone"></i> 이벤트</span></div>
+              <div class="ev-name-m">${title}</div>
+            </div>
+            <div class="ev-card-m-bottom">
+              <div class="ev-shop-m"><i class="ti ti-store"></i> ${shop}</div>
+              <div class="ev-date-m"><i class="ti ti-calendar"></i> ${date}</div>
+            </div>
+          </div>`;
+        }
+        return `<div class="ev-card-new" data-post-id="${ev.id}" style="cursor:pointer;">
+          <div class="ev-card-top discount">
+            <div class="ev-type-row"><span class="ev-type-chip discount"><i class="ti ti-speakerphone"></i> 이벤트</span></div>
+            <div class="ev-name-new">${title}</div>
+          </div>
+          <div class="ev-card-bottom">
+            <div class="ev-shop-new"><i class="ti ti-store"></i> ${shop}</div>
+            <div class="ev-date-new"><i class="ti ti-calendar"></i> ${date}</div>
+          </div>
+        </div>`;
+      })
+      .join('');
+
+    grid.querySelectorAll('[data-post-id]').forEach((el) => {
+      el.addEventListener('click', () => openPostDetail(el.dataset.postId));
+    });
+  } catch (e) {
+    console.error('event section', e);
+  }
+}
+
+function avatarHtml(user) {
+  if (user?.profile_image) {
+    return `<img src="${escapeHtml(user.profile_image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  }
+  const ch = (user?.nickname || '대').charAt(0);
+  return `<div class="pcav" style="background:#FAEEDA;color:#633806;">${escapeHtml(ch)}</div>`;
+}
+
+function createPostCard(post, likedSet, savedSet) {
+  const div = document.createElement('div');
+  div.className = 'pc';
+  div.dataset.postId = post.id;
+  div.dataset.cat = post.category;
+
+  const user = post.users || {};
+  const liked = likedSet?.has(post.id);
+  const saved = savedSet?.has(post.id);
+  const badgeText = user.upjong3nm || getCategoryLabel(post.category);
+
+  div.innerHTML = `
+    <div class="pctop">
+      ${avatarHtml(user)}
+      <div>
+        <span class="pcname pcnm">${escapeHtml(user.nickname || '대장님')}</span>
+        <span class="pcbdg" style="${getCategoryStyle(post.category)}">${escapeHtml(badgeText)}</span>
+        <div class="pcinfo">${escapeHtml(user.region_full || post.region_full || '')} · 팔로워 ${user.follower_count || 0}명</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        ${post.region_dong ? `<span class="pcpin"><i class="ti ti-map-pin"></i> ${escapeHtml(post.region_dong)}</span>` : ''}
+      </div>
+    </div>
+    ${post.title ? `<div class="pctit">${escapeHtml(post.title)}</div>` : ''}
+    <div class="pcbody">${escapeHtml(post.content)}</div>
+    <div class="pcbot">
+      <span class="pca like-btn" data-post-id="${post.id}" style="${liked ? 'color:#E24B4A' : ''}">
+        <i class="ti ti-heart" style="${liked ? 'color:#E24B4A' : ''}"></i>
+        <span class="cnt like-count">${post.like_count || 0}</span>
+      </span>
+      <span class="pca comment-btn" data-post-id="${post.id}"><i class="ti ti-message-circle"></i> ${post.comment_count || 0}</span>
+      <span class="pca share-btn" data-post-id="${post.id}"><i class="ti ti-share"></i></span>
+      <span class="pca save-btn bookmark-btn" data-post-id="${post.id}" style="${saved ? 'color:#F5A623' : ''}"><i class="ti ti-bookmark"></i></span>
+      <span class="pct">${getTimeAgo(post.created_at)}</span>
+    </div>
+  `;
+
+  div.querySelector('.like-btn')?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const res = await toggleLike(post.id);
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      document.getElementById('login-modal')?.classList.add('open');
+      return;
+    }
+    const btn = e.currentTarget;
+    const icon = btn.querySelector('i');
+    const count = btn.querySelector('.like-count');
+    const n = parseInt(count.textContent, 10) || 0;
+    if (res.liked) {
+      icon.style.color = '#E24B4A';
+      btn.style.color = '#E24B4A';
+      count.textContent = n + 1;
+      toast('공감했습니다');
+    } else {
+      icon.style.color = '';
+      btn.style.color = '';
+      count.textContent = Math.max(0, n - 1);
+    }
+  });
+
+  div.querySelector('.bookmark-btn')?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const res = await toggleBookmark(post.id);
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      return;
+    }
+    const icon = e.currentTarget.querySelector('i');
+    if (res.saved) {
+      e.currentTarget.style.color = '#F5A623';
+      icon.style.color = '#F5A623';
+      toast('저장했습니다');
+    } else {
+      e.currentTarget.style.color = '';
+      icon.style.color = '';
+      toast('저장 취소');
+    }
+  });
+
+  div.querySelector('.share-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sharePost(post.id);
+  });
+
+  div.querySelector('.comment-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openPostDetail(post.id);
+  });
+
+  div.addEventListener('click', () => openPostDetail(post.id));
+
+  return div;
+}
+
+export async function openPostDetail(postId) {
+  try {
+    const post = await getPost(postId);
+    const comments = await getComments(postId);
+    const liked = await isLiked(postId);
+    showPostDetailModal(post, comments, liked);
+  } catch (e) {
+    console.error(e);
+    toast('게시글을 불러오지 못했습니다');
+  }
+}
+
+function buildCommentsHtml(comments) {
+  if (!comments.length) {
+    return '<div style="color:#999;font-size:13px;text-align:center;padding:20px;">첫 번째 댓글을 남겨보세요!</div>';
+  }
+  const parents = comments.filter((c) => !c.parent_id);
+  const children = comments.filter((c) => c.parent_id);
+
+  return parents
+    .map((comment) => {
+      const replies = children.filter((c) => c.parent_id === comment.id);
+      const user = comment.users || {};
+      const repliesHtml = replies
+        .map((reply) => {
+          const ru = reply.users || {};
+          return `<div style="margin-left:36px;padding:10px 0;border-top:1px solid #F5F5F5;">
+            <div style="font-size:12px;font-weight:500;">${escapeHtml(ru.nickname || '대장님')} <span style="color:#999;font-weight:400;">${getTimeAgo(reply.created_at)}</span></div>
+            <div style="font-size:13px;color:#333;line-height:1.5;margin-top:4px;">${escapeHtml(reply.content)}</div>
+          </div>`;
+        })
+        .join('');
+
+      return `<div style="padding:12px 0;border-bottom:1px solid #F5F5F5;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:500;">${escapeHtml(user.nickname || '대장님')}</span>
+          <span style="font-size:11px;color:#999;">${getTimeAgo(comment.created_at)}</span>
+          <button type="button" data-reply-id="${comment.id}" class="reply-btn" style="margin-left:auto;font-size:11px;color:#F5A623;background:none;border:none;cursor:pointer;">답글</button>
+        </div>
+        <div style="font-size:13px;color:#333;line-height:1.6;">${escapeHtml(comment.content)}</div>
+        ${repliesHtml}
+      </div>`;
+    })
+    .join('');
+}
+
+function showPostDetailModal(post, comments, liked) {
+  document.getElementById('post-detail-modal')?.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'post-detail-modal';
+  modal.className = 'modal-bg open';
+  modal.style.zIndex = '250';
+
+  const user = post.users || {};
+  const isMobile = window.innerWidth <= 768;
+  const boxW = isMobile ? '100%' : '600px';
+  const boxH = isMobile ? '100%' : 'auto';
+  const maxH = isMobile ? '100vh' : '80vh';
+  const radius = isMobile ? '0' : '16px';
+
+  modal.innerHTML = `
+    <div class="modal" style="width:${boxW};max-width:100%;max-height:${maxH};height:${boxH};border-radius:${radius};display:flex;flex-direction:column;overflow:hidden;padding:0;">
+      <div class="modal-head" style="padding:16px 20px;border-bottom:1px solid #E8E4DC;flex-shrink:0;">
+        <span class="modal-title">${escapeHtml(user.nickname || '대장님')}</span>
+        <button type="button" class="modal-close" id="close-post-detail"><i class="ti ti-x"></i></button>
+      </div>
+      <div style="padding:16px 20px;overflow-y:auto;flex:1;">
+        ${post.title ? `<div style="font-size:18px;font-weight:700;margin-bottom:10px;">${escapeHtml(post.title)}</div>` : ''}
+        <div style="font-size:14px;line-height:1.7;color:#333;margin-bottom:14px;">${escapeHtml(post.content)}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;border-top:1px solid #E8E4DC;border-bottom:1px solid #E8E4DC;margin-bottom:14px;">
+          <button type="button" class="detail-like-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;${liked ? 'color:#E24B4A' : ''}">
+            <i class="ti ti-heart"></i> 공감 <span class="detail-like-count">${post.like_count || 0}</span>
+          </button>
+          <button type="button" class="detail-bookmark-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;">
+            <i class="ti ti-bookmark"></i> 저장
+          </button>
+          <button type="button" class="detail-share-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;">
+            <i class="ti ti-share"></i> 공유
+          </button>
+          ${
+            user.id
+              ? `<button type="button" class="detail-follow-btn" data-user-id="${user.id}" style="display:flex;align-items:center;gap:5px;background:var(--ch);color:#fff;border:none;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;"><i class="ti ti-user-plus"></i> 팔로우</button>`
+              : ''
+          }
+        </div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">댓글 ${post.comment_count || 0}개</div>
+        <div id="comment-list-${post.id}">${buildCommentsHtml(comments)}</div>
+      </div>
+      <div style="padding:12px 16px;border-top:1px solid #E8E4DC;display:flex;gap:8px;flex-shrink:0;">
+        <input id="comment-input-${post.id}" type="text" placeholder="댓글을 입력하세요..." style="flex:1;border:1px solid #E8E4DC;border-radius:20px;padding:8px 14px;font-size:13px;outline:none;">
+        <button type="button" id="comment-submit-${post.id}" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:500;">등록</button>
+      </div>
+    </div>
+  `;
+
+  modal.querySelector('#close-post-detail')?.addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  modal.querySelector('.detail-like-btn')?.addEventListener('click', async () => {
+    const res = await toggleLike(post.id);
+    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    const count = modal.querySelector('.detail-like-count');
+    const n = parseInt(count.textContent, 10) || 0;
+    count.textContent = res.liked ? n + 1 : Math.max(0, n - 1);
+  });
+
+  modal.querySelector('.detail-bookmark-btn')?.addEventListener('click', async () => {
+    const res = await toggleBookmark(post.id);
+    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    toast(res.saved ? '저장했습니다' : '저장 취소');
+  });
+
+  modal.querySelector('.detail-share-btn')?.addEventListener('click', () => sharePost(post.id));
+
+  modal.querySelector('.detail-follow-btn')?.addEventListener('click', async (e) => {
+    const uid = e.currentTarget.dataset.userId;
+    const res = await toggleFollow(uid);
+    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    e.currentTarget.textContent = res.following ? '팔로잉' : '팔로우';
+    toast(res.following ? '팔로우했습니다' : '팔로우 취소');
+  });
+
+  modal.querySelectorAll('.reply-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      replyTargetId = btn.dataset.replyId;
+      const input = modal.querySelector(`#comment-input-${post.id}`);
+      if (input) {
+        input.placeholder = '답글을 입력하세요...';
+        input.focus();
+      }
+    });
+  });
+
+  const submitComment = async () => {
+    const input = modal.querySelector(`#comment-input-${post.id}`);
+    const content = input?.value?.trim();
+    if (!content) return;
+    const res = await createComment({ postId: post.id, content, parentId: replyTargetId });
+    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    input.value = '';
+    replyTargetId = null;
+    input.placeholder = '댓글을 입력하세요...';
+    const updated = await getComments(post.id);
+    modal.querySelector(`#comment-list-${post.id}`).innerHTML = buildCommentsHtml(updated);
+    toast('댓글이 등록되었습니다');
+  };
+
+  modal.querySelector(`#comment-submit-${post.id}`)?.addEventListener('click', submitComment);
+  modal.querySelector(`#comment-input-${post.id}`)?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitComment();
+  });
+
+  document.body.appendChild(modal);
+}
+
+function sharePost(postId) {
+  const url = `${window.location.origin}${window.location.pathname}?post=${postId}`;
+  navigator.clipboard?.writeText(url).then(() => toast('링크가 복사되었습니다'));
+}
+
+async function submitNewPost() {
+  const contentEl = getPostContentInput();
+  const content = contentEl?.value?.trim();
+  if (!content) {
+    toast('내용을 입력해주세요');
+    return;
+  }
+
+  const titleEl = document.getElementById('post-title');
+  const title = titleEl?.value?.trim() || null;
+  const isEvent = selectedWriteCategory === 'event';
+  const eventEndDate = document.getElementById('event-end-date')?.value || null;
+
+  const btn = getSubmitPostBtn();
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '게시 중...';
+  }
+
+  try {
+    const res = await createPost({
+      content,
+      category: selectedWriteCategory,
+      title,
+      isEvent,
+      eventEndDate,
+      regionOverride: userRegion,
+    });
+
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      document.getElementById('login-modal')?.classList.add('open');
+      return;
+    }
+
+    getWriteOverlay()?.classList.remove('open');
+    if (contentEl) contentEl.value = '';
+    if (titleEl) titleEl.value = '';
+    await loadFeed(true);
+    toast('게시글이 등록되었습니다!');
+  } catch (e) {
+    console.error(e);
+    toast('게시글 등록에 실패했습니다');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '게시하기';
+    }
+  }
+}
+
+function bindFeedTabs() {
+  const tabAll = document.getElementById('tab-all');
+  const tabDong = document.getElementById('tab-dong');
+  const rbar = document.getElementById('rbar');
+  const eventSec = document.getElementById('event-section') || document.getElementById('ev-sec');
+
+  const setTab = (type) => {
+    currentFeedType = type;
+    if (tabAll && tabDong) {
+      tabAll.classList.toggle('act', type === 'all');
+      tabDong.classList.toggle('act', type !== 'all');
+    }
+    if (rbar) rbar.style.display = type === 'all' ? 'none' : 'block';
+    if (eventSec) eventSec.style.display = type === 'all' ? 'none' : 'block';
+    loadFeed(true);
+  };
+
+  tabAll?.addEventListener('click', () => setTab('all'));
+  tabDong?.addEventListener('click', () => setTab('dong'));
+
+  document.querySelectorAll('.rpill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.rpill').forEach((p) => p.classList.remove('act'));
+      pill.classList.add('act');
+      currentFeedType = parseRangeLabel(pill.dataset.range);
+      loadFeed(true);
+    });
+  });
+
+  document.querySelectorAll('.seg-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.seg-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const slider = document.getElementById('seg-slider');
+      if (slider) slider.className = `seg-slider pos-${btn.dataset.idx}`;
+      const desc = document.getElementById('range-desc-text');
+      if (desc) desc.textContent = btn.dataset.desc || '';
+      currentFeedType = parseRangeLabel(btn.dataset.r);
+      loadFeed(true);
+    });
+  });
+}
+
+function bindCategoryTabs() {
+  document.querySelectorAll('.ct').forEach((ct) => {
+    ct.addEventListener('click', () => {
+      document.querySelectorAll('.ct').forEach((c) => c.classList.remove('act'));
+      ct.classList.add('act');
+      currentCategory = ct.dataset.cat || 'all';
+      loadFeed(true);
+    });
+  });
+}
+
+function bindWriteModal() {
+  document.querySelectorAll('.cat-select-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-select-btn').forEach((b) => b.classList.remove('act'));
+      btn.classList.add('act');
+      selectedWriteCategory = btn.dataset.cat === 'all' ? 'info' : btn.dataset.cat;
+      const wrap = document.getElementById('event-date-wrap');
+      if (wrap) wrap.style.display = selectedWriteCategory === 'event' ? 'block' : 'none';
+    });
+  });
+
+  getSubmitPostBtn()?.addEventListener('click', submitNewPost);
+
+  document.getElementById('open-write')?.addEventListener('click', openWriteOverlay);
+  document.getElementById('open-write-btn')?.addEventListener('click', openWriteOverlay);
+  document.getElementById('write-btn')?.addEventListener('click', openWriteOverlay);
+}
+
+function bindInfiniteScroll() {
+  const root = document.querySelector('.screen.active') || document.querySelector('.fscroll') || window;
+  const onScroll = () => {
+    if (!hasMore || isLoading) return;
+    let scrolled;
+    let total;
+    if (root === window) {
+      scrolled = window.scrollY + window.innerHeight;
+      total = document.documentElement.scrollHeight;
+    } else {
+      scrolled = root.scrollTop + root.clientHeight;
+      total = root.scrollHeight;
+    }
+    if (scrolled >= total - 200) loadFeed(false);
+  };
+
+  if (root === window) window.addEventListener('scroll', onScroll);
+  else root.addEventListener('scroll', onScroll);
+}
+
+function bindFollowButtons() {
+  document.querySelectorAll('.flbtn').forEach((btn) => {
+    const card = btn.closest('.foli');
+    const uid = btn.dataset.userId;
+    if (!uid) return;
+    btn.addEventListener('click', async () => {
+      const res = await toggleFollow(uid);
+      if (res?.error === 'login') return toast('로그인이 필요합니다');
+      if (res.following) {
+        btn.textContent = '팔로잉';
+        btn.style.background = 'var(--ch)';
+        btn.style.color = '#fff';
+      } else {
+        btn.textContent = '팔로우';
+        btn.style.background = '';
+        btn.style.color = '';
+      }
+    });
+  });
+}
+
+export function initCommunity() {
+  bindFeedTabs();
+  bindCategoryTabs();
+  bindWriteModal();
+  bindInfiniteScroll();
+  bindFollowButtons();
+
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('post');
+  if (postId) {
+    openPostDetail(postId);
+  } else {
+    loadFeed(true);
+  }
+}
+
+window.golmokCommunity = { loadFeed, openPostDetail, initCommunity };
+window.sharePost = sharePost;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initCommunity();
+});
