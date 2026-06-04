@@ -1,0 +1,6 @@
+-- STEP 1: Supabase SQL Editor에서 실행
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS phone VARCHAR(20),
+  ADD COLUMN IF NOT EXISTS user_status VARCHAR(20) DEFAULT 'operating',
+  ADD COLUMN IF NOT EXISTS agree_marketing BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS agreed_at TIMESTAMPTZ;

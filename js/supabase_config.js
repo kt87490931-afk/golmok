@@ -6,7 +6,11 @@ export const SUPABASE_ANON_KEY =
 /**
  * Supabase 대시보드 → Authentication → URL Configuration 에 등록:
  * - https://golmokmaster.com/reset-password.html
+ * - https://golmokmaster.com/terms.html
+ * - https://golmokmaster.com/privacy.html
  * - https://m.golmokmaster.com/reset-password.html
+ * - https://m.golmokmaster.com/terms.html
+ * - https://m.golmokmaster.com/privacy.html
  * - https://golmokmaster.com/ , /index.html , /login.html
  * - https://m.golmokmaster.com/ , /index.html , /login.html
  * - (레거시) github.io/golmok , github.io/golmok-mobile 경로

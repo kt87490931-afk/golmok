@@ -337,6 +337,23 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .auth-label{font-size:12px;color:var(--text2);font-weight:500;margin-top:4px;}
 .auth-forgot-desc{font-size:13px;color:var(--text2);text-align:center;margin-bottom:8px;}
 .auth-intro{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;}
+.signup-label{font-size:12px;color:#555;font-weight:500;display:block;margin-bottom:4px;}
+.signup-label .req{color:#E24B4A;}
+.signup-hint{font-size:11px;color:#999;font-weight:400;}
+.signup-section-divider{height:1px;background:#F0EDE6;margin:4px 0;}
+.signup-optional-title{font-size:12px;color:#999;font-weight:500;}
+.pw-wrap{position:relative;}
+.pw-wrap .auth-input{padding-right:40px;}
+.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:16px;padding:4px;}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.status-btn{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #E8E4DC;background:#fff;font-size:12px;font-weight:500;color:#555;cursor:pointer;line-height:1.4;}
+.status-btn.act{border:1px solid #F5A623;background:#FFF8E7;color:#C17F24;}
+.status-label{cursor:pointer;display:block;}
+.signup-agree .agree-row{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-bottom:6px;flex-wrap:wrap;}
+.signup-agree .agree-all-row{font-size:13px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #E8E4DC;}
+.signup-agree .agree-row a{margin-left:auto;color:#F5A623;font-size:11px;text-decoration:none;}
+#password-strength{margin-top:4px;}
+#password-match-msg{margin-top:4px;}
 
 /* ───── TOAST ───── */
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text1);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:all .3s;z-index:300;}
@@ -734,7 +751,7 @@ document.querySelectorAll('.ni').forEach(ni=>{
   });
 });
 </script>
-<script type="module" src="js/auth.js?v=20260604"></script>
-<script type="module" src="js/community_ui.js?v=20260604"></script>
+<script type="module" src="js/auth.js?v=20260605"></script>
+<script type="module" src="js/community_ui.js?v=20260605"></script>
 </body>
 </html>

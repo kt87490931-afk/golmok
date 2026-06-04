@@ -417,20 +417,135 @@ async function runEmailLogin(btn) {
   }
 }
 
+function getSelectedUserStatus() {
+  return document.querySelector('input[name="user-status"]:checked')?.value || 'operating';
+}
+
+function validateSignupPassword(password) {
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  return password.length >= 8 && hasUpper && hasNumber && hasSpecial;
+}
+
+function renderPasswordStrength(pw) {
+  const strengthEl = document.getElementById('password-strength');
+  if (!strengthEl) return;
+  if (!pw) {
+    strengthEl.innerHTML = '';
+    return;
+  }
+  const hasUpper = /[A-Z]/.test(pw);
+  const hasNumber = /[0-9]/.test(pw);
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(pw);
+  const hasLength = pw.length >= 8;
+  const score = [hasUpper, hasNumber, hasSpecial, hasLength].filter(Boolean).length;
+  const levels = [
+    { label: '매우 약함', color: '#E24B4A', width: '25%' },
+    { label: '약함', color: '#FF8C00', width: '50%' },
+    { label: '보통', color: '#F5A623', width: '75%' },
+    { label: '강함', color: '#1D9E75', width: '100%' },
+  ];
+  const lv = levels[Math.max(0, score - 1)] || levels[0];
+  strengthEl.innerHTML = `
+    <div style="height:4px;background:#E8E4DC;border-radius:4px;overflow:hidden;margin-bottom:3px;">
+      <div style="height:100%;width:${lv.width};background:${lv.color};border-radius:4px;transition:width .3s;"></div>
+    </div>
+    <div style="font-size:11px;color:${lv.color};">
+      비밀번호 강도: ${lv.label}
+      ${!hasUpper ? ' · 대문자 필요' : ''}
+      ${!hasNumber ? ' · 숫자 필요' : ''}
+      ${!hasSpecial ? ' · 특수문자 필요' : ''}
+    </div>`;
+}
+
+function renderPasswordMatch() {
+  const pw = document.getElementById('signup-password')?.value;
+  const pwc = document.getElementById('signup-password-confirm')?.value;
+  const msg = document.getElementById('password-match-msg');
+  if (!msg || !pwc) return;
+  if (pw === pwc) {
+    msg.textContent = '✓ 비밀번호가 일치합니다';
+    msg.style.color = '#1D9E75';
+  } else {
+    msg.textContent = '✗ 비밀번호가 일치하지 않습니다';
+    msg.style.color = '#E24B4A';
+  }
+}
+
+function formatSignupPhoneInput(el) {
+  let val = el.value.replace(/\D/g, '');
+  if (val.length <= 3) el.value = val;
+  else if (val.length <= 7) el.value = `${val.slice(0, 3)}-${val.slice(3)}`;
+  else el.value = `${val.slice(0, 3)}-${val.slice(3, 7)}-${val.slice(7, 11)}`;
+}
+
+function setStatusBtnActive(value) {
+  document.querySelectorAll('.status-btn').forEach((b) => {
+    b.classList.toggle('act', b.dataset.value === value);
+  });
+  const upjongField = document.getElementById('upjong-field');
+  if (upjongField) upjongField.style.display = value === 'operating' ? 'block' : 'none';
+}
+
+export function setupSignupFormInteractions() {
+  if (window.__golmokSignupUi) return;
+  window.__golmokSignupUi = true;
+
+  document.addEventListener('click', (e) => {
+    const pwBtn = e.target.closest?.('.pw-toggle');
+    if (pwBtn?.dataset.pw) {
+      const el = document.getElementById(pwBtn.dataset.pw);
+      if (el) el.type = el.type === 'password' ? 'text' : 'password';
+      return;
+    }
+    const statusBtn = e.target.closest?.('.status-btn');
+    if (statusBtn?.closest('#tab-signup-content')) {
+      const value = statusBtn.dataset.value;
+      const radio = document.querySelector(`input[name="user-status"][value="${value}"]`);
+      if (radio) radio.checked = true;
+      setStatusBtnActive(value);
+    }
+  });
+
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'signup-phone') formatSignupPhoneInput(e.target);
+    if (e.target.id === 'signup-password') renderPasswordStrength(e.target.value);
+    if (e.target.id === 'signup-password-confirm' || e.target.id === 'signup-password') renderPasswordMatch();
+  });
+
+  setStatusBtnActive(getSelectedUserStatus());
+}
+
+window.togglePasswordVisibility = (id) => {
+  const el = document.getElementById(id);
+  if (el) el.type = el.type === 'password' ? 'text' : 'password';
+};
+
 async function runEmailSignup(btn) {
   hideError('signup-error');
+
   const nickname = document.getElementById('signup-nickname')?.value?.trim();
   const email = document.getElementById('signup-email')?.value?.trim();
   const password = document.getElementById('signup-password')?.value;
   const passwordConfirm = document.getElementById('signup-password-confirm')?.value;
+  const phone = document.getElementById('signup-phone')?.value?.trim();
+  const region = document.getElementById('signup-region')?.value?.trim();
+  const upjong = document.getElementById('signup-upjong')?.value;
   const agreeTerms = document.getElementById('agree-terms')?.checked;
   const agreePrivacy = document.getElementById('agree-privacy')?.checked;
   const agreeMarketing = document.getElementById('agree-marketing')?.checked;
+  const userStatus = getSelectedUserStatus();
 
   if (!nickname || nickname.length < 2) return showError('signup-error', '닉네임은 2자 이상 입력해주세요.');
-  if (!email || !email.includes('@')) return showError('signup-error', '올바른 이메일을 입력해주세요.');
-  if (!password || password.length < 8) return showError('signup-error', '비밀번호는 8자 이상이어야 합니다.');
+  if (!email || !email.includes('@')) return showError('signup-error', '올바른 이메일 주소를 입력해주세요.');
+  if (!validateSignupPassword(password)) {
+    return showError('signup-error', '비밀번호에 대문자, 숫자, 특수문자를 포함해 8자 이상 입력해주세요.');
+  }
   if (password !== passwordConfirm) return showError('signup-error', '비밀번호가 일치하지 않습니다.');
+  if (!phone || phone.length < 12) {
+    return showError('signup-error', '연락처를 정확히 입력해주세요. (예: 010-0000-0000)');
+  }
   if (!agreeTerms || !agreePrivacy) return showError('signup-error', '필수 약관에 동의해주세요.');
 
   setButtonLoading(btn, true, '이메일로 가입하기');
@@ -444,17 +559,35 @@ async function runEmailSignup(btn) {
       },
     });
     if (error) {
-      showError('signup-error', error.message.includes('already') ? '이미 가입된 이메일입니다.' : '회원가입에 실패했습니다.');
+      const msg = error.message.includes('already') ? '이미 가입된 이메일입니다. 로그인해주세요.' : '회원가입에 실패했습니다. 다시 시도해주세요.';
+      showError('signup-error', msg);
       return;
     }
+
     if (data.user) {
-      await upsertUserRow(data.user, {
-        nickname,
-        auth_provider: 'email',
-        agree_marketing: agreeMarketing,
-        is_active: true,
-      });
+      const regionParts = region ? region.split(' ').filter(Boolean) : [];
+      const { error: dbError } = await supabase.from('users').upsert(
+        {
+          id: data.user.id,
+          nickname,
+          email,
+          phone,
+          auth_provider: 'email',
+          user_status: userStatus,
+          upjong1cd: upjong || null,
+          region_full: region || null,
+          region_sido: regionParts[0] || null,
+          region_sigungu: regionParts[1] || null,
+          region_dong: regionParts.slice(2).join(' ') || null,
+          agree_marketing: agreeMarketing || false,
+          agreed_at: new Date().toISOString(),
+          is_active: true,
+        },
+        { onConflict: 'id' }
+      );
+      if (dbError) throw dbError;
     }
+
     closeAllModals();
     const addr = document.getElementById('verify-email-address');
     if (addr) addr.textContent = email;
@@ -548,6 +681,7 @@ function bindLogoutButtons() {
 export function bindAuthUI() {
   mountAuthModals();
   setupAuthClickDelegate();
+  setupSignupFormInteractions();
   bindLogoutButtons();
 }
 
