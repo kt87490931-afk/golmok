@@ -13,7 +13,7 @@ export function initPageShell(activePage) {
   });
 
   window.setTimeout(() => {
-    window.golmokCommunity?.loadNeighborSection?.().catch(() => {});
+    window.golmokCommunity?.initSidebarWidgets?.();
   }, 300);
 }
 

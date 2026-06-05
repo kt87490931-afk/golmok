@@ -404,9 +404,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </a>
   <div class="tnav-links">
     <a class="tnl" href="index.html">홈</a>
-    <a class="tnl" href="#" data-open-analysis>상권분석</a>
-    <a class="tnl" href="index.html">창업기상도</a>
-    <a class="tnl" href="index.html">핫플레이스</a>
+    <a class="tnl" href="coming-soon.html?page=analysis">상권분석</a>
+    <a class="tnl" href="coming-soon.html?page=startup">창업기상도</a>
+    <a class="tnl" href="coming-soon.html?page=hotplace">핫플레이스</a>
     <a class="tnl" href="policy.html">정책·지원</a>
   </div>
   <div class="tnav-r">
@@ -430,9 +430,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <aside class="sidebar">
     <div class="nsec">메뉴</div>
     <a class="ni menu-item" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
-    <a class="ni menu-item nav-analysis" data-page="analysis" data-open-analysis href="#"><i class="ti ti-map"></i> 상권분석</a>
-    <a class="ni menu-item" data-page="weather" href="index.html"><i class="ti ti-cloud"></i> 창업기상도</a>
-    <a class="ni menu-item" data-page="hot" href="index.html"><i class="ti ti-flame"></i> 핫플레이스</a>
+    <a class="ni menu-item nav-analysis" data-page="analysis" href="coming-soon.html?page=analysis"><i class="ti ti-map"></i> 상권분석</a>
+    <a class="ni menu-item" data-page="weather" href="coming-soon.html?page=startup"><i class="ti ti-cloud"></i> 창업기상도</a>
+    <a class="ni menu-item" data-page="hot" href="coming-soon.html?page=hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
     <div class="nsec">커뮤니티</div>
     <a class="ni menu-item" data-page="community" href="community.html" id="nav-all"><i class="ti ti-world"></i> 전체 게시판</a>
     <a class="ni menu-item" data-page="neighborhood" href="neighborhood.html" id="nav-dong"><i class="ti ti-map-pin"></i> 우리동네</a>
@@ -506,18 +506,16 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
     <div class="rcs">
       <div class="rct"><i class="ti ti-trending-up"></i> 인기 검색 상권 <span class="rcm">더보기</span></div>
-      <div class="tri"><span class="trr">1</span><span class="trt">동탄 센트럴파크</span><span class="trtg">급상승</span></div>
-      <div class="tri"><span class="trr">2</span><span class="trt">수원 행궁동</span><span class="trtg">인기</span></div>
-      <div class="tri"><span class="trr">3</span><span class="trt">화성 봉담읍</span><span class="trtg">신규</span></div>
-      <div class="tri"><span class="trr">4</span><span class="trt">수원 인계동</span></div>
-      <div class="tri"><span class="trr">5</span><span class="trt">오산 세마동</span></div>
+      <div id="popular-areas-list">
+        <div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>
+      </div>
     </div>
 
     <div class="rcs">
-      <div class="rct"><i class="ti ti-flame"></i> 지금 뜨는 글 <span class="rcm">전체보기</span></div>
-      <div class="hoti"><span class="hotn">01</span><div><div class="hott">식자재 공동구매 함께 할 대장님 모집해요</div><div class="hotc">공감 88 · 댓글 34</div></div></div>
-      <div class="hoti"><span class="hotn">02</span><div><div class="hott">소상공인 전기료 지원 신청 기간 연장</div><div class="hotc">공감 71 · 댓글 19</div></div></div>
-      <div class="hoti"><span class="hotn">03</span><div><div class="hott">배달앱 수수료 협상 성공 후기 공유합니다</div><div class="hotc">공감 64 · 댓글 52</div></div></div>
+      <div class="rct"><i class="ti ti-flame"></i> 지금 뜨는 글 <a href="community.html" style="margin-left:auto;font-size:11px;color:#C17F24;text-decoration:none;font-weight:400;">전체보기</a></div>
+      <div id="hot-posts-list">
+        <div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>
+      </div>
     </div>
 
     <div class="rcs">
@@ -708,10 +706,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260615"></script>
-<script type="module" src="js/community_ui.js?v=20260619"></script>
+<script type="module" src="js/community_ui.js?v=20260620"></script>
 <script type="module" src="js/analysis.js?v=20260615"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/events.js?v=20260619"></script>
+<script type="module" src="js/pages/events.js?v=20260620"></script>
 </body>
 </html>

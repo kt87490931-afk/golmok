@@ -18,6 +18,8 @@ import {
   isFollowing,
   getNeighborUsers,
   getFollowingIds,
+  getHotPosts,
+  getPopularAreas,
 } from './community.js';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
@@ -934,13 +936,126 @@ const NEIGHBOR_AVATAR_STYLES = [
   'background:#EBF4FF;color:#1A4A8A;',
 ];
 
+export async function loadHotPosts() {
+  const hotList = document.getElementById('hot-posts-list');
+  if (!hotList) return;
+
+  hotList.innerHTML = '<div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>';
+
+  try {
+    const posts = await getHotPosts(3);
+    if (!posts.length) {
+      hotList.innerHTML =
+        '<div style="padding:10px 0;color:#999;font-size:12px;">아직 인기 게시글이 없습니다</div>';
+      return;
+    }
+
+    hotList.innerHTML = posts
+      .map((post, idx) => {
+        const title = escapeHtml(post.title || post.content?.slice(0, 40) || '제목 없음');
+        return `<div class="hoti" data-post-id="${post.id}" role="button" tabindex="0">
+          <span class="hotn">${String(idx + 1).padStart(2, '0')}</span>
+          <div><div class="hott">${title}</div>
+          <div class="hotc">공감 ${post.like_count || 0} · 댓글 ${post.comment_count || 0}</div></div>
+        </div>`;
+      })
+      .join('');
+
+    hotList.querySelectorAll('.hoti[data-post-id]').forEach((el) => {
+      el.addEventListener('click', () => openPostDetail(el.dataset.postId));
+    });
+  } catch (err) {
+    console.error('loadHotPosts', err);
+    hotList.innerHTML =
+      '<div style="padding:10px 0;color:#999;font-size:12px;">데이터를 불러올 수 없습니다</div>';
+  }
+}
+
+export async function loadPopularAreas() {
+  const list = document.getElementById('popular-areas-list');
+  if (!list) return;
+
+  list.innerHTML = '<div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>';
+
+  try {
+    const areas = await getPopularAreas(5);
+    if (!areas.length) {
+      list.innerHTML =
+        '<div style="padding:10px 0;color:#999;font-size:12px;">등록된 인기 상권이 없습니다</div>';
+      return;
+    }
+
+    const badgeStyle = (badge) => {
+      if (badge === '급상승') return 'background:#FFF1F1;color:#E24B4A;';
+      if (badge === '인기') return 'background:#FFF8E7;color:#C17F24;';
+      if (badge === '신규') return 'background:#E8F8F0;color:#1D9E75;';
+      return 'background:#F5F1E8;color:#555;';
+    };
+
+    list.innerHTML = areas
+      .map(
+        (area, idx) => `<div class="tri popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
+          <span class="trr">${idx + 1}</span>
+          <span class="trt">${escapeHtml(area.name)}</span>
+          ${
+            area.badge
+              ? `<span class="trtg" style="${badgeStyle(area.badge)}">${escapeHtml(area.badge)}</span>`
+              : ''
+          }
+        </div>`
+      )
+      .join('');
+
+    list.querySelectorAll('.popular-area-item').forEach((el) => {
+      el.addEventListener('click', () => searchArea(el.dataset.areaName));
+    });
+  } catch (err) {
+    console.error('loadPopularAreas', err);
+    list.innerHTML =
+      '<div style="padding:10px 0;color:#999;font-size:12px;">데이터를 불러올 수 없습니다</div>';
+  }
+}
+
+function searchArea(areaName) {
+  if (!areaName) return;
+  const searchInput =
+    document.getElementById('search-input') ||
+    document.querySelector('.sbar input') ||
+    document.getElementById('srch-inp');
+  if (searchInput) {
+    searchInput.value = areaName;
+    searchInput.focus();
+    toast(`"${areaName}" 검색`);
+  }
+}
+
+function initSidebarWidgets() {
+  loadHotPosts().catch(() => {});
+  loadPopularAreas().catch(() => {});
+  loadNeighborSection().catch(() => {});
+
+  if (window.__golmokWidgetInterval) clearInterval(window.__golmokWidgetInterval);
+  window.__golmokWidgetInterval = setInterval(() => {
+    loadHotPosts().catch(() => {});
+    loadNeighborSection().catch(() => {});
+  }, 5 * 60 * 1000);
+}
+
 export async function loadNeighborSection() {
   const wrap = document.getElementById('neighbor-list');
   if (!wrap) return;
 
+  wrap.innerHTML =
+    '<div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">불러오는 중...</div>';
+
   try {
     const user = await getCurrentUser();
-    const neighbors = await getNeighborUsers(user?.id, 5);
+    let regionSigungu = null;
+    if (user) {
+      const profile = await getUserProfile(user.id);
+      regionSigungu = profile?.region_sigungu || null;
+    }
+    const neighbors = await getNeighborUsers(user?.id, { limit: 5, regionSigungu });
     if (!neighbors.length) {
       wrap.innerHTML =
         '<div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">아직 이웃 대장님이 없습니다.<br>회원가입 후 첫 대장님이 되어보세요!</div>';
@@ -977,7 +1092,7 @@ function initCommunityShell() {
   bindWriteModal();
   bindImageUpload();
   bindFollowButtons();
-  loadNeighborSection().catch(() => {});
+  initSidebarWidgets();
   const params = new URLSearchParams(window.location.search);
   const postId = params.get('post');
   if (postId) openPostDetail(postId);
@@ -990,7 +1105,7 @@ export function initCommunity() {
   bindImageUpload();
   bindInfiniteScroll();
   bindFollowButtons();
-  loadNeighborSection().catch(() => {});
+  initSidebarWidgets();
 
   const params = new URLSearchParams(window.location.search);
   const postId = params.get('post');
@@ -1001,7 +1116,20 @@ export function initCommunity() {
   }
 }
 
-window.golmokCommunity = { loadFeed, openPostDetail, initCommunity, openWriteOverlay, openWriteWithPhoto, renderPostList, loadNeighborSection };
+window.golmokCommunity = {
+  loadFeed,
+  openPostDetail,
+  initCommunity,
+  openWriteOverlay,
+  openWriteWithPhoto,
+  renderPostList,
+  loadNeighborSection,
+  loadHotPosts,
+  loadPopularAreas,
+  initSidebarWidgets,
+};
+window.openPostDetail = openPostDetail;
+window.searchArea = searchArea;
 window.sharePost = sharePost;
 window.openWriteOverlay = openWriteOverlay;
 window.openWriteModal = openWriteOverlay;

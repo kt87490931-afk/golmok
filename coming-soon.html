@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">준비중 - 골목대장</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #F7F3EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 48px 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,.08);
+}
+.icon { font-size: 64px; margin-bottom: 20px; }
+h1 { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 10px; }
+.subtitle { font-size: 14px; color: #999; line-height: 1.7; margin-bottom: 24px; white-space: pre-line; }
+.api-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #FFF8E7; border: 1px solid #FAC775;
+  border-radius: 20px; padding: 7px 16px;
+  font-size: 13px; color: #C17F24; font-weight: 500;
+  margin-bottom: 28px;
+}
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #F5A623; color: #fff; border: none;
+  border-radius: 12px; padding: 12px 24px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; text-decoration: none;
+}
+.back-btn:hover { opacity: .9; }
+@media (max-width: 768px) {
+  .card { padding: 36px 20px; }
+  .icon { font-size: 48px; }
+  h1 { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon" id="page-icon">🔧</div>
+  <h1 id="page-name">준비 중입니다</h1>
+  <p class="subtitle" id="page-desc">이 기능은 현재 준비 중입니다.<br>곧 더 나은 서비스로 찾아뵙겠습니다.</p>
+  <div class="api-badge"><i class="ti ti-plug"></i> 소진공 API 연동 후 오픈 예정</div>
+  <br>
+  <a href="index.html" class="back-btn"><i class="ti ti-home"></i> 홈으로 돌아가기</a>
+</div>
+<script>
+const params = new URLSearchParams(window.location.search);
+const page = params.get('page');
+const pages = {
+  startup: { icon: '🌤️', name: '창업기상도', desc: '내 업종과 지역의 창업 성공 가능성을\n날씨처럼 한눈에 보여주는 서비스입니다.\n소진공 API 연동 후 오픈됩니다.' },
+  hotplace: { icon: '🔥', name: '핫플레이스', desc: '지금 이 순간 가장 뜨거운\n상권과 업종을 실시간으로 보여줍니다.\n소진공 API 연동 후 오픈됩니다.' },
+  analysis: { icon: '📊', name: '상권분석', desc: '내 가게 주변 상권을 데이터로\n정밀하게 분석해드립니다.\n소진공 API 연동 후 오픈됩니다.' },
+};
+const config = pages[page] || pages.startup;
+document.getElementById('page-title').textContent = config.name + ' - 골목대장';
+document.getElementById('page-icon').textContent = config.icon;
+document.getElementById('page-name').textContent = config.name;
+document.getElementById('page-desc').textContent = config.desc;
+</script>
+</body>
+</html>

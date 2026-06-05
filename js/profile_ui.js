@@ -178,10 +178,12 @@ function bindActivityModal() {
   });
 
   document.getElementById('nav-my-posts')?.addEventListener('click', (e) => {
+    e.preventDefault();
     e.stopPropagation();
     openMyActivity('my-posts');
   });
   document.getElementById('nav-saved-posts')?.addEventListener('click', (e) => {
+    e.preventDefault();
     e.stopPropagation();
     openMyActivity('saved-posts');
   });  document.getElementById('pm-my-posts')?.addEventListener('click', () => openMyActivity('my-posts'));
