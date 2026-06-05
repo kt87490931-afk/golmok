@@ -296,7 +296,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 /* ───── MODAL OVERLAY (글쓰기) ───── */
 .modal-bg{display:none!important;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px;pointer-events:none;}
 .modal-bg.open{display:flex!important;pointer-events:auto;z-index:210;}
-.modal-bg.open > .modal,.modal-bg.open > .auth-modal-sheet{pointer-events:auto;max-height:90vh;overflow-y:auto;}
+.modal-bg.open > .modal,.modal-bg.open > .auth-modal-sheet,.modal-bg.open > div{pointer-events:auto;max-height:90vh;overflow-y:auto;}
 .modal{background:var(--white);border-radius:16px;width:560px;padding:24px;position:relative;}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .modal-title{font-size:16px;font-weight:700;color:var(--text1);}
@@ -811,10 +811,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
   });
 });
 </script>
-<script type="module" src="js/auth.js?v=20260608"></script>
-<script type="module" src="js/community_ui.js?v=20260608"></script>
-<script type="module" src="js/profile_ui.js?v=20260608"></script>
-<script type="module" src="js/analysis.js?v=20260608"></script>
-<script type="module" src="js/fcm.js?v=20260608"></script>
+<script type="module" src="js/profile_ui.js?v=20260609"></script>
+<script type="module" src="js/auth.js?v=20260609"></script>
+<script type="module" src="js/community_ui.js?v=20260609"></script>
+<script type="module" src="js/analysis.js?v=20260609"></script>
+<script type="module" src="js/fcm.js?v=20260609"></script>
 </body>
 </html>

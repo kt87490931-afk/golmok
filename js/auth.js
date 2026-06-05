@@ -1,8 +1,6 @@
 import { getAuthRedirectUrl, getPasswordResetRedirectUrl } from './supabase_config.js';
 import { supabase } from './supabase_client.js';
 import { mountAuthModals } from './auth_modals.js';
-import { renderSidebarProfile } from './profile_ui.js';
-import { initFCM } from './fcm.js';
 
 export { supabase };
 
@@ -188,7 +186,12 @@ function setAvatar(id, name, imageUrl) {
 
 export function updateAuthUI(profile, session) {
   const loggedIn = Boolean(session?.user);
-  const nickname = profile?.nickname || session?.user?.user_metadata?.full_name || '대장님';
+  const nickname =
+    profile?.nickname ||
+    session?.user?.user_metadata?.nickname ||
+    session?.user?.user_metadata?.full_name ||
+    session?.user?.email?.split('@')[0] ||
+    '대장님';
   const avatarUrl = profile?.profile_image || session?.user?.user_metadata?.avatar_url;
   const regionText = profile?.region_full || (profile?.region_dong ? `경기 ${profile.region_sigungu || ''} ${profile.region_dong}`.trim() : '동네 설정 예정');
 
@@ -212,7 +215,25 @@ export function updateAuthUI(profile, session) {
     el.style.opacity = loggedIn ? '1' : '0.55';
   });
 
-  renderSidebarProfile().catch(() => {});
+  refreshSidebarProfile();
+}
+
+async function refreshSidebarProfile() {
+  try {
+    const { renderSidebarProfile } = await import('./profile_ui.js');
+    await renderSidebarProfile();
+  } catch (e) {
+    console.warn('sidebar profile refresh', e);
+  }
+}
+
+async function runInitFCM() {
+  try {
+    const { initFCM } = await import('./fcm.js');
+    await initFCM();
+  } catch (e) {
+    console.warn('fcm init', e);
+  }
 }
 
 export async function signInWithGoogle() {
@@ -250,32 +271,34 @@ async function handleSignedIn(user) {
 }
 
 async function handleSignedInCore(user) {
-  const { data: existing } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle();
+  const { data: existing, error: existingErr } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle();
+  if (existingErr) console.warn('users select', existingErr.message);
 
-  if (!existing) {
-    await upsertUserRow(user);
-    const provider = getProvider(user);
-    if (provider !== 'email') {
-      openProfileSetup(user);
-    }
-  } else {
-    const { error: loginAtErr } = await supabase
-      .from('users')
-      .update({ last_login_at: new Date().toISOString() })
-      .eq('id', user.id);
-    if (loginAtErr) console.warn('last_login_at', loginAtErr.message);
-    if (user.user_metadata?.phone || user.user_metadata?.nickname) {
+  try {
+    if (!existing) {
       await upsertUserRow(user);
+      const provider = getProvider(user);
+      if (provider !== 'email') openProfileSetup(user);
+    } else {
+      if (user.user_metadata?.phone || user.user_metadata?.nickname) {
+        await upsertUserRow(user);
+      }
+      if (needsProfileSetup(existing) && getProvider(user) !== 'email') openProfileSetup(user);
     }
-    if (needsProfileSetup(existing) && getProvider(user) !== 'email') {
-      openProfileSetup(user);
-    }
+  } catch (e) {
+    console.warn('users upsert', e);
   }
 
-  const profile = await fetchUserProfile(user.id);
+  let profile = null;
+  try {
+    profile = await fetchUserProfile(user.id);
+  } catch (e) {
+    console.warn('fetchUserProfile', e);
+  }
+
   updateAuthUI(profile, { user });
   window.golmokCommunity?.loadFeed?.(true);
-  initFCM().catch(() => {});
+  runInitFCM();
 }
 
 export async function initAuth() {
@@ -290,7 +313,8 @@ export async function initAuth() {
       await handleSignedIn(session.user);
     } catch (e) {
       console.error(e);
-      toast('프로필 동기화 실패');
+      toast('프로필 동기화 중 오류가 있었습니다');
+      updateAuthUI(null, session);
     }
   } else {
     updateAuthUI(null, null);
@@ -304,6 +328,7 @@ export async function initAuth() {
       } catch (e) {
         console.error(e);
         toast('로그인 처리 중 오류가 발생했습니다.');
+        updateAuthUI(null, nextSession);
       }
     }
     if (event === 'SIGNED_OUT') updateAuthUI(null, null);

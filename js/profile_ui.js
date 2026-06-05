@@ -1,7 +1,5 @@
-import { getCurrentUser } from './community.js';
-import { openPostDetail } from './community_ui.js';
 import { getMyPosts, getBookmarkedPosts, getMyProfile } from './profile.js';
-
+import { getCurrentUser } from './community.js';
 const CATEGORY_LABELS = {
   all: '전체',
   qna: '질문·고민',
@@ -77,9 +75,8 @@ async function loadActivityList(tab) {
         </div>`;
       card.addEventListener('click', () => {
         document.getElementById('my-activity-overlay')?.classList.remove('open');
-        openPostDetail(post.id);
-      });
-      list.appendChild(card);
+        window.golmokCommunity?.openPostDetail?.(post.id);
+      });      list.appendChild(card);
     });
   } catch (e) {
     console.error(e);
@@ -124,7 +121,7 @@ export async function renderSidebarProfile() {
 
   try {
     const profile = await getMyProfile(user.id);
-    const nick = profile?.nickname || '대장님';
+    const nick = profile?.nickname || user.user_metadata?.nickname || user.user_metadata?.full_name || user.email?.split('@')[0] || '대장님';
     const sub = [profile?.upjong1nm, profile?.region_dong].filter(Boolean).join(' · ') || '프로필 설정';
 
     actions.innerHTML = `
@@ -149,6 +146,16 @@ export async function renderSidebarProfile() {
     if (sbType) sbType.textContent = sub;
   } catch (e) {
     console.warn('sidebar profile', e);
+    const nick = user.user_metadata?.nickname || user.user_metadata?.full_name || user.email?.split('@')[0] || '대장님';
+    actions.innerHTML = `
+      <button type="button" class="sb-act-btn" data-activity="my-posts"><i class="ti ti-pencil"></i> 내 게시글</button>
+      <button type="button" class="sb-act-btn" data-activity="saved-posts"><i class="ti ti-bookmark"></i> 저장한 글</button>
+      <button type="button" class="sb-act-btn sb-act-out" id="sb-logout-btn"><i class="ti ti-logout"></i> 로그아웃</button>`;
+    actions.querySelectorAll('[data-activity]').forEach((btn) => {
+      btn.addEventListener('click', () => openMyActivity(btn.dataset.activity));
+    });
+    actions.querySelector('#sb-logout-btn')?.addEventListener('click', () => window.signOut?.());
+    document.getElementById('sb-name') && (document.getElementById('sb-name').textContent = nick);
   }
 }
 
@@ -170,9 +177,14 @@ function bindActivityModal() {
     });
   });
 
-  document.getElementById('nav-my-posts')?.addEventListener('click', () => openMyActivity('my-posts'));
-  document.getElementById('nav-saved-posts')?.addEventListener('click', () => openMyActivity('saved-posts'));
-  document.getElementById('pm-my-posts')?.addEventListener('click', () => openMyActivity('my-posts'));
+  document.getElementById('nav-my-posts')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openMyActivity('my-posts');
+  });
+  document.getElementById('nav-saved-posts')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openMyActivity('saved-posts');
+  });  document.getElementById('pm-my-posts')?.addEventListener('click', () => openMyActivity('my-posts'));
   document.getElementById('pm-saved-posts')?.addEventListener('click', () => openMyActivity('saved-posts'));
 }
 

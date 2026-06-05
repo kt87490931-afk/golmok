@@ -1,5 +1,9 @@
--- STEP 1: Supabase Storage (post-images 버킷 생성 후 실행)
--- Dashboard → Storage → New bucket → post-images → Public ON
+-- Storage post-images 버킷 정책 (버킷 생성 후 실행)
+-- 기존 정책이 있으면 duplicate 오류는 무시하세요.
+
+DROP POLICY IF EXISTS "authenticated users can upload" ON storage.objects;
+DROP POLICY IF EXISTS "public can view images" ON storage.objects;
+DROP POLICY IF EXISTS "users can delete own images" ON storage.objects;
 
 CREATE POLICY "authenticated users can upload"
 ON storage.objects FOR INSERT

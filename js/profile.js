@@ -26,7 +26,7 @@ export async function getBookmarkedPosts(userId, page = 0, limit = 20) {
 }
 
 export async function getMyProfile(userId) {
-  const { data, error } = await supabase.from('users').select('*').eq('id', userId).single();
+  const { data, error } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
   if (error) throw error;
   return data;
 }
