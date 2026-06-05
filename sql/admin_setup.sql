@@ -38,26 +38,26 @@ WITH CHECK (auth.uid() = reporter_id);
 DROP POLICY IF EXISTS "admin_can_view_reports" ON public.reports;
 CREATE POLICY "admin_can_view_reports"
 ON public.reports FOR SELECT
-USING (
-  auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
-);
+USING (public.check_is_admin());
 
 GRANT SELECT, INSERT ON TABLE public.reports TO authenticated;
 
 -- 5. 어드민 RLS 정책 (기존 정책과 충돌 시 DROP 후 재생성)
+-- ⚠️ users 테이블을 서브쿼리하면 RLS 무한 재귀(42P17) — check_is_admin() 사용
 DROP POLICY IF EXISTS "admin_can_view_all_users" ON public.users;
 CREATE POLICY "admin_can_view_all_users"
 ON public.users FOR SELECT
 USING (
-  auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
-  OR auth.uid() = id
+  auth.uid() = id
+  OR public.check_is_admin()
 );
 
 DROP POLICY IF EXISTS "admin_can_update_users" ON public.users;
 CREATE POLICY "admin_can_update_users"
 ON public.users FOR UPDATE
 USING (
-  auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
+  auth.uid() = id
+  OR public.check_is_admin()
 );
 
 DROP POLICY IF EXISTS "admin_can_view_all_posts" ON public.posts;
@@ -65,7 +65,7 @@ CREATE POLICY "admin_can_view_all_posts"
 ON public.posts FOR SELECT
 USING (
   is_deleted = false
-  OR auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
+  OR public.check_is_admin()
 );
 
 DROP POLICY IF EXISTS "admin_can_update_posts" ON public.posts;
@@ -73,7 +73,7 @@ CREATE POLICY "admin_can_update_posts"
 ON public.posts FOR UPDATE
 USING (
   auth.uid() = user_id
-  OR auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
+  OR public.check_is_admin()
 );
 
 -- 6. Redirect URLs (Supabase Dashboard → Authentication → URL Configuration)
