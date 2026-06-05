@@ -1,4 +1,4 @@
-import { getPostsByIndustry } from '../community.js';
+﻿import { getPostsByIndustry } from '../community.js?v=20260622';
 import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage } from '../page_common.js';
 
@@ -21,16 +21,16 @@ function activateIndustryBtn(btn) {
 
 async function loadIndustryFeed() {
   const list = document.getElementById('industry-post-list');
-  if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:#999;background:#fff;">불러오는 중...</div>';
+  if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:#999;background:#fff;">遺덈윭?ㅻ뒗 以?..</div>';
 
   try {
     const posts = await getPostsByIndustry(selectedIndustryCode || null, { page: 0, limit: 30 });
     const countEl = document.getElementById('industry-post-count');
-    if (countEl) countEl.textContent = `${posts.length}개의 게시글`;
+    if (countEl) countEl.textContent = `${posts.length}媛쒖쓽 寃뚯떆湲`;
     await renderPostList(posts, 'industry-post-list', { reset: true });
   } catch (e) {
     console.error(e);
-    if (list) list.innerHTML = '<div style="padding:24px;text-align:center;color:#E24B4A;background:#fff;">불러오지 못했습니다.</div>';
+    if (list) list.innerHTML = '<div style="padding:24px;text-align:center;color:#E24B4A;background:#fff;">遺덈윭?ㅼ? 紐삵뻽?듬땲??</div>';
   }
 }
 
@@ -40,7 +40,7 @@ bootPage(() => {
     btn.addEventListener('click', () => {
       activateIndustryBtn(btn);
       selectedIndustryCode = btn.dataset.code || '';
-      document.getElementById('selected-industry-name').textContent = btn.dataset.name || '전체';
+      document.getElementById('selected-industry-name').textContent = btn.dataset.name || '?꾩껜';
       loadIndustryFeed();
     });
   });

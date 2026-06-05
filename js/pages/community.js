@@ -1,4 +1,4 @@
-import { getAllPosts } from '../community.js';
+﻿import { getAllPosts } from '../community.js?v=20260622';
 import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
 
@@ -28,7 +28,7 @@ async function loadCommunityFeed(reset = true) {
     console.error(e);
     if (reset) {
       document.getElementById('community-post-list').innerHTML =
-        '<div style="padding:32px;text-align:center;color:#E24B4A;background:#fff;">게시글을 불러오지 못했습니다.</div>';
+        '<div style="padding:32px;text-align:center;color:#E24B4A;background:#fff;">寃뚯떆湲??遺덈윭?ㅼ? 紐삵뻽?듬땲??</div>';
     }
   }
 

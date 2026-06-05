@@ -91,7 +91,7 @@ async function loadNotificationList() {
 }
 
 export async function openNotifications() {
-  const user = await import('./community.js').then((m) => m.getCurrentUser());
+    const user = await import('./community.js?v=20260622').then((m) => m.getCurrentUser());
   if (!user) {
     toast('로그인이 필요합니다');
     window.openLoginModal?.('login');

@@ -1,5 +1,5 @@
 import { supabase } from './supabase_client.js';
-import { getCurrentUser } from './community.js';
+import { getCurrentUser } from './community.js?v=20260622';
 
 export async function createNotification({ userId, type, title, body, postId = null }) {
   if (!userId) return null;

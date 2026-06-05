@@ -20,7 +20,7 @@ import {
   getFollowingIds,
   getHotPosts,
   getPopularAreas,
-} from './community.js';
+} from './community.js?v=20260622';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
 
