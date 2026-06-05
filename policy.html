@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/device_redirect.js"></script>
-<title>골목대장 — 소상공인 상권 커뮤니티</title>
+<title>정책·지원 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -387,7 +387,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
   </a>
   <div class="tnav-links">
-    <a class="tnl act" href="index.html">홈</a>
+    <a class="tnl" href="index.html">홈</a>
     <a class="tnl" href="#" data-open-analysis>상권분석</a>
     <a class="tnl" href="index.html">창업기상도</a>
     <a class="tnl" href="index.html">핫플레이스</a>
@@ -413,7 +413,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="nsec">메뉴</div>
-    <a class="ni menu-item act" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
+    <a class="ni menu-item" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
     <a class="ni menu-item nav-analysis" data-page="analysis" data-open-analysis href="#"><i class="ti ti-map"></i> 상권분석</a>
     <a class="ni menu-item" data-page="weather" href="index.html"><i class="ti ti-cloud"></i> 창업기상도</a>
     <a class="ni menu-item" data-page="hot" href="index.html"><i class="ti ti-flame"></i> 핫플레이스</a>
@@ -422,7 +422,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <a class="ni menu-item" data-page="neighborhood" href="neighborhood.html" id="nav-dong"><i class="ti ti-map-pin"></i> 우리동네</a>
     <a class="ni menu-item" data-page="by-industry" href="by-industry.html"><i class="ti ti-tag"></i> 업종별</a>
     <a class="ni menu-item" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
-    <a class="ni menu-item" data-page="policy" href="policy.html"><i class="ti ti-file-text"></i> 정책·지원</a>
+    <a class="ni menu-item act" data-page="policy" href="policy.html"><i class="ti ti-file-text"></i> 정책·지원</a>
     <div class="nsec">내 활동</div>
     <a class="ni menu-item" id="nav-saved-posts" href="index.html"><i class="ti ti-bookmark"></i> 저장한 글</a>
     <a class="ni menu-item" id="nav-notifications" href="index.html"><i class="ti ti-bell"></i> 알림 <span class="nbdg" id="sidebar-notify-badge" style="display:none;">0</span></a>
@@ -437,185 +437,28 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
   </aside>
 
-  <!-- CENTER -->
+    <!-- CENTER -->
   <main class="center">
-    <!-- 피드 탭 -->
-    <div class="ftabs">
-      <div class="ft" id="tab-all"><i class="ti ti-world"></i> 전체글</div>
-      <div class="ft act" id="tab-dong"><i class="ti ti-map-pin"></i> 우리동네</div>
-    </div>
+    <div class="fscroll page-main-content">
 
-    <!-- 동네 범위 바 -->
-    <div class="rbar" id="rbar">
-      <span class="rlabel">동네 범위</span>
-      <div class="rpill act" data-range="우리동네">우리동네</div>
-      <div class="rpill" data-range="인근동네">인근 동네</div>
-      <div class="rpill" data-range="전체지역">전체 지역</div>
-      <div class="lchip">
-        <i class="ti ti-map-pin"></i>
-        경기 화성시 동탄2동 기준
-        <i class="ti ti-chevron-down"></i>
-      </div>
-    </div>
-
-    <div class="fscroll">
-
-      <!-- 상권 통계 카드 -->
-      <div class="stats-strip">
-        <div class="stat-card blue">
-          <div class="stat-card-top">
-            <div class="stat-icon-wrap"><i class="ti ti-users"></i></div>
-            <div class="stat-label">일 평균 유동인구</div>
-            <div class="stat-value">31.6만명</div>
-          </div>
-          <div class="stat-bar-wrap"><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:72%;"></div></div></div>
-          <div class="stat-card-bottom">
-            <span class="stat-chg up"><i class="ti ti-trending-up"></i> +17.7% 전월 대비</span>
-            <span class="stat-date">26년 03월 기준</span>
-          </div>
+      <div class="main-content">
+        <div style="margin-bottom:24px;">
+          <h2 style="font-size:20px;font-weight:700;">정책·지원</h2>
+          <p style="font-size:13px;color:#999;margin-top:4px;">소상공인을 위한 정부 지원 정책 정보</p>
         </div>
-        <div class="stat-card gold">
-          <div class="stat-card-top">
-            <div class="stat-icon-wrap"><i class="ti ti-chart-bar"></i></div>
-            <div class="stat-label">월 평균 매출</div>
-            <div class="stat-value">1,316만원</div>
-          </div>
-          <div class="stat-bar-wrap"><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:54%;"></div></div></div>
-          <div class="stat-card-bottom">
-            <span class="stat-chg dn"><i class="ti ti-trending-down"></i> -2.2% 전년 대비</span>
-            <span class="stat-date">26년 03월 기준</span>
-          </div>
+        <div style="background:linear-gradient(135deg,#F5A623,#E8920E);border-radius:14px;padding:20px;margin-bottom:20px;color:#fff;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px;">🔔 소진공 API 연동 준비 중</div>
+          <div style="font-size:13px;opacity:.9;line-height:1.6;">곧 소상공인진흥공단의 실시간 정책 정보가 이 페이지에 자동으로 업데이트됩니다.</div>
         </div>
-        <div class="stat-card red">
-          <div class="stat-card-top">
-            <div class="stat-icon-wrap"><i class="ti ti-store"></i></div>
-            <div class="stat-label">동종 업소수 (요리주점)</div>
-            <div class="stat-value">175개</div>
-          </div>
-          <div class="stat-bar-wrap"><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:38%;"></div></div></div>
-          <div class="stat-card-bottom">
-            <span class="stat-chg dn"><i class="ti ti-trending-down"></i> -17.8% 전년 대비</span>
-            <span class="stat-date">26년 03월 기준</span>
-          </div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">🔗 바로가기</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px;">
+          <a href="https://www.sbiz.or.kr" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:14px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;text-decoration:none;color:#1A1A1A;font-size:13px;font-weight:500;"><span style="font-size:24px;">🏛️</span><div><div>소상공인진흥공단</div><div style="font-size:11px;color:#999;">정책자금·교육</div></div></a>
+          <a href="https://www.sbiz.or.kr/sup/main.do" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:14px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;text-decoration:none;color:#1A1A1A;font-size:13px;font-weight:500;"><span style="font-size:24px;">💰</span><div><div>정책자금 신청</div><div style="font-size:11px;color:#999;">융자·보증</div></div></a>
+          <a href="https://bizinfo.go.kr" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:14px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;text-decoration:none;color:#1A1A1A;font-size:13px;font-weight:500;"><span style="font-size:24px;">📋</span><div><div>기업마당</div><div style="font-size:11px;color:#999;">지원사업 통합검색</div></div></a>
+          <a href="https://www.work.go.kr" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:14px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;text-decoration:none;color:#1A1A1A;font-size:13px;font-weight:500;"><span style="font-size:24px;">👷</span><div><div>워크넷</div><div style="font-size:11px;color:#999;">고용·노무 지원</div></div></a>
         </div>
-      </div>
-
-      <!-- AI 분석 카드 -->
-      <div class="ai-analysis-card">
-        <div class="ai-analysis-header">
-          <div class="ai-logo-circle"><img src="assets/gmlogo.png" alt="골목대장 로고"></div>
-          <div class="ai-header-text">
-            <div class="ai-header-title"><i class="ti ti-robot"></i> 골목대장 AI 분석</div>
-            <div class="ai-header-sub">동탄 · 음식 &gt; 요리주점 · 26년 03월 기준</div>
-          </div>
-          <div class="ai-header-badge">AI LIVE</div>
-        </div>
-        <div class="ai-analysis-body">
-          <div class="ai-summary-tags">
-            <div class="ai-tag warn"><i class="ti ti-trending-down"></i> 매출 감소 중</div>
-            <div class="ai-tag info"><i class="ti ti-clock"></i> 피크 금요일 18~23시</div>
-            <div class="ai-tag tip"><i class="ti ti-bulb"></i> 진입 타이밍 주목</div>
-          </div>
-          <div class="ai-text-body">이 상권 요리주점 업종은 전년 대비 매출이 감소하고 있어요. 피크타임은 금요일 18~23시예요. 업소수도 17.8% 줄어들어 경쟁이 낮아진 상황 - 지금이 오히려 진입 타이밍일 수 있어요!</div>
-        </div>
-        <div class="ai-analysis-footer">
-          <span class="ai-footer-note"><i class="ti ti-info-circle"></i> 소진공 빅데이터 기반 분석</span>
-          <button type="button" class="ai-detail-btn" data-open-analysis><i class="ti ti-chart-line"></i> 상세 분석 보기</button>
-        </div>
-      </div>
-
-      <!-- 이벤트·이슈 섹션 -->
-      <div class="event-section" id="event-section">
-        <div class="event-section-header">
-          <div class="event-section-title">
-            <div class="event-title-icon"><i class="ti ti-speakerphone"></i></div>
-            이번 주 우리동네 이벤트·이슈
-            <span class="event-count-badge">4</span>
-          </div>
-          <button class="event-more-btn">전체보기 <i class="ti ti-chevron-right"></i></button>
-        </div>
-        <div class="event-grid" id="event-grid">
-          <div class="ev-card-new">
-            <div class="ev-card-top discount">
-              <div class="ev-type-row">
-                <span class="ev-type-chip discount"><i class="ti ti-discount"></i> 할인이벤트</span>
-                <span class="ev-dday soon">D-3</span>
-              </div>
-              <div class="ev-name-new">오픈 1주년 기념<br>전 메뉴 20% 할인</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-store"></i> 동탄 맛있는 김밥집</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> ~06.04(화)</div>
-            </div>
-          </div>
-          <div class="ev-card-new">
-            <div class="ev-card-top groupbuy">
-              <div class="ev-type-row">
-                <span class="ev-type-chip groupbuy"><i class="ti ti-shopping-cart"></i> 공동구매</span>
-                <span class="ev-dday normal">모집중</span>
-              </div>
-              <div class="ev-name-new">식자재 공동구매<br>대장님 모집</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-users"></i> 동탄 대장님 모임</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> ~06.08(토)</div>
-            </div>
-          </div>
-          <div class="ev-card-new">
-            <div class="ev-card-top issue">
-              <div class="ev-type-row">
-                <span class="ev-type-chip issue"><i class="ti ti-alert-triangle"></i> 이슈</span>
-                <span class="ev-dday ongoing">진행중</span>
-              </div>
-              <div class="ev-name-new">도로공사로 인한<br>접근성 차단 문제</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-map-pin"></i> 동탄 센트럴 상가 일대</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> 진행 중</div>
-            </div>
-          </div>
-          <div class="ev-card-new">
-            <div class="ev-card-top meeting">
-              <div class="ev-type-row">
-                <span class="ev-type-chip meeting"><i class="ti ti-users"></i> 모임·행사</span>
-                <span class="ev-dday normal">D-8</span>
-              </div>
-              <div class="ev-name-new">동탄 소상공인<br>네트워킹 모임</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-building"></i> 동탄2 커뮤니티센터</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> 06.10(월) 오후 7시</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 글쓰기 -->
-      <div class="wbox">
-        <div class="wrow">
-          <div class="wav">김</div>
-          <div class="winp" id="open-write">대장님들과 이야기를 나눠보세요...</div>
-        </div>
-        <div class="wacts">
-          <button type="button" class="wab" data-write-action="photo" id="feed-photo-btn"><i class="ti ti-photo"></i> 사진</button>
-          <button type="button" class="wab" data-write-action="location"><i class="ti ti-map-pin"></i> 위치</button>
-          <button type="button" class="wab" data-write-action="tag"><i class="ti ti-tag"></i> 업종태그</button>
-          <button type="button" class="wab" data-write-action="event"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
-          <button type="button" class="pbtn" id="open-write-btn">게시하기</button>
-        </div>
-      </div>
-
-      <!-- 게시글 탭 + 리스트 -->
-      <div style="border-radius:12px;overflow:hidden;border:1px solid var(--border);">
-        <div class="ctabs">
-          <div class="ct act" data-cat="all">전체</div>
-          <div class="ct" data-cat="qna">질문·고민</div>
-          <div class="ct" data-cat="info">정보공유</div>
-          <div class="ct" data-cat="startup">창업준비</div>
-          <div class="ct" data-cat="issue">이슈</div>
-          <div class="ct" data-cat="event">이벤트</div>
-        </div>
-        <div class="plist" id="post-list"></div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">📢 대장님들의 정책 정보 공유</div>
+        <div id="policy-post-list" class="plist" style="border-radius:12px;overflow:hidden;border:1px solid var(--border);"></div>
       </div>
     </div>
   </main>
@@ -850,5 +693,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260615"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
+<script type="module" src="js/pages/policy.js?v=20260615"></script>
 </body>
 </html>

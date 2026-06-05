@@ -376,3 +376,47 @@ export async function getNeighborUsers(excludeUserId, limit = 5) {
   if (error) throw error;
   return data || [];
 }
+
+export async function getPostsByIndustry(upjong1cd, { page = 0, limit = 30 } = {}) {
+  let query = supabase
+    .from('posts')
+    .select(POST_SELECT)
+    .eq('is_deleted', false)
+    .order('created_at', { ascending: false })
+    .range(page * limit, (page + 1) * limit - 1);
+
+  if (upjong1cd) query = query.eq('upjong1cd', upjong1cd);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getEventsByType(eventType, { limit = 50 } = {}) {
+  let query = supabase
+    .from('posts')
+    .select(`*, users(nickname, profile_image, region_dong)`)
+    .eq('is_event', true)
+    .eq('is_deleted', false)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (eventType && eventType !== 'all') query = query.eq('event_type', eventType);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getInfoPosts(limit = 20) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(POST_SELECT)
+    .eq('category', 'info')
+    .eq('is_deleted', false)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+}
