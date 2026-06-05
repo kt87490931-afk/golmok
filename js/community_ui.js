@@ -15,7 +15,10 @@ import {
   getLikedPostIds,
   getBookmarkedPostIds,
   isLiked,
+  isFollowing,
 } from './community.js';
+import { uploadImages, createImagePreview } from './upload.js';
+import { sendCommentNotification } from './fcm.js';
 
 const DEFAULT_REGION = {
   region_sido: '경기',
@@ -32,6 +35,7 @@ let hasMore = true;
 let selectedWriteCategory = 'qna';
 let replyTargetId = null;
 let userRegion = { ...DEFAULT_REGION };
+let selectedImages = [];
 
 function toast(msg) {
   if (typeof window.showToast === 'function') window.showToast(msg);
@@ -102,7 +106,81 @@ function feedLoadErrorHtml(err) {
   return `<div style="padding:32px;text-align:center;color:#E24B4A;">게시글을 불러오지 못했습니다.<br><span style="font-size:12px;color:#999;">${escapeHtml(err?.message || '네트워크 또는 로그인 상태를 확인해주세요.')}</span></div>`;
 }
 
+function renderPostImagesHtml(images) {
+  if (!images?.length) return '';
+  const cols = images.length === 1 ? 1 : 2;
+  const items = images
+    .slice(0, 4)
+    .map(
+      (url) =>
+        `<img src="${escapeHtml(url)}" alt="" loading="lazy" style="width:100%;height:120px;object-fit:cover;border-radius:8px;">`
+    )
+    .join('');
+  return `<div class="pcimgs" style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:6px;margin-top:8px;">${items}</div>`;
+}
+
+function updateImageCountLabel() {
+  const countEl = document.getElementById('image-count');
+  if (countEl) countEl.textContent = selectedImages.length > 0 ? `(${selectedImages.length}/4)` : '';
+}
+
+async function rerenderImagePreviews() {
+  const previewWrap = document.getElementById('image-preview-wrap');
+  if (!previewWrap) return;
+  previewWrap.innerHTML = '';
+  if (!selectedImages.length) {
+    previewWrap.style.display = 'none';
+    updateImageCountLabel();
+    return;
+  }
+  previewWrap.style.display = 'flex';
+  for (let idx = 0; idx < selectedImages.length; idx += 1) {
+    const file = selectedImages[idx];
+    const previewUrl = await createImagePreview(file);
+    const div = document.createElement('div');
+    div.style.cssText = 'position:relative;width:80px;height:80px;';
+    div.innerHTML = `
+      <img src="${previewUrl}" alt="미리보기" style="width:80px;height:80px;object-fit:cover;border-radius:8px;">
+      <button type="button" data-rm-idx="${idx}" style="position:absolute;top:-6px;right:-6px;background:#E24B4A;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;line-height:1;">×</button>`;
+    div.querySelector('button')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedImages.splice(idx, 1);
+      rerenderImagePreviews();
+    });
+    previewWrap.appendChild(div);
+  }
+  updateImageCountLabel();
+}
+
+function resetSelectedImages() {
+  selectedImages = [];
+  const input = document.getElementById('image-file-input');
+  if (input) input.value = '';
+  rerenderImagePreviews();
+}
+
+function bindImageUpload() {
+  document.getElementById('btn-photo-upload')?.addEventListener('click', () => {
+    document.getElementById('image-file-input')?.click();
+  });
+
+  document.getElementById('image-file-input')?.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (selectedImages.length + files.length > 4) {
+      toast('이미지는 최대 4장까지 첨부 가능합니다');
+      return;
+    }
+    selectedImages.push(...files);
+    await rerenderImagePreviews();
+    e.target.value = '';
+  });
+}
+
+window.triggerImageUpload = () => document.getElementById('image-file-input')?.click();
+
 function getPostListEl() {
+  return document.getElementById('post-list') || document.querySelector('.plist');
+}
   return document.getElementById('post-list') || document.querySelector('.plist');
 }
 
@@ -296,6 +374,7 @@ function createPostCard(post, likedSet, savedSet) {
     </div>
     ${post.title ? `<div class="pctit">${escapeHtml(post.title)}</div>` : ''}
     <div class="pcbody">${escapeHtml(post.content)}</div>
+    ${renderPostImagesHtml(post.images)}
     <div class="pcbot">
       <span class="pca like-btn" data-post-id="${post.id}" style="${liked ? 'color:#E24B4A' : ''}">
         <i class="ti ti-heart" style="${liked ? 'color:#E24B4A' : ''}"></i>
@@ -372,7 +451,9 @@ export async function openPostDetail(postId) {
     const post = await getPost(postId);
     const comments = await getComments(postId);
     const liked = await isLiked(postId);
-    showPostDetailModal(post, comments, liked);
+    const authorId = post.users?.id;
+    const following = authorId ? await isFollowing(authorId) : false;
+    showPostDetailModal(post, comments, liked, following);
   } catch (e) {
     console.error(e);
     toast('게시글을 불러오지 못했습니다');
@@ -413,7 +494,7 @@ function buildCommentsHtml(comments) {
     .join('');
 }
 
-function showPostDetailModal(post, comments, liked) {
+function showPostDetailModal(post, comments, liked, following = false) {
   document.getElementById('post-detail-modal')?.remove();
 
   const modal = document.createElement('div');
@@ -437,6 +518,7 @@ function showPostDetailModal(post, comments, liked) {
       <div style="padding:16px 20px;overflow-y:auto;flex:1;">
         ${post.title ? `<div style="font-size:18px;font-weight:700;margin-bottom:10px;">${escapeHtml(post.title)}</div>` : ''}
         <div style="font-size:14px;line-height:1.7;color:#333;margin-bottom:14px;">${escapeHtml(post.content)}</div>
+        ${renderPostImagesHtml(post.images)}
         <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;border-top:1px solid #E8E4DC;border-bottom:1px solid #E8E4DC;margin-bottom:14px;">
           <button type="button" class="detail-like-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;${liked ? 'color:#E24B4A' : ''}">
             <i class="ti ti-heart"></i> 공감 <span class="detail-like-count">${post.like_count || 0}</span>
@@ -449,7 +531,11 @@ function showPostDetailModal(post, comments, liked) {
           </button>
           ${
             user.id
-              ? `<button type="button" class="detail-follow-btn" data-user-id="${user.id}" style="display:flex;align-items:center;gap:5px;background:var(--ch);color:#fff;border:none;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;"><i class="ti ti-user-plus"></i> 팔로우</button>`
+              ? `<button type="button" class="detail-follow-btn" data-user-id="${user.id}" style="display:flex;align-items:center;gap:5px;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;${
+                  following
+                    ? 'background:#F5F1E8;border:1px solid #E8E4DC;color:#555;'
+                    : 'background:var(--ch);color:#fff;border:none;'
+                }"><i class="ti ti-user-plus"></i> ${following ? '팔로잉' : '팔로우'}</button>`
               : ''
           }
         </div>
@@ -494,10 +580,26 @@ function showPostDetailModal(post, comments, liked) {
 
   modal.querySelector('.detail-follow-btn')?.addEventListener('click', async (e) => {
     const uid = e.currentTarget.dataset.userId;
+    const btn = e.currentTarget;
     const res = await toggleFollow(uid);
-    if (res?.error === 'login') return toast('로그인이 필요합니다');
-    e.currentTarget.textContent = res.following ? '팔로잉' : '팔로우';
-    toast(res.following ? '팔로우했습니다' : '팔로우 취소');
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
+    if (res.following) {
+      btn.innerHTML = '<i class="ti ti-user-plus"></i> 팔로잉';
+      btn.style.background = '#F5F1E8';
+      btn.style.border = '1px solid #E8E4DC';
+      btn.style.color = '#555';
+      toast('팔로우했습니다');
+    } else {
+      btn.innerHTML = '<i class="ti ti-user-plus"></i> 팔로우';
+      btn.style.background = 'var(--ch)';
+      btn.style.border = 'none';
+      btn.style.color = '#fff';
+      toast('팔로우 취소');
+    }
   });
 
   modal.querySelectorAll('.reply-btn').forEach((btn) => {
@@ -526,6 +628,11 @@ function showPostDetailModal(post, comments, liked) {
     input.placeholder = '댓글을 입력하세요...';
     const updated = await getComments(post.id);
     modal.querySelector(`#comment-list-${post.id}`).innerHTML = buildCommentsHtml(updated);
+    const me = await getCurrentUser();
+    if (me && post.user_id && post.user_id !== me.id) {
+      const profile = await getUserProfile(me.id);
+      sendCommentNotification(post.user_id, profile?.nickname || '대장님');
+    }
     toast('댓글이 등록되었습니다');
   };
 
@@ -562,10 +669,28 @@ async function submitNewPost() {
   }
 
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
+
+    let imageUrls = [];
+    if (selectedImages.length > 0) {
+      if (btn) btn.textContent = '이미지 업로드 중...';
+      imageUrls = await uploadImages(selectedImages, user.id);
+      if (selectedImages.length > 0 && !imageUrls.length) {
+        toast('이미지 업로드에 실패했습니다. Storage 버킷(post-images)을 확인해주세요.');
+        return;
+      }
+    }
+
     const res = await createPost({
       content,
       category: selectedWriteCategory,
       title,
+      images: imageUrls.length ? imageUrls : null,
       isEvent,
       eventEndDate,
       regionOverride: userRegion,
@@ -580,6 +705,7 @@ async function submitNewPost() {
     getWriteOverlay()?.classList.remove('open');
     if (contentEl) contentEl.value = '';
     if (titleEl) titleEl.value = '';
+    resetSelectedImages();
     await loadFeed(true);
     toast('게시글이 등록되었습니다!');
   } catch (e) {
@@ -731,6 +857,7 @@ export function initCommunity() {
   bindFeedTabs();
   bindCategoryTabs();
   bindWriteModal();
+  bindImageUpload();
   bindInfiniteScroll();
   bindFollowButtons();
 

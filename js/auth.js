@@ -1,6 +1,8 @@
 import { getAuthRedirectUrl, getPasswordResetRedirectUrl } from './supabase_config.js';
 import { supabase } from './supabase_client.js';
 import { mountAuthModals } from './auth_modals.js';
+import { renderSidebarProfile } from './profile_ui.js';
+import { initFCM } from './fcm.js';
 
 export { supabase };
 
@@ -209,6 +211,8 @@ export function updateAuthUI(profile, session) {
   document.querySelectorAll('[data-requires-auth]').forEach((el) => {
     el.style.opacity = loggedIn ? '1' : '0.55';
   });
+
+  renderSidebarProfile().catch(() => {});
 }
 
 export async function signInWithGoogle() {
@@ -271,6 +275,7 @@ async function handleSignedInCore(user) {
   const profile = await fetchUserProfile(user.id);
   updateAuthUI(profile, { user });
   window.golmokCommunity?.loadFeed?.(true);
+  initFCM().catch(() => {});
 }
 
 export async function initAuth() {

@@ -1,0 +1,23 @@
+-- STEP 1: Supabase Storage (post-images 버킷 생성 후 실행)
+-- Dashboard → Storage → New bucket → post-images → Public ON
+
+CREATE POLICY "authenticated users can upload"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'post-images'
+  AND auth.role() = 'authenticated'
+);
+
+CREATE POLICY "public can view images"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'post-images');
+
+CREATE POLICY "users can delete own images"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'post-images'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
