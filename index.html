@@ -705,21 +705,7 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// 글쓰기 모달 (피드/CRUD는 community_ui.js)
-const modal=document.getElementById('write-modal');
-document.getElementById('open-write')?.addEventListener('click',()=>modal?.classList.add('open'));
-document.getElementById('open-write-btn')?.addEventListener('click',()=>modal?.classList.add('open'));
-document.getElementById('close-modal')?.addEventListener('click',()=>modal?.classList.remove('open'));
-modal?.addEventListener('click',(e)=>{if(e.target===modal)modal.classList.remove('open');});
-
-document.getElementById('tab-all')?.addEventListener('click',()=>{
-  document.getElementById('nav-all')?.classList.add('act');
-  document.getElementById('nav-dong')?.classList.remove('act');
-});
-document.getElementById('tab-dong')?.addEventListener('click',()=>{
-  document.getElementById('nav-dong')?.classList.add('act');
-  document.getElementById('nav-all')?.classList.remove('act');
-});
+// 글쓰기·피드·필터: community_ui.js
 
 // AI 채팅
 const aiInput=document.getElementById('ai-input');
@@ -751,7 +737,7 @@ document.querySelectorAll('.ni').forEach(ni=>{
   });
 });
 </script>
-<script type="module" src="js/auth.js?v=20260605"></script>
-<script type="module" src="js/community_ui.js?v=20260605"></script>
+<script type="module" src="js/auth.js?v=20260607"></script>
+<script type="module" src="js/community_ui.js?v=20260607"></script>
 </body>
 </html>

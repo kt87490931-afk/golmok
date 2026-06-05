@@ -1,0 +1,53 @@
+-- 골목대장 커뮤니티: 테이블 권한(GRANT) + 카운터 RPC
+-- Supabase SQL Editor에서 한 번 실행하세요.
+
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+
+GRANT SELECT ON TABLE public.posts TO anon, authenticated;
+GRANT INSERT, UPDATE ON TABLE public.posts TO authenticated;
+
+GRANT SELECT ON TABLE public.users TO anon, authenticated;
+GRANT INSERT, UPDATE ON TABLE public.users TO authenticated;
+
+GRANT SELECT ON TABLE public.comments TO anon, authenticated;
+GRANT INSERT, UPDATE ON TABLE public.comments TO authenticated;
+
+GRANT SELECT ON TABLE public.likes TO authenticated;
+GRANT INSERT, DELETE ON TABLE public.likes TO authenticated;
+
+GRANT SELECT ON TABLE public.bookmarks TO authenticated;
+GRANT INSERT, DELETE ON TABLE public.bookmarks TO authenticated;
+
+GRANT SELECT ON TABLE public.follows TO authenticated;
+GRANT INSERT, DELETE ON TABLE public.follows TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.increment_view_count(post_id UUID)
+RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  UPDATE public.posts SET view_count = view_count + 1 WHERE id = post_id;
+$$;
+
+CREATE OR REPLACE FUNCTION public.increment_like_count(post_id UUID)
+RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  UPDATE public.posts SET like_count = like_count + 1 WHERE id = post_id;
+$$;
+
+CREATE OR REPLACE FUNCTION public.decrement_like_count(post_id UUID)
+RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  UPDATE public.posts SET like_count = GREATEST(like_count - 1, 0) WHERE id = post_id;
+$$;
+
+CREATE OR REPLACE FUNCTION public.increment_comment_count(post_id UUID)
+RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  UPDATE public.posts SET comment_count = comment_count + 1 WHERE id = post_id;
+$$;
+
+CREATE OR REPLACE FUNCTION public.decrement_comment_count(post_id UUID)
+RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  UPDATE public.posts SET comment_count = GREATEST(comment_count - 1, 0) WHERE id = post_id;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.increment_view_count(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_like_count(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.decrement_like_count(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_comment_count(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.decrement_comment_count(UUID) TO authenticated;

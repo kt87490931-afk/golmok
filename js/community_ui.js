@@ -87,6 +87,21 @@ function parseRangeLabel(label) {
   return 'dong';
 }
 
+function isDbPermissionError(err) {
+  const msg = String(err?.message || err?.details || '');
+  return err?.code === '42501' || msg.includes('permission denied');
+}
+
+function feedLoadErrorHtml(err) {
+  if (isDbPermissionError(err)) {
+    return `<div style="padding:32px 16px;text-align:center;color:#E24B4A;line-height:1.6;">
+      <p style="font-weight:600;margin-bottom:8px;">DB 권한 설정이 필요합니다</p>
+      <p style="font-size:13px;color:#555;">Supabase SQL Editor에서<br><code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;">golmok/sql/community_grants_and_rpc.sql</code><br>파일을 실행한 뒤 새로고침해주세요.</p>
+    </div>`;
+  }
+  return `<div style="padding:32px;text-align:center;color:#E24B4A;">게시글을 불러오지 못했습니다.<br><span style="font-size:12px;color:#999;">${escapeHtml(err?.message || '네트워크 또는 로그인 상태를 확인해주세요.')}</span></div>`;
+}
+
 function getPostListEl() {
   return document.getElementById('post-list') || document.querySelector('.plist');
 }
@@ -181,11 +196,8 @@ export async function loadFeed(reset = true) {
     await loadEventSection();
   } catch (e) {
     console.error(e);
-    if (reset) {
-      list.innerHTML =
-        '<div style="padding:32px;text-align:center;color:#E24B4A;">게시글을 불러오지 못했습니다.<br>로그인 후 다시 시도해주세요.</div>';
-    }
-    toast('피드 로드 실패');
+    if (reset) list.innerHTML = feedLoadErrorHtml(e);
+    toast(isDbPermissionError(e) ? 'DB 권한 SQL 실행이 필요합니다' : '피드 로드 실패');
   }
 
   isLoading = false;
@@ -205,9 +217,14 @@ async function loadEventSection() {
 
     if (badge) badge.textContent = String(events.length);
 
-    if (!events.length) return;
-
     const isMobile = !!document.querySelector('.ev-scroll-wrap');
+
+    if (!events.length) {
+      grid.innerHTML = isMobile
+        ? '<div class="ev-card-m" style="min-width:200px;opacity:0.7;"><div class="ev-card-m-bottom" style="padding:16px;"><div class="ev-shop-m">등록된 이벤트가 없습니다</div></div></div>'
+        : '<div style="grid-column:1/-1;padding:20px;text-align:center;color:#999;font-size:13px;">등록된 이벤트·이슈가 없습니다. 이벤트 카테고리로 첫 글을 올려보세요!</div>';
+      return;
+    }
     grid.innerHTML = events
       .map((ev) => {
         const title = escapeHtml(ev.title || ev.content?.slice(0, 40) || '이벤트');
@@ -320,6 +337,7 @@ function createPostCard(post, likedSet, savedSet) {
     const res = await toggleBookmark(post.id);
     if (res?.error === 'login') {
       toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
       return;
     }
     const icon = e.currentTarget.querySelector('i');
@@ -452,7 +470,11 @@ function showPostDetailModal(post, comments, liked) {
 
   modal.querySelector('.detail-like-btn')?.addEventListener('click', async () => {
     const res = await toggleLike(post.id);
-    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
     const count = modal.querySelector('.detail-like-count');
     const n = parseInt(count.textContent, 10) || 0;
     count.textContent = res.liked ? n + 1 : Math.max(0, n - 1);
@@ -460,7 +482,11 @@ function showPostDetailModal(post, comments, liked) {
 
   modal.querySelector('.detail-bookmark-btn')?.addEventListener('click', async () => {
     const res = await toggleBookmark(post.id);
-    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
     toast(res.saved ? '저장했습니다' : '저장 취소');
   });
 
@@ -490,7 +516,11 @@ function showPostDetailModal(post, comments, liked) {
     const content = input?.value?.trim();
     if (!content) return;
     const res = await createComment({ postId: post.id, content, parentId: replyTargetId });
-    if (res?.error === 'login') return toast('로그인이 필요합니다');
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
     input.value = '';
     replyTargetId = null;
     input.placeholder = '댓글을 입력하세요...';
@@ -554,7 +584,8 @@ async function submitNewPost() {
     toast('게시글이 등록되었습니다!');
   } catch (e) {
     console.error(e);
-    toast('게시글 등록에 실패했습니다');
+    if (isDbPermissionError(e)) toast('DB 권한 SQL(community_grants_and_rpc.sql) 실행이 필요합니다');
+    else toast(e?.message || '게시글 등록에 실패했습니다');
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -575,6 +606,8 @@ function bindFeedTabs() {
       tabAll.classList.toggle('act', type === 'all');
       tabDong.classList.toggle('act', type !== 'all');
     }
+    document.getElementById('nav-all')?.classList.toggle('act', type === 'all');
+    document.getElementById('nav-dong')?.classList.toggle('act', type !== 'all');
     if (rbar) rbar.style.display = type === 'all' ? 'none' : 'block';
     if (eventSec) eventSec.style.display = type === 'all' ? 'none' : 'block';
     loadFeed(true);
@@ -587,6 +620,14 @@ function bindFeedTabs() {
     pill.addEventListener('click', () => {
       document.querySelectorAll('.rpill').forEach((p) => p.classList.remove('act'));
       pill.classList.add('act');
+      if (tabDong && tabAll) {
+        tabDong.classList.add('act');
+        tabAll.classList.remove('act');
+        document.getElementById('nav-dong')?.classList.add('act');
+        document.getElementById('nav-all')?.classList.remove('act');
+      }
+      if (rbar) rbar.style.display = 'block';
+      if (eventSec) eventSec.style.display = 'block';
       currentFeedType = parseRangeLabel(pill.dataset.range);
       loadFeed(true);
     });
@@ -600,6 +641,12 @@ function bindFeedTabs() {
       if (slider) slider.className = `seg-slider pos-${btn.dataset.idx}`;
       const desc = document.getElementById('range-desc-text');
       if (desc) desc.textContent = btn.dataset.desc || '';
+      if (tabDong && tabAll) {
+        tabDong.classList.add('act');
+        tabAll.classList.remove('act');
+      }
+      if (rbar) rbar.style.display = 'block';
+      if (eventSec) eventSec.style.display = 'block';
       currentFeedType = parseRangeLabel(btn.dataset.r);
       loadFeed(true);
     });
@@ -633,6 +680,10 @@ function bindWriteModal() {
   document.getElementById('open-write')?.addEventListener('click', openWriteOverlay);
   document.getElementById('open-write-btn')?.addEventListener('click', openWriteOverlay);
   document.getElementById('write-btn')?.addEventListener('click', openWriteOverlay);
+  document.getElementById('close-modal')?.addEventListener('click', () => getWriteOverlay()?.classList.remove('open'));
+  getWriteOverlay()?.addEventListener('click', (e) => {
+    if (e.target === getWriteOverlay()) getWriteOverlay().classList.remove('open');
+  });
 }
 
 function bindInfiniteScroll() {

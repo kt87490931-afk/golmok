@@ -22,6 +22,45 @@ export async function getUserProfile(userId) {
   return data;
 }
 
+const DEFAULT_PROFILE_REGION = {
+  region_sido: '경기',
+  region_sigungu: '화성시',
+  region_dong: '동탄2동',
+  region_full: '경기 화성시 동탄2동',
+};
+
+/** 게시글/댓글 FK — users 행이 없으면 자동 생성 */
+export async function ensureUserProfile(user) {
+  if (!user) return null;
+  const existing = await getUserProfile(user.id);
+  if (existing) return existing;
+
+  const payload = {
+    id: user.id,
+    nickname: user.user_metadata?.nickname || user.user_metadata?.full_name || user.user_metadata?.name || '대장님',
+    email: user.email,
+    profile_image: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+    ...DEFAULT_PROFILE_REGION,
+  };
+  const { error } = await supabase.from('users').upsert(payload, { onConflict: 'id' });
+  if (error) throw error;
+  return getUserProfile(user.id);
+}
+
+async function bumpPostField(postId, field, delta) {
+  const { data: row, error } = await supabase.from('posts').select(field).eq('id', postId).maybeSingle();
+  if (error || !row) return;
+  const next = Math.max(0, (row[field] || 0) + delta);
+  await supabase.from('posts').update({ [field]: next }).eq('id', postId);
+}
+
+async function runPostCounterRpc(fn, postId) {
+  const { error } = await supabase.rpc(fn, { post_id: postId });
+  if (!error) return true;
+  console.warn(`rpc ${fn}`, error.message);
+  return false;
+}
+
 export async function getAllPosts({ category = 'all', page = 0, limit = 20 } = {}) {
   let query = supabase
     .from('posts')
@@ -88,7 +127,8 @@ export async function getEventPosts({ regionDong, regionSigungu, limit = 6 } = {
 
 export async function getPost(postId, { bumpView = true } = {}) {
   if (bumpView) {
-    await supabase.rpc('increment_view_count', { post_id: postId });
+    const ok = await runPostCounterRpc('increment_view_count', postId);
+    if (!ok) await bumpPostField(postId, 'view_count', 1);
   }
 
   const { data, error } = await supabase.from('posts').select(POST_SELECT).eq('id', postId).single();
@@ -110,8 +150,8 @@ export async function createPost({
   const user = await getCurrentUser();
   if (!user) return { error: 'login' };
 
-  const profile = await getUserProfile(user.id);
-  const region = { ...profile, ...regionOverride };
+  const profile = (await ensureUserProfile(user)) || {};
+  const region = { ...DEFAULT_PROFILE_REGION, ...profile, ...regionOverride };
 
   const { data, error } = await supabase
     .from('posts')
@@ -137,10 +177,14 @@ export async function createPost({
 
   if (error) throw error;
 
-  await supabase
-    .from('users')
-    .update({ post_count: (profile?.post_count || 0) + 1 })
-    .eq('id', user.id);
+  try {
+    await supabase
+      .from('users')
+      .update({ post_count: (profile?.post_count || 0) + 1 })
+      .eq('id', user.id);
+  } catch (e) {
+    console.warn('post_count update', e);
+  }
 
   return { data };
 }
@@ -155,6 +199,8 @@ export async function toggleLike(postId) {
   const user = await getCurrentUser();
   if (!user) return { error: 'login' };
 
+  await ensureUserProfile(user);
+
   const { data: existing } = await supabase
     .from('likes')
     .select('id')
@@ -164,12 +210,14 @@ export async function toggleLike(postId) {
 
   if (existing) {
     await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId);
-    await supabase.rpc('decrement_like_count', { post_id: postId });
+    const ok = await runPostCounterRpc('decrement_like_count', postId);
+    if (!ok) await bumpPostField(postId, 'like_count', -1);
     return { liked: false };
   }
 
   await supabase.from('likes').insert({ user_id: user.id, post_id: postId });
-  await supabase.rpc('increment_like_count', { post_id: postId });
+  const ok = await runPostCounterRpc('increment_like_count', postId);
+  if (!ok) await bumpPostField(postId, 'like_count', 1);
   return { liked: true };
 }
 
@@ -199,6 +247,8 @@ export async function getLikedPostIds(postIds) {
 export async function toggleBookmark(postId) {
   const user = await getCurrentUser();
   if (!user) return { error: 'login' };
+
+  await ensureUserProfile(user);
 
   const { data: existing } = await supabase
     .from('bookmarks')
@@ -245,6 +295,8 @@ export async function createComment({ postId, content, parentId = null }) {
   const user = await getCurrentUser();
   if (!user) return { error: 'login' };
 
+  await ensureUserProfile(user);
+
   const { data, error } = await supabase
     .from('comments')
     .insert({
@@ -258,7 +310,8 @@ export async function createComment({ postId, content, parentId = null }) {
 
   if (error) throw error;
 
-  await supabase.rpc('increment_comment_count', { post_id: postId });
+  const ok = await runPostCounterRpc('increment_comment_count', postId);
+  if (!ok) await bumpPostField(postId, 'comment_count', 1);
   return { data };
 }
 

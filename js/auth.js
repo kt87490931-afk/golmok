@@ -95,17 +95,55 @@ function showForgotPassword() {
   hideError('signup-error');
 }
 
-async function upsertUserRow(user, extra = {}) {
-  const provider = getProvider(user);
-  const payload = {
-    id: user.id,
-    nickname: extra.nickname || user.user_metadata?.nickname || user.user_metadata?.full_name || user.user_metadata?.name || '대장님',
-    email: user.email,
-    profile_image: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
-    auth_provider: provider,
-    last_login_at: new Date().toISOString(),
-    ...extra,
+function parseSignupRegion(region) {
+  if (!region) return {};
+  const parts = region.split(' ').filter(Boolean);
+  if (parts.length >= 3) {
+    return {
+      region_full: region,
+      region_sido: parts[0],
+      region_sigungu: parts[1],
+      region_dong: parts.slice(2).join(' '),
+    };
+  }
+  return { region_full: region, region_dong: region };
+}
+
+/** 가입 폼 → auth user_metadata (이메일 인증 전에도 보존) */
+function signupMetaFromForm({ nickname, phone, userStatus, upjong, region, agreeMarketing }) {
+  return {
+    nickname,
+    full_name: nickname,
+    phone,
+    user_status: userStatus,
+    upjong1cd: upjong || null,
+    agree_marketing: !!agreeMarketing,
+    agreed_at: new Date().toISOString(),
+    ...parseSignupRegion(region),
   };
+}
+
+function userRowFromMetadata(user, extra = {}) {
+  const m = { ...(user.user_metadata || {}), ...extra };
+  return {
+    id: user.id,
+    nickname: m.nickname || m.full_name || m.name || '대장님',
+    email: user.email,
+    profile_image: m.avatar_url || m.picture || null,
+    phone: m.phone || null,
+    user_status: m.user_status || 'operating',
+    upjong1cd: m.upjong1cd || null,
+    region_full: m.region_full || null,
+    region_sido: m.region_sido || null,
+    region_sigungu: m.region_sigungu || null,
+    region_dong: m.region_dong || null,
+    agree_marketing: m.agree_marketing === true,
+    agreed_at: m.agreed_at || null,
+  };
+}
+
+async function upsertUserRow(user, extra = {}) {
+  const payload = userRowFromMetadata(user, extra);
   const { error } = await supabase.from('users').upsert(payload, { onConflict: 'id' });
   if (error) throw error;
 }
@@ -217,7 +255,14 @@ async function handleSignedInCore(user) {
       openProfileSetup(user);
     }
   } else {
-    await supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', user.id);
+    const { error: loginAtErr } = await supabase
+      .from('users')
+      .update({ last_login_at: new Date().toISOString() })
+      .eq('id', user.id);
+    if (loginAtErr) console.warn('last_login_at', loginAtErr.message);
+    if (user.user_metadata?.phone || user.user_metadata?.nickname) {
+      await upsertUserRow(user);
+    }
     if (needsProfileSetup(existing) && getProvider(user) !== 'email') {
       openProfileSetup(user);
     }
@@ -550,52 +595,58 @@ async function runEmailSignup(btn) {
 
   setButtonLoading(btn, true, '이메일로 가입하기');
   try {
+    const signupMeta = signupMetaFromForm({
+      nickname,
+      phone,
+      userStatus,
+      upjong,
+      region,
+      agreeMarketing,
+    });
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: getAuthRedirectUrl(),
-        data: { nickname, full_name: nickname },
+        data: signupMeta,
       },
     });
     if (error) {
-      const msg = error.message.includes('already') ? '이미 가입된 이메일입니다. 로그인해주세요.' : '회원가입에 실패했습니다. 다시 시도해주세요.';
+      console.error('signUp', error);
+      let msg = '회원가입에 실패했습니다. 다시 시도해주세요.';
+      if (error.message?.includes('already') || error.message?.includes('registered')) {
+        msg = '이미 가입된 이메일입니다. 로그인해주세요.';
+      } else if (error.message) {
+        msg = error.message;
+      }
       showError('signup-error', msg);
       return;
     }
 
-    if (data.user) {
-      const regionParts = region ? region.split(' ').filter(Boolean) : [];
-      const { error: dbError } = await supabase.from('users').upsert(
-        {
-          id: data.user.id,
-          nickname,
-          email,
-          phone,
-          auth_provider: 'email',
-          user_status: userStatus,
-          upjong1cd: upjong || null,
-          region_full: region || null,
-          region_sido: regionParts[0] || null,
-          region_sigungu: regionParts[1] || null,
-          region_dong: regionParts.slice(2).join(' ') || null,
-          agree_marketing: agreeMarketing || false,
-          agreed_at: new Date().toISOString(),
-          is_active: true,
-        },
-        { onConflict: 'id' }
-      );
-      if (dbError) throw dbError;
+    // 이메일 인증 ON: session 없음 → users INSERT는 RLS 때문에 실패함 → 로그인/인증 후 upsert
+    if (data.session && data.user) {
+      const { error: dbError } = await supabase.from('users').upsert(userRowFromMetadata(data.user), { onConflict: 'id' });
+      if (dbError) {
+        console.error('users upsert', dbError);
+        showError('signup-error', dbError.message || '프로필 저장에 실패했습니다.');
+        return;
+      }
+      closeAllModals();
+      await handleSignedIn(data.user);
+      toast('가입이 완료되었습니다!');
+      return;
     }
 
     closeAllModals();
     const addr = document.getElementById('verify-email-address');
     if (addr) addr.textContent = email;
     document.getElementById('verify-email-overlay')?.classList.add('open');
-    toast('인증 메일을 발송했습니다. 메일함을 확인해주세요.');
+    toast('인증 메일을 발송했습니다. 메일함(스팸함 포함)을 확인해주세요.');
   } catch (err) {
     console.error(err);
-    showError('signup-error', '회원가입 요청 중 오류가 발생했습니다.');
+    const detail = err?.message || err?.details || '';
+    showError('signup-error', detail ? `회원가입 오류: ${detail}` : '회원가입 요청 중 오류가 발생했습니다.');
   } finally {
     setButtonLoading(btn, false, '이메일로 가입하기');
   }
