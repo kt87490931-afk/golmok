@@ -110,15 +110,18 @@ function feedLoadErrorHtml(err) {
 
 function renderPostImagesHtml(images) {
   if (!images?.length) return '';
-  const cols = images.length === 1 ? 1 : 2;
-  const items = images
-    .slice(0, 4)
-    .map(
-      (url) =>
-        `<img src="${escapeHtml(url)}" alt="" loading="lazy" style="width:100%;height:120px;object-fit:cover;border-radius:8px;">`
-    )
+  const urls = images.slice(0, 4);
+  const count = urls.length;
+  const countClass = count === 1 ? 'pcimgs--single' : count === 2 ? 'pcimgs--duo' : 'pcimgs--multi';
+
+  const items = urls
+    .map((url, idx) => {
+      const hero = count >= 3 && idx === 0 ? ' pcimg-wrap--hero' : '';
+      return `<div class="pcimg-wrap${hero}"><img src="${escapeHtml(url)}" alt="" class="pcimg" loading="lazy"></div>`;
+    })
     .join('');
-  return `<div class="pcimgs" style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:6px;margin-top:8px;">${items}</div>`;
+
+  return `<div class="pcimgs ${countClass}">${items}</div>`;
 }
 
 function updateImageCountLabel() {
@@ -350,7 +353,7 @@ async function loadEventSection() {
 
 function avatarHtml(user) {
   if (user?.profile_image) {
-    return `<img src="${escapeHtml(user.profile_image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    return `<div class="pcav"><img src="${escapeHtml(user.profile_image)}" alt="" class="pcav-img"></div>`;
   }
   const ch = (user?.nickname || '대').charAt(0);
   return `<div class="pcav" style="background:#FAEEDA;color:#633806;">${escapeHtml(ch)}</div>`;

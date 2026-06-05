@@ -1,21 +1,88 @@
 import { supabase } from './supabase_client.js';
 
+const MAX_UPLOAD_BYTES = 1024 * 1024;
+
+/** 업로드 전 canvas 리사이즈 + 1MB 이하 JPEG 압축 */
+export async function resizeImage(file, maxWidth = 1200, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(width);
+      canvas.height = Math.round(height);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const compress = (q) => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('이미지 변환에 실패했습니다.'));
+              return;
+            }
+            if (blob.size <= MAX_UPLOAD_BYTES || q <= 0.5) {
+              const baseName = (file.name || 'image').replace(/\.[^.]+$/, '') || 'image';
+              resolve(new File([blob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() }));
+              return;
+            }
+            compress(Math.max(0.5, q - 0.1));
+          },
+          'image/jpeg',
+          q
+        );
+      };
+
+      compress(quality);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('이미지를 불러올 수 없습니다.'));
+    };
+
+    img.src = objectUrl;
+  });
+}
+
 export async function uploadImage(file, userId) {
-  if (file.size > 5 * 1024 * 1024) {
-    alert('이미지는 5MB 이하만 업로드 가능합니다.');
-    return null;
-  }
   if (!file.type.startsWith('image/')) {
     alert('이미지 파일만 업로드 가능합니다.');
     return null;
   }
 
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-  const fileName = `${userId}/${Date.now()}.${ext}`;
+  let uploadFile = file;
+  try {
+    uploadFile = await resizeImage(file);
+  } catch (e) {
+    console.warn('이미지 리사이즈 실패, 원본 업로드 시도', e);
+    if (file.size > 5 * 1024 * 1024) {
+      alert('이미지는 5MB 이하만 업로드 가능합니다.');
+      return null;
+    }
+  }
 
-  const { error } = await supabase.storage.from('post-images').upload(fileName, file, {
+  if (uploadFile.size > MAX_UPLOAD_BYTES) {
+    alert('이미지 압축 후에도 1MB를 초과합니다. 다른 사진을 선택해주세요.');
+    return null;
+  }
+
+  const fileName = `${userId}/${Date.now()}.jpg`;
+
+  const { error } = await supabase.storage.from('post-images').upload(fileName, uploadFile, {
     cacheControl: '3600',
     upsert: false,
+    contentType: 'image/jpeg',
   });
 
   if (error) {
