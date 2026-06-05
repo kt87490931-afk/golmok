@@ -242,12 +242,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pctop{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .pcav{width:40px;height:40px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
 .pcav-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
-.pcimgs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px;max-width:100%;overflow:hidden;width:100%;}
+.pcimgs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px;max-width:100%;width:100%;}
 .pcimgs--single{grid-template-columns:1fr;}
-.pcimg-wrap{overflow:hidden;border-radius:10px;max-width:100%;min-width:0;}
-.pcimg-wrap--hero{grid-column:1 / -1;}
-.pcimg{width:100%;max-width:100%;max-height:400px;object-fit:cover;border-radius:10px;display:block;}
-.pcimgs--duo .pcimg,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero) .pcimg{max-height:200px;}
+.pcimg-wrap{border-radius:10px;max-width:100%;min-width:0;background:#F5F1E8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.pcimg-wrap--hero{grid-column:1 / -1;max-height:400px;}
+.pcimg{max-width:100%;width:auto;height:auto;max-height:400px;object-fit:contain;border-radius:10px;display:block;}
+.pcimgs--single .pcimg-wrap{max-height:400px;}
+.pcimgs--single .pcimg{max-width:min(100%,400px);margin:0 auto;}
+.pcimgs--duo .pcimg-wrap,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero){aspect-ratio:1;max-height:200px;}
+.pcimgs--duo .pcimg,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero) .pcimg{max-width:100%;max-height:100%;width:auto;height:auto;}
 .pcname{font-size:13px;font-weight:500;color:var(--text1);}
 .pcinfo{font-size:11px;color:var(--text3);margin-top:1px;}
 .pcbdg{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:4px;}
@@ -384,7 +387,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 @media (max-width:768px){
 .pcimgs,.pcimg-wrap,.pcimg{max-width:100%;}
 .pcimg{max-height:320px;}
-.pcimgs--duo .pcimg,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero) .pcimg{max-height:160px;}
+.pcimgs--single .pcimg{max-width:min(100%,320px);}
+.pcimgs--duo .pcimg-wrap,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero){max-height:160px;}
+.pcimg-wrap--hero,.pcimgs--single .pcimg-wrap{max-height:320px;}
 }
 </style>
 </head>
@@ -702,10 +707,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260615"></script>
-<script type="module" src="js/community_ui.js?v=20260617"></script>
+<script type="module" src="js/community_ui.js?v=20260618"></script>
 <script type="module" src="js/analysis.js?v=20260615"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/policy.js?v=20260617"></script>
+<script type="module" src="js/pages/policy.js?v=20260618"></script>
 </body>
 </html>

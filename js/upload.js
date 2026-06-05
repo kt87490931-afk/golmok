@@ -2,8 +2,8 @@ import { supabase } from './supabase_client.js';
 
 const MAX_UPLOAD_BYTES = 1024 * 1024;
 
-/** 업로드 전 canvas 리사이즈 + 1MB 이하 JPEG 압축 */
-export async function resizeImage(file, maxWidth = 1200, quality = 0.85) {
+/** 업로드 전 canvas 리사이즈 (긴 변 최대 maxSize) + 1MB 이하 JPEG 압축 */
+export async function resizeImage(file, maxSize = 1200, quality = 0.85) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
@@ -14,9 +14,14 @@ export async function resizeImage(file, maxWidth = 1200, quality = 0.85) {
       let width = img.width;
       let height = img.height;
 
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
+      if (width > maxSize || height > maxSize) {
+        if (width >= height) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        } else {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        }
       }
 
       const canvas = document.createElement('canvas');
