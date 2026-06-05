@@ -104,37 +104,25 @@ function showError(msg) {
   err.style.display = 'block';
 }
 
-async function ensurePublicUserRow(user) {
-  const { data: existing } = await supabase.from('users').select('id').eq('id', user.id).maybeSingle();
-  if (existing) return;
-  await supabase.from('users').upsert(
-    {
-      id: user.id,
-      email: user.email,
-      nickname: user.user_metadata?.full_name || user.user_metadata?.name || '대장님',
-      auth_provider: 'google',
-      is_admin: false,
-    },
-    { onConflict: 'id' }
-  );
-}
-
-async function isAdminUser(user) {
-  await ensurePublicUserRow(user);
-  const { data } = await supabase.from('users').select('is_admin').eq('id', user.id).maybeSingle();
-  return data?.is_admin === true;
+async function checkIsAdminViaRpc() {
+  const { data, error } = await supabase.rpc('check_is_admin');
+  if (error) {
+    console.warn('check_is_admin', error.message);
+    return false;
+  }
+  return data === true;
 }
 
 async function checkAdminSession(session) {
   if (!session?.user) return;
-  if (await isAdminUser(session.user)) {
+  if (await checkIsAdminViaRpc()) {
     window.location.href = 'dashboard.html';
   }
 }
 
 supabase.auth.onAuthStateChange(async (event, session) => {
   if (!session?.user) return;
-  if (await isAdminUser(session.user)) {
+  if (await checkIsAdminViaRpc()) {
     window.location.href = 'dashboard.html';
     return;
   }

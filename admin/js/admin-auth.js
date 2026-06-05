@@ -3,6 +3,16 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../js/supabase_config.js';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+/** RPC로 is_admin 확인 (RLS·upsert 충돌 방지) */
+export async function checkIsAdmin() {
+  const { data, error } = await supabase.rpc('check_is_admin');
+  if (error) {
+    console.warn('check_is_admin', error.message);
+    return false;
+  }
+  return data === true;
+}
+
 /** 어드민 인증 확인 (모든 어드민 페이지 최상단에서 호출) */
 export async function requireAdmin() {
   const {
@@ -14,28 +24,15 @@ export async function requireAdmin() {
     return null;
   }
 
-  let { data: user, error } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle();
-
-  if (!user && session.user.email) {
-    await supabase.from('users').upsert(
-      {
-        id: session.user.id,
-        email: session.user.email,
-        nickname: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '대장님',
-        auth_provider: 'google',
-      },
-      { onConflict: 'id' }
-    );
-    ({ data: user, error } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle());
-  }
-
-  if (error || !user?.is_admin) {
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin) {
     await supabase.auth.signOut();
     window.location.href = 'index.html';
     return null;
   }
 
-  return user;
+  const { data: user } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle();
+  return user || { id: session.user.id, email: session.user.email, nickname: session.user.user_metadata?.name };
 }
 
 /** 로그아웃 */
