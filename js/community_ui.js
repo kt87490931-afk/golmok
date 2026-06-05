@@ -20,7 +20,7 @@ import {
   getFollowingIds,
   getHotPosts,
   getPopularAreas,
-} from './community.js?v=20260622';
+} from './community.js?v=20260624';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
 
@@ -1074,8 +1074,15 @@ function initSidebarWidgets() {
   }, 5 * 60 * 1000);
 }
 
+function neighborAvatarHtml(user, fallbackStyle, initial) {
+  if (user?.profile_image) {
+    return `<div class="flav"><img src="${escapeHtml(user.profile_image)}" alt="" class="neighbor-av-img"></div>`;
+  }
+  return `<div class="flav" style="${fallbackStyle}">${initial}</div>`;
+}
+
 export async function loadNeighborSection() {
-  const wrap = document.getElementById('neighbor-list');
+  const wrap = document.getElementById('neighbor-list') || document.getElementById('neighbor-users-list');
   if (!wrap) return;
 
   wrap.innerHTML =
@@ -1084,14 +1091,19 @@ export async function loadNeighborSection() {
   try {
     const user = await getCurrentUser();
     let regionSigungu = null;
+    let regionLabel = '';
     if (user) {
       const profile = await getUserProfile(user.id);
       regionSigungu = profile?.region_sigungu || null;
+      regionLabel = profile?.region_sigungu || profile?.region_dong || '';
     }
+
     const neighbors = await getNeighborUsers(user?.id, { limit: 5, regionSigungu });
+
     if (!neighbors.length) {
-      wrap.innerHTML =
-        '<div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">아직 이웃 대장님이 없습니다.<br>회원가입 후 첫 대장님이 되어보세요!</div>';
+      wrap.innerHTML = `<div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">
+        ${regionLabel ? `${escapeHtml(regionLabel)} 이웃 대장님이 아직 없습니다.<br>` : ''}곧 새로운 대장님이 합류할 예정이에요!
+      </div>`;
       return;
     }
 
@@ -1100,15 +1112,16 @@ export async function loadNeighborSection() {
       .map((n, i) => {
         const initial = escapeHtml((n.nickname || '대').charAt(0));
         const name = escapeHtml(n.nickname || '대장님');
-        const meta = escapeHtml([n.upjong3nm, n.region_dong].filter(Boolean).join(' · ') || '골목대장');
+        const job = n.upjong3nm || n.upjong1nm || '';
+        const meta = escapeHtml([job, n.region_dong].filter(Boolean).join(' · ') || '골목대장');
         const following = followingSet.has(n.id);
         const avStyle = NEIGHBOR_AVATAR_STYLES[i % NEIGHBOR_AVATAR_STYLES.length];
         const btnStyle = following
           ? 'background:#F5F1E8;border:1px solid #E8E4DC;color:#555;'
           : 'background:var(--ch);color:#fff;border:none;';
         return `<div class="foli">
-          <div class="flav" style="${avStyle}">${initial}</div>
-          <div><div class="flnm">${name}</div><div class="fltp">${meta}</div></div>
+          ${neighborAvatarHtml(n, avStyle, initial)}
+          <div style="flex:1;min-width:0;"><div class="flnm">${name}</div><div class="fltp">${meta}</div></div>
           <button type="button" class="flbtn" data-user-id="${n.id}" data-following="${following ? 'true' : 'false'}" style="${btnStyle}">${following ? '팔로잉' : '팔로우'}</button>
         </div>`;
       })
@@ -1116,8 +1129,9 @@ export async function loadNeighborSection() {
 
     bindFollowButtons(wrap);
   } catch (e) {
-    console.warn('loadNeighborSection', e);
-    wrap.innerHTML = '<div style="padding:12px 8px;color:#999;font-size:12px;">이웃 목록을 불러오지 못했습니다.</div>';
+    console.error('loadNeighborSection', e);
+    wrap.innerHTML =
+      '<div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">이웃 목록을 불러오지 못했습니다.</div>';
   }
 }
 

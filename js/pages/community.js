@@ -1,4 +1,4 @@
-﻿import { getAllPosts } from '../community.js?v=20260622';
+﻿import { getAllPosts } from '../community.js?v=20260624';
 import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
 

@@ -303,7 +303,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .hott{font-size:12px;color:var(--text1);line-height:1.5;flex:1;}
 .hotc{font-size:11px;color:var(--text3);margin-top:2px;}
 .foli{display:flex;align-items:center;gap:8px;padding:7px 0;}
-.flav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.flav{width:36px;height:36px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.neighbor-av-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
 .flnm{font-size:12px;font-weight:500;color:var(--text1);}
 .fltp{font-size:11px;color:var(--text3);}
 .flbtn{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid var(--ch);color:var(--chd);cursor:pointer;background:transparent;font-weight:500;transition:background .15s,color .15s,border-color .15s;flex-shrink:0;}
@@ -520,8 +521,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
 
     <div class="rcs">
-      <div class="rct"><i class="ti ti-user-plus"></i> 이웃 대장님 <span class="rcm">더보기</span></div>
-      <div id="neighbor-list">
+      <div class="rct"><i class="ti ti-user-plus"></i> 이웃 대장님 <a href="neighborhood.html" class="rcm" style="text-decoration:none;">더보기</a></div>
+      <div id="neighbor-list" data-neighbor-widget>
         <div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">불러오는 중...</div>
       </div>
     </div>
@@ -707,10 +708,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260615"></script>
-<script type="module" src="js/community_ui.js?v=20260623"></script>
+<script type="module" src="js/community_ui.js?v=20260624"></script>
 <script type="module" src="js/analysis.js?v=20260615"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/by_industry.js?v=20260623"></script>
+<script type="module" src="js/pages/by_industry.js?v=20260624"></script>
 </body>
 </html>

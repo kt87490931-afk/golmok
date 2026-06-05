@@ -1,4 +1,4 @@
-﻿import { getEventsByType } from '../community.js?v=20260622';
+﻿import { getEventsByType } from '../community.js?v=20260624';
 import { openPostDetail } from '../community_ui.js';
 import { initPageShell, bootPage, activatePillButtons } from '../page_common.js';
 

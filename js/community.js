@@ -396,19 +396,30 @@ export async function getFollowingIds(userIds) {
 }
 
 export async function getNeighborUsers(excludeUserId, { limit = 5, regionSigungu = null } = {}) {
-  let query = supabase
-    .from('users')
-    .select('id, nickname, profile_image, upjong3nm, upjong1nm, region_dong')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-    .limit(limit);
+  const selectCols = 'id, nickname, profile_image, upjong3nm, upjong1nm, region_dong, region_sigungu';
 
-  if (regionSigungu) query = query.eq('region_sigungu', regionSigungu);
-  if (excludeUserId) query = query.neq('id', excludeUserId);
+  async function fetchUsers(sigungu) {
+    let query = supabase
+      .from('users')
+      .select(selectCols)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(limit);
 
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
+    if (sigungu) query = query.eq('region_sigungu', sigungu);
+    if (excludeUserId) query = query.neq('id', excludeUserId);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  if (regionSigungu) {
+    const local = await fetchUsers(regionSigungu);
+    if (local.length) return local;
+  }
+
+  return fetchUsers(null);
 }
 
 export async function getHotPosts(limit = 3) {

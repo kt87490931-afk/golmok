@@ -1,5 +1,5 @@
 import { getMyPosts, getBookmarkedPosts, getMyProfile } from './profile.js';
-import { getCurrentUser } from './community.js?v=20260622';
+import { getCurrentUser } from './community.js?v=20260624';
 const CATEGORY_LABELS = {
   all: '전체',
   qna: '질문·고민',

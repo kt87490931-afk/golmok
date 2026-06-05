@@ -1,4 +1,4 @@
-﻿import { getInfoPosts } from '../community.js?v=20260622';
+﻿import { getInfoPosts } from '../community.js?v=20260624';
 import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage } from '../page_common.js';
 

@@ -1,4 +1,4 @@
-﻿import { getCurrentUser, getUserProfile, getDongPosts, getSigunguPosts, getAllPosts, getEventPosts } from '../community.js?v=20260622';
+﻿import { getCurrentUser, getUserProfile, getDongPosts, getSigunguPosts, getAllPosts, getEventPosts } from '../community.js?v=20260624';
 import { renderPostList, openPostDetail } from '../community_ui.js';
 import { initPageShell, bootPage, activatePillButtons } from '../page_common.js';
 

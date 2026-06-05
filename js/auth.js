@@ -325,13 +325,17 @@ export async function initAuth() {
       try {
         await handleSignedIn(nextSession.user);
         toast('로그인되었습니다.');
+        window.golmokCommunity?.loadNeighborSection?.().catch(() => {});
       } catch (e) {
         console.error(e);
         toast('로그인 처리 중 오류가 발생했습니다.');
         updateAuthUI(null, nextSession);
       }
     }
-    if (event === 'SIGNED_OUT') updateAuthUI(null, null);
+    if (event === 'SIGNED_OUT') {
+      updateAuthUI(null, null);
+      window.golmokCommunity?.loadNeighborSection?.().catch(() => {});
+    }
   });
 }
 
