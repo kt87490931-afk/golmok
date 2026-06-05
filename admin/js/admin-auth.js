@@ -1,7 +1,35 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../js/supabase_config.js';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
+
+/** OAuth 리다이렉트 직후 세션이 localStorage에 저장될 때까지 대기 */
+export async function waitForSession(timeoutMs = 8000) {
+  const { data: { session: initial } } = await supabase.auth.getSession();
+  if (initial?.user) return initial;
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (session) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      sub?.subscription?.unsubscribe();
+      resolve(session);
+    };
+
+    const timer = setTimeout(() => finish(null), timeoutMs);
+    const sub = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) finish(session);
+    });
+  });
+}
 
 /** RPC로 is_admin 확인 (RLS·upsert 충돌 방지) */
 export async function checkIsAdmin() {
@@ -15,30 +43,43 @@ export async function checkIsAdmin() {
 
 /** 어드민 인증 확인 (모든 어드민 페이지 최상단에서 호출) */
 export async function requireAdmin() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    window.location.href = 'index.html';
+  const session = await waitForSession();
+  if (!session?.user) {
+    window.location.replace('index.html');
     return null;
   }
 
   const isAdmin = await checkIsAdmin();
   if (!isAdmin) {
+    console.warn('requireAdmin: not admin', session.user.email);
     await supabase.auth.signOut();
-    window.location.href = 'index.html';
+    window.location.replace('index.html');
     return null;
   }
 
   const { data: user } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle();
-  return user || { id: session.user.id, email: session.user.email, nickname: session.user.user_metadata?.name };
+  return (
+    user || {
+      id: session.user.id,
+      email: session.user.email,
+      nickname: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '관리자',
+    }
+  );
+}
+
+/** 로그인 페이지: 세션+관리자 확인 후 대시보드 이동 */
+export async function redirectIfAdmin() {
+  const session = await waitForSession();
+  if (!session?.user) return false;
+  if (!(await checkIsAdmin())) return false;
+  window.location.replace('dashboard.html');
+  return true;
 }
 
 /** 로그아웃 */
 export async function adminLogout() {
   await supabase.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.replace('index.html');
 }
 
 export function formatDate(dateStr) {
