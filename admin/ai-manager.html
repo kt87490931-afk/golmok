@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 관리 - 골목대장 어드민</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-page-title" id="admin-page-title">AI 관리</div>
+    </div>
+    <div class="admin-content">
+      <div class="coming-soon-banner">
+        <div class="icon">🤖</div>
+        <h3>AI 관리</h3>
+        <p>
+          Gemini AI 토큰 사용량 모니터링,<br>
+          시스템 프롬프트 관리, AI 기능 ON/OFF 제어,<br>
+          질문 트리 설정을 관리합니다.<br><br>
+          Gemini API 연동 후 활성화됩니다.
+        </p>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title"><i class="ti ti-robot"></i> Gemini AI 설정</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F5F1E8;">
+            <div>
+              <div style="font-size:14px;font-weight:500;">AI 기능 ON/OFF</div>
+              <div style="font-size:12px;color:#999;margin-top:2px;">비용 급증 시 즉시 차단</div>
+            </div>
+            <div style="background:#E8E4DC;border-radius:20px;width:48px;height:26px;cursor:not-allowed;opacity:.5;"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F5F1E8;">
+            <div>
+              <div style="font-size:14px;font-weight:500;">maxOutputTokens</div>
+              <div style="font-size:12px;color:#999;margin-top:2px;">현재 설정값: 80 토큰</div>
+            </div>
+            <input type="number" value="80" disabled style="width:80px;border:1px solid #E8E4DC;border-radius:8px;padding:6px 10px;font-size:13px;opacity:.5;">
+          </div>
+          <div style="padding:12px 0;">
+            <div style="font-size:14px;font-weight:500;margin-bottom:8px;">시스템 프롬프트</div>
+            <textarea disabled rows="5" style="width:100%;border:1px solid #E8E4DC;border-radius:8px;padding:10px;font-size:12px;font-family:monospace;opacity:.5;resize:none;">당신은 소상공인 상권 검색 키워드 추출기입니다.
+상권·업종·지역과 무관한 질문은 {"intent":"기타"} 만 반환.
+최대 80토큰 이내 JSON만 반환.</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title"><i class="ti ti-chart-line"></i> 토큰 사용량</div>
+        <div style="text-align:center;padding:30px;color:#999;">Gemini API 연동 후 실시간 사용량이 표시됩니다</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { requireAdmin } from './js/admin-auth.js';
+import { initAdminPage } from './js/admin.js';
+document.addEventListener('DOMContentLoaded', async () => {
+  const admin = await requireAdmin();
+  if (!admin) return;
+  await initAdminPage({ activePage: 'ai', pageTitle: 'AI 관리', adminUser: admin });
+});
+</script>
+</body>
+</html>

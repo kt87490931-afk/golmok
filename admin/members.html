@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원 관리 - 골목대장 어드민</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-page-title" id="admin-page-title">회원 관리</div>
+      <div id="member-count" style="font-size:13px;color:#999;">총 0명</div>
+    </div>
+    <div class="admin-content">
+      <div class="search-bar">
+        <input type="text" id="member-search" placeholder="닉네임, 이메일, 지역 검색...">
+        <select id="member-filter">
+          <option value="all">전체</option>
+          <option value="active">활성</option>
+          <option value="suspended">정지</option>
+          <option value="admin">관리자</option>
+        </select>
+      </div>
+      <div class="admin-card" style="padding:0;overflow:hidden;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>회원</th>
+              <th>지역</th>
+              <th>업종</th>
+              <th>가입방식</th>
+              <th>최근 로그인</th>
+              <th>상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="members-tbody">
+            <tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { supabase, requireAdmin, showAdminToast, escapeHtml } from './js/admin-auth.js';
+import { initAdminPage } from './js/admin.js';
+
+let allMembers = [];
+let searchQuery = '';
+let filterStatus = 'all';
+
+async function loadMembers() {
+  const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+  if (error) {
+    console.error(error);
+    showAdminToast('회원 목록을 불러오지 못했습니다', 'error');
+    return;
+  }
+  allMembers = data || [];
+  renderMembers();
+}
+
+function renderMembers() {
+  let filtered = allMembers;
+
+  if (searchQuery) {
+    filtered = filtered.filter(
+      (u) =>
+        u.nickname?.includes(searchQuery) ||
+        u.email?.includes(searchQuery) ||
+        u.region_dong?.includes(searchQuery)
+    );
+  }
+
+  if (filterStatus === 'active') filtered = filtered.filter((u) => u.is_active !== false);
+  else if (filterStatus === 'suspended') filtered = filtered.filter((u) => u.is_active === false);
+  else if (filterStatus === 'admin') filtered = filtered.filter((u) => u.is_admin === true);
+
+  const tbody = document.getElementById('members-tbody');
+  const countEl = document.getElementById('member-count');
+  if (!tbody) return;
+  if (countEl) countEl.textContent = `총 ${filtered.length}명`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">검색 결과가 없습니다</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered
+    .map(
+      (user) => `<tr>
+      <td>
+        <div style="font-weight:500;">${escapeHtml(user.nickname || '-')}
+          ${user.is_admin ? '<span class="badge badge-admin">관리자</span>' : ''}
+        </div>
+        <div style="font-size:11px;color:#999;">${escapeHtml(user.email || '-')}</div>
+      </td>
+      <td>${escapeHtml(user.region_full || user.region_dong || '-')}</td>
+      <td>${escapeHtml(user.upjong1nm || '-')}</td>
+      <td>${escapeHtml(user.auth_provider || 'email')}</td>
+      <td style="font-size:12px;color:#999;">${user.last_login_at ? new Date(user.last_login_at).toLocaleDateString('ko-KR') : '-'}</td>
+      <td><span class="badge ${user.is_active === false ? 'badge-suspended' : 'badge-active'}">${user.is_active === false ? '정지' : '활성'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          ${
+            !user.is_admin
+              ? `<button type="button" class="btn-${user.is_active === false ? 'secondary' : 'danger'}" data-action="toggle" data-id="${user.id}" data-suspend="${user.is_active !== false}">${user.is_active === false ? '활성화' : '정지'}</button>`
+              : ''
+          }
+          <button type="button" class="btn-secondary" data-action="detail" data-id="${user.id}">상세</button>
+        </div>
+      </td>
+    </tr>`
+    )
+    .join('');
+
+  tbody.querySelectorAll('[data-action="toggle"]').forEach((btn) => {
+    btn.addEventListener('click', () => toggleUserStatus(btn.dataset.id, btn.dataset.suspend === 'true'));
+  });
+  tbody.querySelectorAll('[data-action="detail"]').forEach((btn) => {
+    btn.addEventListener('click', () => viewUserDetail(btn.dataset.id));
+  });
+}
+
+async function toggleUserStatus(userId, suspend) {
+  if (!window.confirm(suspend ? '이 회원을 정지하시겠습니까?' : '이 회원을 활성화하시겠습니까?')) return;
+  const { error } = await supabase.from('users').update({ is_active: !suspend }).eq('id', userId);
+  if (error) {
+    showAdminToast('처리에 실패했습니다', 'error');
+    return;
+  }
+  showAdminToast(suspend ? '계정이 정지되었습니다' : '계정이 활성화되었습니다');
+  await loadMembers();
+}
+
+async function viewUserDetail(userId) {
+  const user = allMembers.find((u) => u.id === userId);
+  if (!user) return;
+  const { count: postCount } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_deleted', false);
+  window.alert(
+    `닉네임: ${user.nickname || '-'}\n이메일: ${user.email || '-'}\n지역: ${user.region_full || '-'}\n업종: ${user.upjong1nm || '-'}\n상태: ${user.user_status || '-'}\n연락처: ${user.phone || '-'}\n게시글 수: ${postCount || 0}개\n가입일: ${new Date(user.created_at).toLocaleDateString('ko-KR')}`
+  );
+}
+
+document.getElementById('member-search')?.addEventListener('input', (e) => {
+  searchQuery = e.target.value.trim();
+  renderMembers();
+});
+document.getElementById('member-filter')?.addEventListener('change', (e) => {
+  filterStatus = e.target.value;
+  renderMembers();
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const admin = await requireAdmin();
+  if (!admin) return;
+  await initAdminPage({ activePage: 'members', pageTitle: '회원 관리', adminUser: admin });
+  await loadMembers();
+});
+</script>
+</body>
+</html>

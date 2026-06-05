@@ -13,7 +13,8 @@ export const SUPABASE_ANON_KEY =
  * - https://m.golmokmaster.com/privacy.html
  * - https://golmokmaster.com/ , /index.html , /login.html
  * - https://m.golmokmaster.com/ , /index.html , /login.html
- * - (레거시) github.io/golmok , github.io/golmok-mobile 경로
+ * - https://golmokmaster.com/admin/index.html
+ * - https://golmokmaster.com/admin/dashboard.html
  */
 export function getAuthRedirectUrl() {
   const path = window.location.pathname.replace(/login\.html$/i, 'index.html');

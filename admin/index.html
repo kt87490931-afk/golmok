@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>골목대장 어드민 로그인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #1A1A2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.login-logo img { width: 40px; height: 40px; border-radius: 50%; }
+.login-title { font-size: 22px; font-weight: 700; color: #C17F24; }
+.login-subtitle { font-size: 13px; color: #999; margin-bottom: 32px; }
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 16px;
+  border: 2px solid #E8E4DC;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16px;
+  transition: border-color .2s;
+}
+.btn-google:hover { border-color: #F5A623; }
+.btn-google img { width: 22px; height: 22px; }
+.security-note {
+  background: #FFF8E7;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: #8B5A10;
+  text-align: left;
+  line-height: 1.6;
+}
+.error-msg {
+  display: none;
+  background: #FFF1F1;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #E24B4A;
+  margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+<div class="login-card">
+  <div class="login-logo">
+    <img src="../assets/gmlogo.png" alt="골목대장">
+    <div><div class="login-title">골목대장</div></div>
+  </div>
+  <div class="login-subtitle">관리자 전용 페이지</div>
+  <div class="error-msg" id="login-error"></div>
+  <button type="button" class="btn-google" id="btn-admin-google">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Google 계정으로 로그인
+  </button>
+  <div class="security-note">
+    🔐 이 페이지는 등록된 관리자 계정만 접근 가능합니다.<br>
+    Google OTP 2단계 인증이 적용됩니다.<br>
+    비인가 접근 시 자동으로 차단됩니다.
+  </div>
+</div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../js/supabase_config.js';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function showError(msg) {
+  const err = document.getElementById('login-error');
+  err.textContent = msg;
+  err.style.display = 'block';
+}
+
+async function checkAdminSession(session) {
+  if (!session?.user) return;
+  const { data } = await supabase.from('users').select('is_admin').eq('id', session.user.id).maybeSingle();
+  if (data?.is_admin) {
+    window.location.href = 'dashboard.html';
+  }
+}
+
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user) {
+    const { data } = await supabase.from('users').select('is_admin').eq('id', session.user.id).maybeSingle();
+    if (data?.is_admin) {
+      window.location.href = 'dashboard.html';
+    } else if (event === 'SIGNED_IN') {
+      await supabase.auth.signOut();
+      showError('관리자 권한이 없는 계정입니다.');
+    }
+  }
+});
+
+const { data: { session } } = await supabase.auth.getSession();
+await checkAdminSession(session);
+
+document.getElementById('btn-admin-google')?.addEventListener('click', async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}/admin/index.html` },
+  });
+  if (error) showError('로그인에 실패했습니다.');
+});
+</script>
+</body>
+</html>

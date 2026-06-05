@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대시보드 - 골목대장 어드민</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-page-title" id="admin-page-title">대시보드</div>
+    </div>
+    <div class="admin-content">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-label"><i class="ti ti-users"></i> 전체 회원</div>
+          <div class="stat-card-value" id="stat-total-users">-</div>
+          <div class="stat-card-change up" id="stat-today-users"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label"><i class="ti ti-pencil"></i> 전체 게시글</div>
+          <div class="stat-card-value" id="stat-total-posts">-</div>
+          <div class="stat-card-change up" id="stat-today-posts"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label"><i class="ti ti-message-circle"></i> 전체 댓글</div>
+          <div class="stat-card-value" id="stat-total-comments">-</div>
+          <div class="stat-card-change up" id="stat-today-comments"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label"><i class="ti ti-alert-circle"></i> 신고 대기</div>
+          <div class="stat-card-value" id="stat-pending-reports">-</div>
+          <div class="stat-card-change" id="stat-reports-note"></div>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">
+          <i class="ti ti-users"></i> 최근 가입 회원
+          <a href="members.html" style="margin-left:auto;font-size:12px;color:#F5A623;text-decoration:none;">전체보기 →</a>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr><th>닉네임 / 이메일</th><th>지역</th><th>업종</th><th>가입일</th></tr>
+          </thead>
+          <tbody id="recent-members-body">
+            <tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">
+          <i class="ti ti-pencil"></i> 최근 게시글
+          <a href="posts.html" style="margin-left:auto;font-size:12px;color:#F5A623;text-decoration:none;">전체보기 →</a>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr><th>내용</th><th>카테고리</th><th>작성자</th><th>반응</th><th>작성일</th></tr>
+          </thead>
+          <tbody id="recent-posts-body">
+            <tr><td colspan="5" style="text-align:center;color:#999;padding:20px;">로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { supabase, requireAdmin, formatNumber, escapeHtml } from './js/admin-auth.js';
+import { initAdminPage } from './js/admin.js';
+
+const catLabels = { all: '전체', qna: '질문', info: '정보', startup: '창업', issue: '이슈', event: '이벤트' };
+
+async function loadStats() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayIso = today.toISOString();
+
+  const [{ count: totalUsers }, { count: todayUsers }, { count: totalPosts }, { count: todayPosts }, { count: totalComments }, { count: todayComments }] =
+    await Promise.all([
+      supabase.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
+      supabase.from('posts').select('*', { count: 'exact', head: true }).eq('is_deleted', false),
+      supabase.from('posts').select('*', { count: 'exact', head: true }).eq('is_deleted', false).gte('created_at', todayIso),
+      supabase.from('comments').select('*', { count: 'exact', head: true }).eq('is_deleted', false),
+      supabase.from('comments').select('*', { count: 'exact', head: true }).eq('is_deleted', false).gte('created_at', todayIso),
+    ]);
+
+  let pendingReports = 0;
+  try {
+    const { count } = await supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+    pendingReports = count || 0;
+  } catch (_) {
+    pendingReports = 0;
+  }
+
+  document.getElementById('stat-total-users').textContent = formatNumber(totalUsers);
+  document.getElementById('stat-today-users').textContent = `오늘 +${todayUsers || 0}`;
+  document.getElementById('stat-total-posts').textContent = formatNumber(totalPosts);
+  document.getElementById('stat-today-posts').textContent = `오늘 +${todayPosts || 0}`;
+  document.getElementById('stat-total-comments').textContent = formatNumber(totalComments);
+  document.getElementById('stat-today-comments').textContent = `오늘 +${todayComments || 0}`;
+  document.getElementById('stat-pending-reports').textContent = formatNumber(pendingReports || 0);
+  document.getElementById('stat-reports-note').textContent = pendingReports ? '처리 필요' : '신고 없음';
+}
+
+async function loadRecentMembers() {
+  const { data } = await supabase
+    .from('users')
+    .select('id, nickname, email, region_dong, upjong1nm, created_at')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  const tbody = document.getElementById('recent-members-body');
+  if (!tbody) return;
+  if (!data?.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">회원이 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data
+    .map(
+      (user) => `<tr>
+      <td><div style="font-weight:500;">${escapeHtml(user.nickname || '-')}</div>
+        <div style="font-size:11px;color:#999;">${escapeHtml(user.email || '-')}</div></td>
+      <td>${escapeHtml(user.region_dong || '-')}</td>
+      <td>${escapeHtml(user.upjong1nm || '-')}</td>
+      <td style="font-size:12px;color:#999;">${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
+    </tr>`
+    )
+    .join('');
+}
+
+async function loadRecentPosts() {
+  const { data } = await supabase
+    .from('posts')
+    .select('id, content, category, like_count, comment_count, created_at, users(nickname, region_dong)')
+    .eq('is_deleted', false)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  const tbody = document.getElementById('recent-posts-body');
+  if (!tbody) return;
+  if (!data?.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:20px;">게시글이 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data
+    .map(
+      (post) => `<tr>
+      <td style="max-width:200px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(post.content?.slice(0, 40) || '-')}</div></td>
+      <td><span style="background:#FFF8E7;color:#C17F24;padding:2px 7px;border-radius:10px;font-size:11px;">${catLabels[post.category] || post.category}</span></td>
+      <td>${escapeHtml(post.users?.nickname || '-')}</td>
+      <td style="font-size:12px;color:#999;">❤️${post.like_count || 0} 💬${post.comment_count || 0}</td>
+      <td style="font-size:12px;color:#999;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</td>
+    </tr>`
+    )
+    .join('');
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const admin = await requireAdmin();
+  if (!admin) return;
+  await initAdminPage({ activePage: 'dashboard', pageTitle: '대시보드', adminUser: admin });
+  await loadStats();
+  await loadRecentMembers();
+  await loadRecentPosts();
+});
+</script>
+</body>
+</html>
