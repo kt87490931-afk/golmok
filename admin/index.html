@@ -93,7 +93,7 @@ body {
   </div>
 </div>
 <script type="module">
-import { supabase, checkIsAdmin, signInWithGoogleAdmin } from './js/admin-auth.js';
+import { supabase, checkIsAdmin } from './js/admin-auth.js?v=20260616';
 
 function showError(msg) {
   const err = document.getElementById('login-error');
@@ -107,7 +107,13 @@ btn?.addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = 'Google 로그인 연결 중...';
   try {
-    await signInWithGoogleAdmin();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/admin/index.html` },
+    });
+    if (error) throw error;
+    if (data?.url) window.location.assign(data.url);
+    else throw new Error('Google 로그인 URL을 받지 못했습니다.');
   } catch (e) {
     console.error(e);
     showError('로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
