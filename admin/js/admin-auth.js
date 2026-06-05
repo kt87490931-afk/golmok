@@ -9,29 +9,33 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 });
 
-/** OAuth 리다이렉트 직후 세션이 localStorage에 저장될 때까지 대기 */
-export async function waitForSession(timeoutMs = 8000) {
-  const { data: { session: initial } } = await supabase.auth.getSession();
+/** OAuth 직후 세션 준비 대기 (대시보드 등에서만 사용) */
+export async function waitForSession(timeoutMs = 5000) {
+  const {
+    data: { session: initial },
+  } = await supabase.auth.getSession();
   if (initial?.user) return initial;
 
   return new Promise((resolve) => {
     let settled = false;
+    let subscription = null;
+
     const finish = (session) => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      sub?.subscription?.unsubscribe();
+      subscription?.unsubscribe();
       resolve(session);
     };
 
     const timer = setTimeout(() => finish(null), timeoutMs);
-    const sub = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) finish(session);
     });
+    subscription = data.subscription;
   });
 }
 
-/** RPC로 is_admin 확인 (RLS·upsert 충돌 방지) */
 export async function checkIsAdmin() {
   const { data, error } = await supabase.rpc('check_is_admin');
   if (error) {
@@ -41,7 +45,6 @@ export async function checkIsAdmin() {
   return data === true;
 }
 
-/** 어드민 인증 확인 (모든 어드민 페이지 최상단에서 호출) */
 export async function requireAdmin() {
   const session = await waitForSession();
   if (!session?.user) {
@@ -49,9 +52,7 @@ export async function requireAdmin() {
     return null;
   }
 
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) {
-    console.warn('requireAdmin: not admin', session.user.email);
+  if (!(await checkIsAdmin())) {
     await supabase.auth.signOut();
     window.location.replace('index.html');
     return null;
@@ -67,16 +68,15 @@ export async function requireAdmin() {
   );
 }
 
-/** 로그인 페이지: 세션+관리자 확인 후 대시보드 이동 */
-export async function redirectIfAdmin() {
-  const session = await waitForSession();
-  if (!session?.user) return false;
-  if (!(await checkIsAdmin())) return false;
-  window.location.replace('dashboard.html');
-  return true;
+export async function signInWithGoogleAdmin() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}/admin/index.html` },
+  });
+  if (error) throw error;
+  if (data?.url) window.location.assign(data.url);
 }
 
-/** 로그아웃 */
 export async function adminLogout() {
   await supabase.auth.signOut();
   window.location.replace('index.html');

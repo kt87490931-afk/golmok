@@ -93,7 +93,7 @@ body {
   </div>
 </div>
 <script type="module">
-import { supabase, checkIsAdmin, waitForSession, redirectIfAdmin } from './js/admin-auth.js';
+import { supabase, checkIsAdmin, signInWithGoogleAdmin } from './js/admin-auth.js';
 
 function showError(msg) {
   const err = document.getElementById('login-error');
@@ -101,39 +101,36 @@ function showError(msg) {
   err.style.display = 'block';
 }
 
-let handlingAuth = false;
-
-supabase.auth.onAuthStateChange(async (event, session) => {
-  if (handlingAuth) return;
-  if (!session?.user) return;
-
-  if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-    handlingAuth = true;
-    try {
-      if (await checkIsAdmin()) {
-        window.location.replace('dashboard.html');
-        return;
-      }
-      if (event === 'SIGNED_IN') {
-        const email = session.user.email || '알 수 없음';
-        await supabase.auth.signOut();
-        showError(`관리자 권한이 없는 계정입니다. (${email})`);
-      }
-    } finally {
-      handlingAuth = false;
-    }
+const btn = document.getElementById('btn-admin-google');
+btn?.addEventListener('click', async () => {
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = 'Google 로그인 연결 중...';
+  try {
+    await signInWithGoogleAdmin();
+  } catch (e) {
+    console.error(e);
+    showError('로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    btn.disabled = false;
+    btn.innerHTML =
+      '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:22px;height:22px;"> Google 계정으로 로그인';
   }
 });
 
-await waitForSession(5000);
-await redirectIfAdmin();
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (!session?.user) return;
+  if (event !== 'INITIAL_SESSION' && event !== 'SIGNED_IN') return;
 
-document.getElementById('btn-admin-google')?.addEventListener('click', async () => {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: `${window.location.origin}/admin/index.html` },
-  });
-  if (error) showError('로그인에 실패했습니다.');
+  if (await checkIsAdmin()) {
+    window.location.replace('dashboard.html');
+    return;
+  }
+
+  if (event === 'SIGNED_IN') {
+    const email = session.user.email || '알 수 없음';
+    await supabase.auth.signOut();
+    showError(`관리자 권한이 없는 계정입니다. (${email})`);
+  }
 });
 </script>
 </body>
