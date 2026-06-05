@@ -349,3 +349,30 @@ export async function isFollowing(targetUserId) {
 
   return !!data;
 }
+
+export async function getFollowingIds(userIds) {
+  const user = await getCurrentUser();
+  if (!user || !userIds?.length) return new Set();
+
+  const { data } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', user.id)
+    .in('following_id', userIds);
+
+  return new Set((data || []).map((r) => r.following_id));
+}
+
+export async function getNeighborUsers(excludeUserId, limit = 5) {
+  let query = supabase
+    .from('users')
+    .select('id, nickname, profile_image, upjong3nm, region_dong')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (excludeUserId) query = query.neq('id', excludeUserId);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}

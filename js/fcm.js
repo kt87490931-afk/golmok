@@ -46,8 +46,17 @@ export async function initFCM() {
   }
 }
 
-/** 댓글 알림 (FastAPI 연동 전까지 로그만) */
-export async function sendCommentNotification(postOwnerId, commenterName) {
+/** 댓글 알림 — 인앱 알림 + FCM(설정 시) */
+export async function sendCommentNotification(postOwnerId, commenterName, postId = null) {
+  try {
+    const { notifyComment } = await import('./notifications.js');
+    await notifyComment({ postOwnerId, commenterName, postId });
+    const { refreshNotificationBadge } = await import('./notifications_ui.js');
+    refreshNotificationBadge?.();
+  } catch (e) {
+    console.warn('인앱 댓글 알림 실패:', e?.message);
+  }
+
   const { data: owner } = await supabase
     .from('users')
     .select('fcm_token, push_enabled')

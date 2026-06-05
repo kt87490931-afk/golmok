@@ -179,8 +179,11 @@ function bindAnalysisUI() {
   if (window.__golmokAnalysisBound) return;
   window.__golmokAnalysisBound = true;
 
-  document.querySelectorAll('.ni[data-open-analysis], .nav-analysis').forEach((el) => {
-    el.addEventListener('click', openAnalysisPanel);
+  document.querySelectorAll('.ni[data-open-analysis], .nav-analysis, .tnl[data-open-analysis], .ai-detail-btn[data-open-analysis]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAnalysisPanel();
+    });
   });
 
   document.getElementById('close-analysis-overlay')?.addEventListener('click', () => {

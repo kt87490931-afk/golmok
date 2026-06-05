@@ -16,9 +16,12 @@ import {
   getBookmarkedPostIds,
   isLiked,
   isFollowing,
+  getNeighborUsers,
+  getFollowingIds,
 } from './community.js';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
+import { notifyLike } from './notifications.js';
 
 const DEFAULT_REGION = {
   region_sido: '경기',
@@ -181,8 +184,6 @@ window.triggerImageUpload = () => document.getElementById('image-file-input')?.c
 function getPostListEl() {
   return document.getElementById('post-list') || document.querySelector('.plist');
 }
-  return document.getElementById('post-list') || document.querySelector('.plist');
-}
 
 function getWriteOverlay() {
   const el = document.getElementById('write-modal') || document.getElementById('wr-overlay');
@@ -272,6 +273,7 @@ export async function loadFeed(reset = true) {
     }
 
     await loadEventSection();
+    loadNeighborSection().catch(() => {});
   } catch (e) {
     console.error(e);
     if (reset) list.innerHTML = feedLoadErrorHtml(e);
@@ -404,6 +406,11 @@ function createPostCard(post, likedSet, savedSet) {
       btn.style.color = '#E24B4A';
       count.textContent = n + 1;
       toast('공감했습니다');
+      const me = await getCurrentUser();
+      if (me && post.user_id && post.user_id !== me.id) {
+        const profile = await getUserProfile(me.id);
+        notifyLike({ postOwnerId: post.user_id, likerName: profile?.nickname || '대장님', postId: post.id }).catch(() => {});
+      }
     } else {
       icon.style.color = '';
       btn.style.color = '';
@@ -631,7 +638,7 @@ function showPostDetailModal(post, comments, liked, following = false) {
     const me = await getCurrentUser();
     if (me && post.user_id && post.user_id !== me.id) {
       const profile = await getUserProfile(me.id);
-      sendCommentNotification(post.user_id, profile?.nickname || '대장님');
+      sendCommentNotification(post.user_id, profile?.nickname || '대장님', post.id);
     }
     toast('댓글이 등록되었습니다');
   };
@@ -832,25 +839,83 @@ function bindInfiniteScroll() {
   else root.addEventListener('scroll', onScroll);
 }
 
-function bindFollowButtons() {
-  document.querySelectorAll('.flbtn').forEach((btn) => {
-    const card = btn.closest('.foli');
+function bindFollowButtons(root = document) {
+  const scope = root instanceof Element ? root : document;
+  scope.querySelectorAll('.flbtn:not([data-bound])').forEach((btn) => {
     const uid = btn.dataset.userId;
     if (!uid) return;
-    btn.addEventListener('click', async () => {
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const res = await toggleFollow(uid);
-      if (res?.error === 'login') return toast('로그인이 필요합니다');
+      if (res?.error === 'login') {
+        toast('로그인이 필요합니다');
+        window.openLoginModal?.('login');
+        return;
+      }
       if (res.following) {
         btn.textContent = '팔로잉';
-        btn.style.background = 'var(--ch)';
-        btn.style.color = '#fff';
+        btn.style.background = '#F5F1E8';
+        btn.style.border = '1px solid #E8E4DC';
+        btn.style.color = '#555';
+        toast('팔로우했습니다');
       } else {
         btn.textContent = '팔로우';
         btn.style.background = '';
+        btn.style.border = '';
         btn.style.color = '';
+        toast('팔로우 취소');
       }
     });
   });
+}
+
+const NEIGHBOR_AVATAR_STYLES = [
+  'background:#FAEEDA;color:#633806;',
+  'background:#E1F5EE;color:#085041;',
+  'background:#EEEDFE;color:#3C3489;',
+  'background:#FFF1F1;color:#8B2942;',
+  'background:#EBF4FF;color:#1A4A8A;',
+];
+
+export async function loadNeighborSection() {
+  const wrap = document.getElementById('neighbor-list');
+  if (!wrap) return;
+
+  try {
+    const user = await getCurrentUser();
+    const neighbors = await getNeighborUsers(user?.id, 5);
+    if (!neighbors.length) {
+      wrap.innerHTML =
+        '<div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">아직 이웃 대장님이 없습니다.<br>회원가입 후 첫 대장님이 되어보세요!</div>';
+      return;
+    }
+
+    const followingSet = user ? await getFollowingIds(neighbors.map((n) => n.id)) : new Set();
+    wrap.innerHTML = neighbors
+      .map((n, i) => {
+        const initial = escapeHtml((n.nickname || '대').charAt(0));
+        const name = escapeHtml(n.nickname || '대장님');
+        const meta = escapeHtml([n.upjong3nm, n.region_dong].filter(Boolean).join(' · ') || '골목대장');
+        const following = followingSet.has(n.id);
+        const avStyle = NEIGHBOR_AVATAR_STYLES[i % NEIGHBOR_AVATAR_STYLES.length];
+        const btnStyle = following
+          ? 'background:#F5F1E8;border:1px solid #E8E4DC;color:#555;'
+          : 'background:var(--ch);color:#fff;border:none;';
+        return `<div class="foli">
+          <div class="flav" style="${avStyle}">${initial}</div>
+          <div><div class="flnm">${name}</div><div class="fltp">${meta}</div></div>
+          <button type="button" class="flbtn" data-user-id="${n.id}" style="${btnStyle}">${following ? '팔로잉' : '팔로우'}</button>
+        </div>`;
+      })
+      .join('');
+
+    bindFollowButtons(wrap);
+  } catch (e) {
+    console.warn('loadNeighborSection', e);
+    wrap.innerHTML = '<div style="padding:12px 8px;color:#999;font-size:12px;">이웃 목록을 불러오지 못했습니다.</div>';
+  }
 }
 
 export function initCommunity() {
@@ -860,6 +925,7 @@ export function initCommunity() {
   bindImageUpload();
   bindInfiniteScroll();
   bindFollowButtons();
+  loadNeighborSection().catch(() => {});
 
   const params = new URLSearchParams(window.location.search);
   const postId = params.get('post');
