@@ -580,7 +580,7 @@ function showPostDetailModal(post, comments, liked, following = false) {
           </button>
           ${
             user.id
-              ? `<button type="button" class="detail-follow-btn" data-user-id="${user.id}" style="display:flex;align-items:center;gap:5px;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;${
+              ? `<button type="button" class="detail-follow-btn" data-user-id="${user.id}" data-following="${following ? 'true' : 'false'}" style="display:flex;align-items:center;gap:5px;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;transition:background .15s,color .15s,border-color .15s;${
                   following
                     ? 'background:#F5F1E8;border:1px solid #E8E4DC;color:#555;'
                     : 'background:var(--ch);color:#fff;border:none;'
@@ -627,28 +627,11 @@ function showPostDetailModal(post, comments, liked, following = false) {
 
   modal.querySelector('.detail-share-btn')?.addEventListener('click', () => sharePost(post.id));
 
-  modal.querySelector('.detail-follow-btn')?.addEventListener('click', async (e) => {
+  modal.querySelector('.detail-follow-btn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const uid = e.currentTarget.dataset.userId;
-    const btn = e.currentTarget;
-    const res = await toggleFollow(uid);
-    if (res?.error === 'login') {
-      toast('로그인이 필요합니다');
-      window.openLoginModal?.('login');
-      return;
-    }
-    if (res.following) {
-      btn.innerHTML = '<i class="ti ti-user-plus"></i> 팔로잉';
-      btn.style.background = '#F5F1E8';
-      btn.style.border = '1px solid #E8E4DC';
-      btn.style.color = '#555';
-      toast('팔로우했습니다');
-    } else {
-      btn.innerHTML = '<i class="ti ti-user-plus"></i> 팔로우';
-      btn.style.background = 'var(--ch)';
-      btn.style.border = 'none';
-      btn.style.color = '#fff';
-      toast('팔로우 취소');
-    }
+    handleFollowClick(e.currentTarget, uid);
   });
 
   modal.querySelectorAll('.reply-btn').forEach((btn) => {
@@ -896,34 +879,79 @@ function bindInfiniteScroll() {
   else root.addEventListener('scroll', onScroll);
 }
 
+function setFollowButtonState(btn, following) {
+  if (!btn) return;
+  btn.dataset.following = following ? 'true' : 'false';
+  if (btn.classList.contains('detail-follow-btn')) {
+    btn.innerHTML = following
+      ? '<i class="ti ti-user-plus"></i> 팔로잉'
+      : '<i class="ti ti-user-plus"></i> 팔로우';
+  } else {
+    btn.textContent = following ? '팔로잉' : '팔로우';
+  }
+  if (following) {
+    btn.style.background = '#F5F1E8';
+    btn.style.border = '1px solid #E8E4DC';
+    btn.style.color = '#555';
+  } else {
+    btn.style.background = 'var(--ch)';
+    btn.style.color = '#fff';
+    btn.style.border = 'none';
+  }
+}
+
+function syncFollowButtonsForUser(userId, following) {
+  document
+    .querySelectorAll(`.flbtn[data-user-id="${userId}"], .detail-follow-btn[data-user-id="${userId}"]`)
+    .forEach((b) => setFollowButtonState(b, following));
+}
+
+async function handleFollowClick(btn, targetUserId) {
+  if (!btn || btn.disabled) return;
+
+  const wasFollowing = btn.dataset.following === 'true';
+  const nextFollowing = !wasFollowing;
+
+  setFollowButtonState(btn, nextFollowing);
+  syncFollowButtonsForUser(targetUserId, nextFollowing);
+  btn.disabled = true;
+
+  try {
+    const res = await toggleFollow(targetUserId);
+    if (res?.error === 'login') {
+      syncFollowButtonsForUser(targetUserId, wasFollowing);
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
+    if (res == null) {
+      syncFollowButtonsForUser(targetUserId, wasFollowing);
+      return;
+    }
+    syncFollowButtonsForUser(targetUserId, !!res.following);
+    toast(res.following ? '팔로우했습니다' : '팔로우 취소');
+  } catch (e) {
+    console.error('handleFollowClick', e);
+    syncFollowButtonsForUser(targetUserId, wasFollowing);
+    toast('오류가 발생했습니다. 다시 시도해주세요');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 function bindFollowButtons(root = document) {
   const scope = root instanceof Element ? root : document;
   scope.querySelectorAll('.flbtn:not([data-bound])').forEach((btn) => {
     const uid = btn.dataset.userId;
     if (!uid) return;
     btn.dataset.bound = '1';
-    btn.addEventListener('click', async (e) => {
+    if (!btn.dataset.following) {
+      btn.dataset.following = btn.textContent.trim() === '팔로잉' ? 'true' : 'false';
+    }
+    btn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const res = await toggleFollow(uid);
-      if (res?.error === 'login') {
-        toast('로그인이 필요합니다');
-        window.openLoginModal?.('login');
-        return;
-      }
-      if (res.following) {
-        btn.textContent = '팔로잉';
-        btn.style.background = '#F5F1E8';
-        btn.style.border = '1px solid #E8E4DC';
-        btn.style.color = '#555';
-        toast('팔로우했습니다');
-      } else {
-        btn.textContent = '팔로우';
-        btn.style.background = '';
-        btn.style.border = '';
-        btn.style.color = '';
-        toast('팔로우 취소');
-      }
+      handleFollowClick(btn, uid);
     });
   });
 }
@@ -1076,7 +1104,7 @@ export async function loadNeighborSection() {
         return `<div class="foli">
           <div class="flav" style="${avStyle}">${initial}</div>
           <div><div class="flnm">${name}</div><div class="fltp">${meta}</div></div>
-          <button type="button" class="flbtn" data-user-id="${n.id}" style="${btnStyle}">${following ? '팔로잉' : '팔로우'}</button>
+          <button type="button" class="flbtn" data-user-id="${n.id}" data-following="${following ? 'true' : 'false'}" style="${btnStyle}">${following ? '팔로잉' : '팔로우'}</button>
         </div>`;
       })
       .join('');

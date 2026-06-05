@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const indexPath = path.join(root, 'index.html');
-const ver = '20260620';
+const ver = '20260621';
 
 const communityMain = `
       <div class="main-content">
