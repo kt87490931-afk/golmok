@@ -320,23 +320,51 @@ export async function toggleFollow(targetUserId) {
   if (!user) return { error: 'login' };
   if (user.id === targetUserId) return null;
 
-  const { data: existing } = await supabase
+  const { data: existing, error: selectError } = await supabase
     .from('follows')
     .select('id')
     .eq('follower_id', user.id)
     .eq('following_id', targetUserId)
     .maybeSingle();
 
+  if (selectError) {
+    console.error('toggleFollow select', selectError);
+    return { error: selectError.message || 'follow_select_failed' };
+  }
+
   if (existing) {
-    await supabase.from('follows').delete().eq('follower_id', user.id).eq('following_id', targetUserId);
-    await supabase.rpc('decrement_follower_count', { target_user_id: targetUserId }).catch(() => {});
-    await supabase.rpc('decrement_following_count', { current_user_id: user.id }).catch(() => {});
+    const { error: deleteError } = await supabase
+      .from('follows')
+      .delete()
+      .eq('follower_id', user.id)
+      .eq('following_id', targetUserId);
+
+    if (deleteError) {
+      console.error('toggleFollow delete', deleteError);
+      return { error: deleteError.message || 'follow_delete_failed' };
+    }
+
+    const { error: rpc1 } = await supabase.rpc('decrement_follower_count', { target_user_id: targetUserId });
+    const { error: rpc2 } = await supabase.rpc('decrement_following_count', { current_user_id: user.id });
+    if (rpc1) console.warn('decrement_follower_count', rpc1.message);
+    if (rpc2) console.warn('decrement_following_count', rpc2.message);
     return { following: false };
   }
 
-  await supabase.from('follows').insert({ follower_id: user.id, following_id: targetUserId });
-  await supabase.rpc('increment_follower_count', { target_user_id: targetUserId }).catch(() => {});
-  await supabase.rpc('increment_following_count', { current_user_id: user.id }).catch(() => {});
+  const { error: insertError } = await supabase.from('follows').insert({
+    follower_id: user.id,
+    following_id: targetUserId,
+  });
+
+  if (insertError) {
+    console.error('toggleFollow insert', insertError);
+    return { error: insertError.message || 'follow_insert_failed' };
+  }
+
+  const { error: rpc1 } = await supabase.rpc('increment_follower_count', { target_user_id: targetUserId });
+  const { error: rpc2 } = await supabase.rpc('increment_following_count', { current_user_id: user.id });
+  if (rpc1) console.warn('increment_follower_count', rpc1.message);
+  if (rpc2) console.warn('increment_following_count', rpc2.message);
   return { following: true };
 }
 

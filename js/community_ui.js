@@ -928,6 +928,11 @@ async function handleFollowClick(btn, targetUserId) {
       syncFollowButtonsForUser(targetUserId, wasFollowing);
       return;
     }
+    if (res.error) {
+      syncFollowButtonsForUser(targetUserId, wasFollowing);
+      toast('팔로우 처리에 실패했습니다. 다시 시도해주세요');
+      return;
+    }
     syncFollowButtonsForUser(targetUserId, !!res.following);
     toast(res.following ? '팔로우했습니다' : '팔로우 취소');
   } catch (e) {
