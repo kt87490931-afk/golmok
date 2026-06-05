@@ -14,7 +14,20 @@ export async function requireAdmin() {
     return null;
   }
 
-  const { data: user, error } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle();
+  let { data: user, error } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle();
+
+  if (!user && session.user.email) {
+    await supabase.from('users').upsert(
+      {
+        id: session.user.id,
+        email: session.user.email,
+        nickname: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '대장님',
+        auth_provider: 'google',
+      },
+      { onConflict: 'id' }
+    );
+    ({ data: user, error } = await supabase.from('users').select('*').eq('id', session.user.id).maybeSingle());
+  }
 
   if (error || !user?.is_admin) {
     await supabase.auth.signOut();

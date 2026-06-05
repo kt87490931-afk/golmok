@@ -104,23 +104,44 @@ function showError(msg) {
   err.style.display = 'block';
 }
 
+async function ensurePublicUserRow(user) {
+  const { data: existing } = await supabase.from('users').select('id').eq('id', user.id).maybeSingle();
+  if (existing) return;
+  await supabase.from('users').upsert(
+    {
+      id: user.id,
+      email: user.email,
+      nickname: user.user_metadata?.full_name || user.user_metadata?.name || '대장님',
+      auth_provider: 'google',
+      is_admin: false,
+    },
+    { onConflict: 'id' }
+  );
+}
+
+async function isAdminUser(user) {
+  await ensurePublicUserRow(user);
+  const { data } = await supabase.from('users').select('is_admin').eq('id', user.id).maybeSingle();
+  return data?.is_admin === true;
+}
+
 async function checkAdminSession(session) {
   if (!session?.user) return;
-  const { data } = await supabase.from('users').select('is_admin').eq('id', session.user.id).maybeSingle();
-  if (data?.is_admin) {
+  if (await isAdminUser(session.user)) {
     window.location.href = 'dashboard.html';
   }
 }
 
 supabase.auth.onAuthStateChange(async (event, session) => {
-  if (session?.user) {
-    const { data } = await supabase.from('users').select('is_admin').eq('id', session.user.id).maybeSingle();
-    if (data?.is_admin) {
-      window.location.href = 'dashboard.html';
-    } else if (event === 'SIGNED_IN') {
-      await supabase.auth.signOut();
-      showError('관리자 권한이 없는 계정입니다.');
-    }
+  if (!session?.user) return;
+  if (await isAdminUser(session.user)) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+  if (event === 'SIGNED_IN') {
+    const email = session.user.email || '알 수 없음';
+    await supabase.auth.signOut();
+    showError(`관리자 권한이 없는 계정입니다. (${email})`);
   }
 });
 
