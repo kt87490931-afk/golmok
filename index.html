@@ -595,11 +595,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <div class="winp" id="open-write">대장님들과 이야기를 나눠보세요...</div>
         </div>
         <div class="wacts">
-          <button class="wab"><i class="ti ti-photo"></i> 사진</button>
-          <button class="wab"><i class="ti ti-map-pin"></i> 위치</button>
-          <button class="wab"><i class="ti ti-tag"></i> 업종태그</button>
-          <button class="wab"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
-          <button class="pbtn" id="open-write-btn">게시하기</button>
+          <button type="button" class="wab" data-write-action="photo" id="feed-photo-btn"><i class="ti ti-photo"></i> 사진</button>
+          <button type="button" class="wab" data-write-action="location"><i class="ti ti-map-pin"></i> 위치</button>
+          <button type="button" class="wab" data-write-action="tag"><i class="ti ti-tag"></i> 업종태그</button>
+          <button type="button" class="wab" data-write-action="event"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
+          <button type="button" class="pbtn" id="open-write-btn">게시하기</button>
         </div>
       </div>
 
@@ -698,6 +698,32 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
   </div>
 </div>
+
+<script>
+(function () {
+  function openWriteModalSafe() {
+    document.getElementById('write-modal')?.classList.add('open');
+  }
+  function bindWriteFallback() {
+    document.getElementById('open-write')?.addEventListener('click', openWriteModalSafe);
+    document.getElementById('open-write-btn')?.addEventListener('click', openWriteModalSafe);
+    document.getElementById('feed-photo-btn')?.addEventListener('click', function () {
+      openWriteModalSafe();
+      setTimeout(function () {
+        document.getElementById('image-file-input')?.click();
+      }, 120);
+    });
+    document.getElementById('close-modal')?.addEventListener('click', function () {
+      document.getElementById('write-modal')?.classList.remove('open');
+    });
+    document.getElementById('write-modal')?.addEventListener('click', function (e) {
+      if (e.target.id === 'write-modal') e.target.classList.remove('open');
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindWriteFallback);
+  else bindWriteFallback();
+})();
+</script>
 
 <!-- 내 게시글 / 저장한 글 -->
 <div class="modal-bg" id="my-activity-overlay">
@@ -816,11 +842,11 @@ document.querySelectorAll('.ni').forEach(ni=>{
   });
 });
 </script>
-<script type="module" src="js/profile_ui.js?v=20260612"></script>
-<script type="module" src="js/auth.js?v=20260612"></script>
-<script type="module" src="js/community_ui.js?v=20260612"></script>
-<script type="module" src="js/analysis.js?v=20260612"></script>
-<script type="module" src="js/notifications_ui.js?v=20260612"></script>
-<script type="module" src="js/fcm.js?v=20260612"></script>
+<script type="module" src="js/profile_ui.js?v=20260613"></script>
+<script type="module" src="js/auth.js?v=20260613"></script>
+<script type="module" src="js/community_ui.js?v=20260613"></script>
+<script type="module" src="js/analysis.js?v=20260613"></script>
+<script type="module" src="js/notifications_ui.js?v=20260613"></script>
+<script type="module" src="js/fcm.js?v=20260613"></script>
 </body>
 </html>

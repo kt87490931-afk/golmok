@@ -21,7 +21,6 @@ import {
 } from './community.js';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
-import { notifyLike } from './notifications.js';
 
 const DEFAULT_REGION = {
   region_sido: '경기',
@@ -195,6 +194,12 @@ function openWriteOverlay() {
   const ov = getWriteOverlay();
   if (!ov) return;
   ov.classList.add('open');
+  window.dispatchEvent(new CustomEvent('golmok:write-open'));
+}
+
+function openWriteWithPhoto() {
+  openWriteOverlay();
+  setTimeout(() => document.getElementById('image-file-input')?.click(), 120);
 }
 
 function getPostContentInput() {
@@ -409,7 +414,15 @@ function createPostCard(post, likedSet, savedSet) {
       const me = await getCurrentUser();
       if (me && post.user_id && post.user_id !== me.id) {
         const profile = await getUserProfile(me.id);
-        notifyLike({ postOwnerId: post.user_id, likerName: profile?.nickname || '대장님', postId: post.id }).catch(() => {});
+        import('./notifications.js')
+          .then((m) =>
+            m.notifyLike({
+              postOwnerId: post.user_id,
+              likerName: profile?.nickname || '대장님',
+              postId: post.id,
+            })
+          )
+          .catch(() => {});
       }
     } else {
       icon.style.color = '';
@@ -813,6 +826,20 @@ function bindWriteModal() {
   document.getElementById('open-write')?.addEventListener('click', openWriteOverlay);
   document.getElementById('open-write-btn')?.addEventListener('click', openWriteOverlay);
   document.getElementById('write-btn')?.addEventListener('click', openWriteOverlay);
+  document.getElementById('feed-photo-btn')?.addEventListener('click', openWriteWithPhoto);
+
+  document.querySelectorAll('.wbox .wab[data-write-action]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = btn.dataset.writeAction;
+      if (action === 'photo') openWriteWithPhoto();
+      else if (action === 'event') {
+        openWriteOverlay();
+        document.querySelector('.cat-select-btn[data-cat="event"]')?.click();
+      } else openWriteOverlay();
+    });
+  });
+
   document.getElementById('close-modal')?.addEventListener('click', () => getWriteOverlay()?.classList.remove('open'));
   getWriteOverlay()?.addEventListener('click', (e) => {
     if (e.target === getWriteOverlay()) getWriteOverlay().classList.remove('open');
@@ -936,9 +963,18 @@ export function initCommunity() {
   }
 }
 
-window.golmokCommunity = { loadFeed, openPostDetail, initCommunity };
+window.golmokCommunity = { loadFeed, openPostDetail, initCommunity, openWriteOverlay, openWriteWithPhoto };
 window.sharePost = sharePost;
+window.openWriteOverlay = openWriteOverlay;
 
-document.addEventListener('DOMContentLoaded', () => {
+function bootCommunity() {
+  if (window.__golmokCommunityBooted) return;
+  window.__golmokCommunityBooted = true;
   initCommunity();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootCommunity);
+} else {
+  bootCommunity();
+}
