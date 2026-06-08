@@ -1,6 +1,10 @@
 import { supabase } from './supabase_client.js';
 
-const CHARACTERS = ['/assets/gmlogo.png'];
+const CHARACTERS = [
+  { url: '/assets/characters/char_radish.png', label: '무 캐릭터' },
+  { url: '/assets/characters/char_chef_cat.png', label: '셰프 고양이' },
+  { url: '/assets/characters/char_white_cat.png', label: '리본 고양이' },
+];
 
 const UPJONG_MAP = {
   I2: '음식',
@@ -231,8 +235,9 @@ window.openCharacterSelect = function () {
     return;
   }
   grid.innerHTML = CHARACTERS.map(
-    (url, i) => `<div class="character-item" data-url="${url}">
-      <img src="${url}" alt="캐릭터 ${i + 1}">
+    (ch, i) => `<div class="character-item" data-url="${ch.url}" title="${ch.label}">
+      <img src="${ch.url}" alt="${ch.label}">
+      <span class="character-label">${ch.label}</span>
     </div>`
   ).join('');
   grid.querySelectorAll('.character-item').forEach((el) => {
