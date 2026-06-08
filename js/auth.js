@@ -201,7 +201,13 @@ export function updateAuthUI(profile, session) {
   setAvatar('sb-av', nickname, loggedIn ? avatarUrl : null);
   setText('prof-nm', loggedIn ? nickname : '로그인');
   setAvatar('prof-av', nickname, loggedIn ? avatarUrl : null);
-  setText('prof-tp', loggedIn ? regionText : '로그인 후 이용 가능');
+  const profTp = document.getElementById('prof-tp');
+  if (profTp?.tagName === 'A') {
+    profTp.textContent = loggedIn ? '프로필 설정' : '로그인 후 이용 가능';
+    if (loggedIn) profTp.href = 'profile.html';
+  } else {
+    setText('prof-tp', loggedIn ? regionText : '로그인 후 이용 가능');
+  }
 
   const legacyLogin = document.getElementById('login-panel');
   const legacyLogged = document.getElementById('logged-panel');

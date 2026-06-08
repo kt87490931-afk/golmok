@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="js/device_redirect.js"></script>
+<title>프로필 설정 — 골목대장</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:#F7F3EB;color:#1A1A1A;min-height:100vh;}
+.profile-page-wrap{max-width:600px;margin:0 auto;padding:24px 16px 80px;}
+.profile-page-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.back-btn{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid #E8E4DC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#555;flex-shrink:0;text-decoration:none;}
+.back-btn:hover{background:#F5F1E8;}
+.profile-page-title{font-size:18px;font-weight:700;}
+.profile-section{background:#fff;border-radius:16px;border:1px solid #E8E4DC;padding:20px;margin-bottom:16px;}
+.profile-section-title{font-size:13px;font-weight:700;color:#555;margin-bottom:16px;display:flex;align-items:center;gap:6px;}
+.profile-section-title i{color:#F5A623;font-size:16px;}
+.field-wrap{margin-bottom:14px;}
+.field-label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:6px;}
+.field-input{width:100%;border:1px solid #E8E4DC;border-radius:10px;padding:11px 14px;font-size:14px;outline:none;font-family:inherit;transition:border-color .15s;}
+.field-input:focus{border-color:#F5A623;}
+.field-input-readonly{width:100%;background:#F7F3EB;border:1px solid #E8E4DC;border-radius:10px;padding:11px 14px;font-size:14px;color:#555;display:flex;align-items:center;justify-content:space-between;}
+.btn-primary{width:100%;background:#F5A623;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;}
+.btn-primary:hover{opacity:.9;}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+.btn-secondary{padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;}
+.btn-gold-outline{padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid #F5A623;background:#FFF8E7;color:#C17F24;cursor:pointer;font-weight:500;}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.status-btn{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #E8E4DC;background:#fff;font-size:12px;font-weight:500;color:#555;cursor:pointer;line-height:1.6;transition:all .15s;}
+.status-btn.active{border-color:#F5A623;background:#FFF8E7;color:#C17F24;}
+.msg-success{background:#E8F8F0;color:#1D9E75;border-radius:8px;padding:10px 14px;font-size:13px;margin-top:8px;}
+.msg-error{background:#FFF1F1;color:#E24B4A;border-radius:8px;padding:10px 14px;font-size:13px;margin-top:8px;}
+.avatar-section{display:flex;flex-direction:column;align-items:center;padding:24px 0 8px;}
+.avatar-wrap{position:relative;margin-bottom:16px;}
+.avatar-img{width:96px;height:96px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#633806;border:3px solid #FAC775;overflow:hidden;}
+.avatar-edit-btn{position:absolute;bottom:0;right:0;width:30px;height:30px;border-radius:50%;background:#F5A623;border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#fff;}
+.avatar-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.character-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-end;justify-content:center;}
+.character-overlay.open{display:flex;}
+.character-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px;max-height:70vh;overflow-y:auto;}
+.character-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.character-item{border-radius:12px;overflow:hidden;aspect-ratio:1;border:2px solid transparent;cursor:pointer;}
+.character-item.selected{border-color:#F5A623;}
+.character-item img{width:100%;height:100%;object-fit:cover;}
+.social-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:#F7F3EB;border:1px solid #E8E4DC;margin-bottom:8px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
+@media(max-width:768px){
+.profile-page-wrap{padding:16px 12px 100px;}
+.profile-section{padding:16px;border-radius:14px;}
+.field-input{font-size:16px;}
+.status-btn{padding:8px 4px;font-size:11px;}
+.avatar-img{width:80px;height:80px;}
+}
+</style>
+</head>
+<body>
+
+<div class="profile-page-wrap">
+  <div class="profile-page-header">
+    <a href="index.html" class="back-btn" aria-label="뒤로"><i class="ti ti-arrow-left"></i></a>
+    <h1 class="profile-page-title">프로필 설정</h1>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title"><i class="ti ti-user-circle"></i> 프로필 사진</div>
+    <div class="avatar-section">
+      <div class="avatar-wrap">
+        <div class="avatar-img" id="avatar-preview"></div>
+        <button type="button" class="avatar-edit-btn" onclick="document.getElementById('avatar-file-input').click()"><i class="ti ti-camera"></i></button>
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none;">
+      <div class="avatar-btns">
+        <button type="button" class="btn-gold-outline" onclick="document.getElementById('avatar-file-input').click()"><i class="ti ti-upload"></i> 사진 업로드</button>
+        <button type="button" class="btn-secondary" onclick="openCharacterSelect()"><i class="ti ti-mood-smile"></i> 캐릭터 선택</button>
+        <button type="button" class="btn-secondary" onclick="resetAvatar()"><i class="ti ti-trash"></i> 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title"><i class="ti ti-id-badge"></i> 기본 정보</div>
+    <div class="field-wrap">
+      <label class="field-label">닉네임 <span style="color:#E24B4A;">*</span></label>
+      <div style="display:flex;gap:8px;">
+        <input id="edit-nickname" type="text" class="field-input" maxlength="20" placeholder="2자 이상 20자 이하">
+        <button type="button" onclick="checkNickname()" style="padding:0 16px;border-radius:10px;background:#F5A623;color:#fff;border:none;font-size:13px;cursor:pointer;font-weight:500;white-space:nowrap;flex-shrink:0;">중복확인</button>
+      </div>
+      <div id="nickname-msg" style="font-size:11px;margin-top:4px;"></div>
+    </div>
+    <div class="field-wrap">
+      <label class="field-label">현재 상태</label>
+      <div class="status-grid">
+        <div class="status-btn" data-value="operating" onclick="selectStatus(this)">🏪<br>가게 운영중</div>
+        <div class="status-btn" data-value="preparing" onclick="selectStatus(this)">📋<br>창업 준비중</div>
+        <div class="status-btn" data-value="prospective" onclick="selectStatus(this)">🔍<br>예비창업자</div>
+      </div>
+    </div>
+    <div class="field-wrap" id="upjong-field-wrap">
+      <label class="field-label">업종</label>
+      <select id="edit-upjong" class="field-input" style="background:#fff;cursor:pointer;">
+        <option value="">업종을 선택해주세요</option>
+        <option value="I2">음식</option>
+        <option value="G2">소매</option>
+        <option value="S2">수리·개인</option>
+        <option value="R1">예술·스포츠</option>
+        <option value="P1">교육</option>
+        <option value="L1">부동산</option>
+        <option value="I1">숙박</option>
+        <option value="M1">과학·기술</option>
+        <option value="Q1">보건의료</option>
+        <option value="N1">시설관리·임대</option>
+      </select>
+    </div>
+    <div class="field-wrap">
+      <label class="field-label">주요 활동 지역 <span style="font-size:11px;color:#999;font-weight:400;">(우리동네 피드에 사용됩니다)</span></label>
+      <input id="edit-region" type="text" class="field-input" placeholder="예: 경기 화성시 동탄2동">
+    </div>
+    <button type="button" id="btn-save-profile" class="btn-primary">저장하기</button>
+    <div id="profile-save-msg" style="display:none;"></div>
+  </div>
+
+  <div class="profile-section" id="password-section">
+    <div class="profile-section-title"><i class="ti ti-lock"></i> 비밀번호 변경</div>
+    <div class="field-wrap">
+      <label class="field-label">현재 비밀번호</label>
+      <div style="position:relative;">
+        <input id="current-pw" type="password" class="field-input" style="padding-right:40px;" placeholder="현재 비밀번호 입력">
+        <button type="button" onclick="togglePw('current-pw')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:16px;"><i class="ti ti-eye"></i></button>
+      </div>
+    </div>
+    <div class="field-wrap">
+      <label class="field-label">새 비밀번호 <span style="font-size:11px;color:#999;font-weight:400;">(대문자·숫자·특수문자 포함 8자 이상)</span></label>
+      <div style="position:relative;">
+        <input id="new-pw" type="password" class="field-input" style="padding-right:40px;" placeholder="새 비밀번호 입력">
+        <button type="button" onclick="togglePw('new-pw')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:16px;"><i class="ti ti-eye"></i></button>
+      </div>
+      <div id="pw-strength" style="margin-top:5px;"></div>
+    </div>
+    <div class="field-wrap">
+      <label class="field-label">새 비밀번호 확인</label>
+      <div style="position:relative;">
+        <input id="new-pw-confirm" type="password" class="field-input" style="padding-right:40px;" placeholder="새 비밀번호 재입력">
+        <button type="button" onclick="togglePw('new-pw-confirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:16px;"><i class="ti ti-eye"></i></button>
+      </div>
+      <div id="pw-match-msg" style="font-size:11px;margin-top:4px;"></div>
+    </div>
+    <button type="button" id="btn-change-pw" class="btn-primary" style="background:#1A1A1A;">비밀번호 변경</button>
+    <div id="pw-change-msg" style="display:none;"></div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title"><i class="ti ti-info-circle"></i> 계정 정보</div>
+    <div class="field-wrap">
+      <label class="field-label">이메일</label>
+      <div class="field-input-readonly"><span id="display-email"></span><span style="font-size:11px;color:#999;">변경 불가</span></div>
+    </div>
+    <div class="field-wrap">
+      <label class="field-label">연락처</label>
+      <div class="field-input-readonly">
+        <span id="display-phone"></span>
+        <span style="font-size:11px;color:#999;text-align:right;line-height:1.4;">PASS 본인인증 후<br>변경 가능</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title"><i class="ti ti-link"></i> 연결된 간편 로그인</div>
+    <div id="linked-providers"></div>
+    <p style="font-size:11px;color:#999;margin-top:10px;line-height:1.6;">간편 로그인을 연결하면 해당 계정으로도 로그인할 수 있습니다.</p>
+  </div>
+</div>
+
+<div class="character-overlay" id="character-overlay">
+  <div class="character-sheet">
+    <div style="width:36px;height:4px;background:#E8E4DC;border-radius:4px;margin:0 auto 16px;"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:700;">캐릭터 선택</div>
+      <button type="button" onclick="closeCharacterSelect()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="character-grid" id="character-grid"></div>
+    <button type="button" onclick="closeCharacterSelect()" style="width:100%;background:#F5F1E8;color:#555;border:none;border-radius:12px;padding:12px;font-size:14px;cursor:pointer;">취소</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="js/auth.js?v=20260625"></script>
+<script type="module" src="js/profile-edit.js?v=20260625"></script>
+</body>
+</html>

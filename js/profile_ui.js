@@ -141,9 +141,16 @@ export async function renderSidebarProfile() {
     actions.querySelector('#sb-logout-btn')?.addEventListener('click', () => window.signOut?.());
 
     const sbName = document.getElementById('sb-name');
-    const sbType = document.querySelector('.sbtype');
+    const sbType = document.getElementById('nav-profile-settings') || document.querySelector('.sbtype');
     if (sbName) sbName.textContent = nick;
-    if (sbType) sbType.textContent = sub;
+    if (sbType) {
+      if (sbType.tagName === 'A') {
+        sbType.textContent = '프로필 설정';
+        sbType.href = 'profile.html';
+      } else {
+        sbType.textContent = sub;
+      }
+    }
   } catch (e) {
     console.warn('sidebar profile', e);
     const nick = user.user_metadata?.nickname || user.user_metadata?.full_name || user.email?.split('@')[0] || '대장님';

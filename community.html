@@ -445,10 +445,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <a class="ni menu-item" id="nav-notifications" href="index.html"><i class="ti ti-bell"></i> 알림 <span class="nbdg" id="sidebar-notify-badge" style="display:none;">0</span></a>
     <a class="ni menu-item" id="nav-my-posts" href="index.html"><i class="ti ti-edit"></i> 내 게시글</a>
     <div class="sb-bot">
-      <div class="sb-pr">
-        <div class="sbav" id="sb-av">?</div>
-        <div><div class="sbname" id="sb-name">로그인</div><div class="sbtype">음식 · 동탄</div></div>
-        <i class="ti ti-dots" style="margin-left:auto;font-size:16px;color:#999;cursor:pointer;"></i>
+      <div class="sb-pr" id="sb-profile-link">
+        <a href="profile.html" class="sbav" id="sb-av" style="text-decoration:none;color:inherit;">?</a>
+        <div style="flex:1;min-width:0;">
+          <div class="sbname" id="sb-name">로그인</div>
+          <a href="profile.html" class="sbtype" id="nav-profile-settings" style="font-size:11px;color:#C17F24;font-weight:500;text-decoration:none;display:block;">프로필 설정</a>
+        </div>
+        <a href="profile.html" style="margin-left:auto;font-size:16px;color:#999;cursor:pointer;text-decoration:none;display:flex;" title="프로필 설정"><i class="ti ti-dots"></i></a>
       </div>
       <div id="sidebar-profile-actions"></div>
     </div>
@@ -703,7 +706,7 @@ document.querySelectorAll('.ni').forEach(ni=>{
 });
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
-<script type="module" src="js/auth.js?v=20260615"></script>
+<script type="module" src="js/auth.js?v=20260624"></script>
 <script type="module" src="js/community_ui.js?v=20260624"></script>
 <script type="module" src="js/analysis.js?v=20260615"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
