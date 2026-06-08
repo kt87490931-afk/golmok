@@ -1,9 +1,10 @@
 import { supabase } from './supabase_client.js';
 
 const CHARACTERS = [
-  { url: '/assets/characters/char_radish.png', label: '무 캐릭터' },
-  { url: '/assets/characters/char_chef_cat.png', label: '셰프 고양이' },
-  { url: '/assets/characters/char_white_cat.png', label: '리본 고양이' },
+  '/assets/characters/char_default.png',
+  '/assets/characters/char_radish.png',
+  '/assets/characters/char_chef_cat.png',
+  '/assets/characters/char_white_cat.png',
 ];
 
 const UPJONG_MAP = {
@@ -235,9 +236,8 @@ window.openCharacterSelect = function () {
     return;
   }
   grid.innerHTML = CHARACTERS.map(
-    (ch, i) => `<div class="character-item" data-url="${ch.url}" title="${ch.label}">
-      <img src="${ch.url}" alt="${ch.label}">
-      <span class="character-label">${ch.label}</span>
+    (url) => `<div class="character-item" data-url="${url}">
+      <img src="${url}" alt="">
     </div>`
   ).join('');
   grid.querySelectorAll('.character-item').forEach((el) => {
