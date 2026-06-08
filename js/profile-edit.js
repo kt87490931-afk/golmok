@@ -46,6 +46,11 @@ function showMsg(elId, text, type) {
   el.style.color = type === 'success' ? '#1D9E75' : type === 'error' ? '#E24B4A' : '#999';
 }
 
+function absolutizeAssetUrl(url) {
+  if (!url || /^https?:\/\//i.test(url)) return url;
+  return `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
+}
+
 function parseRegionFields(region) {
   if (!region) return {};
   const parts = region.trim().split(/\s+/).filter(Boolean);
@@ -391,9 +396,12 @@ async function saveProfile() {
     } else if (selectedCharacterUrl === 'reset') {
       profileImageUrl = null;
     } else if (selectedCharacterUrl) {
-      profileImageUrl = selectedCharacterUrl;
+      profileImageUrl = absolutizeAssetUrl(selectedCharacterUrl);
+    } else if (profileImageUrl && !/^https?:\/\//i.test(profileImageUrl)) {
+      profileImageUrl = absolutizeAssetUrl(profileImageUrl);
     }
 
+    const updatedAt = new Date().toISOString();
     const upjongCd = currentStatus === 'operating' ? upjong || null : null;
     const { error } = await supabase
       .from('users')
@@ -404,13 +412,29 @@ async function saveProfile() {
         upjong1nm: upjongCd ? UPJONG_MAP[upjongCd] || null : null,
         ...regionFields,
         profile_image: profileImageUrl,
-        updated_at: new Date().toISOString(),
+        updated_at: updatedAt,
       })
       .eq('id', currentUser.id);
 
     if (error) throw error;
 
-    currentProfile = { ...currentProfile, nickname, user_status: currentStatus, profile_image: profileImageUrl, ...regionFields };
+    try {
+      await supabase.auth.updateUser({
+        data: { avatar_url: profileImageUrl || null },
+      });
+    } catch (metaErr) {
+      console.warn('auth metadata avatar sync', metaErr);
+    }
+
+    currentProfile = {
+      ...currentProfile,
+      nickname,
+      user_status: currentStatus,
+      profile_image: profileImageUrl,
+      updated_at: updatedAt,
+      ...regionFields,
+    };
+    renderAvatar(profileImageUrl, nickname);
     selectedAvatarFile = null;
     selectedCharacterUrl = null;
     nicknameChecked = false;

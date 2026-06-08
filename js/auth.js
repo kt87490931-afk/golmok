@@ -143,7 +143,19 @@ function userRowFromMetadata(user, extra = {}) {
 }
 
 async function upsertUserRow(user, extra = {}) {
+  const { data: existing } = await supabase
+    .from('users')
+    .select('profile_image')
+    .eq('id', user.id)
+    .maybeSingle();
+
   const payload = userRowFromMetadata(user, extra);
+
+  // 기존 회원: users.profile_image 를 OAuth 아바타로 덮어쓰지 않음
+  if (existing) {
+    payload.profile_image = existing.profile_image ?? null;
+  }
+
   const { error } = await supabase.from('users').upsert(payload, { onConflict: 'id' });
   if (error) throw error;
 }
@@ -174,11 +186,25 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
-function setAvatar(id, name, imageUrl) {
+function withCacheBust(url, version) {
+  if (!url) return null;
+  if (!version) return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}t=${encodeURIComponent(version)}`;
+}
+
+function resolveAvatarUrl(profile, session) {
+  if (profile?.profile_image) return profile.profile_image;
+  const meta = session?.user?.user_metadata;
+  return meta?.avatar_url || meta?.picture || null;
+}
+
+function setAvatar(id, name, imageUrl, cacheVersion) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (imageUrl) {
-    el.innerHTML = `<img src="${imageUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  const src = withCacheBust(imageUrl, cacheVersion);
+  if (src) {
+    el.innerHTML = `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     return;
   }
   el.textContent = initialFromName(name);
@@ -192,15 +218,16 @@ export function updateAuthUI(profile, session) {
     session?.user?.user_metadata?.full_name ||
     session?.user?.email?.split('@')[0] ||
     '대장님';
-  const avatarUrl = profile?.profile_image || session?.user?.user_metadata?.avatar_url;
+  const avatarUrl = resolveAvatarUrl(profile, session);
+  const avatarVer = profile?.updated_at || profile?.profile_image || '';
   const regionText = profile?.region_full || (profile?.region_dong ? `경기 ${profile.region_sigungu || ''} ${profile.region_dong}`.trim() : '동네 설정 예정');
 
   setText('user-pname', loggedIn ? nickname : '로그인');
-  setAvatar('user-pav', nickname, loggedIn ? avatarUrl : null);
+  setAvatar('user-pav', nickname, loggedIn ? avatarUrl : null, avatarVer);
   setText('sb-name', loggedIn ? nickname : '로그인');
-  setAvatar('sb-av', nickname, loggedIn ? avatarUrl : null);
+  setAvatar('sb-av', nickname, loggedIn ? avatarUrl : null, avatarVer);
   setText('prof-nm', loggedIn ? nickname : '로그인');
-  setAvatar('prof-av', nickname, loggedIn ? avatarUrl : null);
+  setAvatar('prof-av', nickname, loggedIn ? avatarUrl : null, avatarVer);
   const profTp = document.getElementById('prof-tp');
   if (profTp?.tagName === 'A') {
     profTp.textContent = loggedIn ? '프로필 설정' : '로그인 후 이용 가능';
