@@ -25,12 +25,31 @@ ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "admin_only_settings" ON public.app_settings;
 CREATE POLICY "admin_only_settings"
 ON public.app_settings FOR ALL
-USING (
-  auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
+USING (public.check_is_admin())
+WITH CHECK (public.check_is_admin());
+
+-- 어드민 API 관리 화면용 (RLS 우회, check_is_admin 검증)
+CREATE OR REPLACE FUNCTION public.get_admin_app_settings()
+RETURNS TABLE(
+  id uuid,
+  key text,
+  value text,
+  description text,
+  is_secret boolean,
+  updated_at timestamptz
 )
-WITH CHECK (
-  auth.uid() IN (SELECT id FROM public.users WHERE is_admin = true)
-);
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT s.id, s.key::text, s.value, s.description, s.is_secret, s.updated_at
+  FROM public.app_settings s
+  WHERE public.check_is_admin()
+  ORDER BY s.key;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_admin_app_settings() TO authenticated;
 
 -- 로그인 사용자: RPC로만 소진공 설정 조회 (테이블 직접 SELECT 불가)
 CREATE OR REPLACE FUNCTION public.get_sojanggong_settings()
