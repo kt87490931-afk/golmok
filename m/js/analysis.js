@@ -80,13 +80,6 @@ async function loadSbizAnalysis() {
   const mode = await getApiMode();
 
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      toast('로그인이 필요합니다');
-      window.openLoginModal?.('login');
-      return getMockAnalysisData();
-    }
-
     const [weatherRes, themeRes, mapUrl] = await Promise.all([
       getWeatherForecast({ regionCode: condition.regionFull, upjongCode: condition.upjong1cd }),
       getThemeAnalysis({
@@ -260,7 +253,13 @@ function renderWizardStep() {
   });
 }
 
-export function openAnalysisPanel() {
+export async function openAnalysisPanel() {
+  const user = await getCurrentUser();
+  if (!user) {
+    toast('AI 분석은 로그인 후 이용할 수 있습니다');
+    window.openLoginModal?.('login');
+    return;
+  }
   const overlay = document.getElementById('analysis-overlay');
   if (!overlay) return;
   overlay.classList.add('open');

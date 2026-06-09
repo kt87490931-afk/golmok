@@ -125,13 +125,6 @@ async function searchStartup() {
     return;
   }
 
-  const user = await getCurrentUser();
-  if (!user) {
-    toast('로그인이 필요합니다');
-    window.openLoginModal?.('login');
-    return;
-  }
-
   const loadingEl = document.getElementById('startup-loading');
   const resultEl = document.getElementById('startup-result');
   if (loadingEl) loadingEl.style.display = 'block';

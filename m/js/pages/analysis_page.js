@@ -1,6 +1,5 @@
 import { initPageShell, bootPage } from '../page_common.js';
 import { getApiKey } from '../api-config.js?v=20260630';
-import { getCurrentUser } from '../community.js?v=20260624';
 
 const TABS = [
   { id: 'map', label: '상권지도', endpoint: 'startupPublic', keyName: 'SOJANGGONG_STARTUP_KEY' },
@@ -58,16 +57,6 @@ async function selectTab(tabId, { updateQuery = true } = {}) {
   const iframe = document.getElementById('sbiz-iframe');
   const loading = document.getElementById('sbiz-iframe-loading');
   if (!iframe || !loading) return;
-
-  const user = await getCurrentUser();
-  if (!user) {
-    loading.style.display = 'flex';
-    loading.innerHTML =
-      '<span>로그인이 필요합니다. <button type="button" id="sbiz-login-btn" style="margin-left:8px;padding:6px 12px;border:none;border-radius:8px;background:#F5A623;color:#fff;cursor:pointer;">로그인</button></span>';
-    document.getElementById('sbiz-login-btn')?.addEventListener('click', () => window.openLoginModal?.('login'));
-    iframe.removeAttribute('src');
-    return;
-  }
 
   loading.style.display = 'flex';
   loading.textContent = `${tab.label} 불러오는 중...`;
