@@ -64,3 +64,12 @@ export function buildApiUrl(endpoint, params = {}) {
   });
   return url.toString();
 }
+
+/** 소상공인365 iFrame URL (#/openApi/ 경로) */
+export function buildSbizIframeUrl(endpoint, certKey, extraParams = {}) {
+  if (!endpoint || !certKey || certKey.startsWith('YOUR_') || certKey.startsWith('REPLACE_')) {
+    return '';
+  }
+  const qs = new URLSearchParams({ certKey, ...extraParams });
+  return `${SOJANGGONG_BASE}/#/openApi/${endpoint}?${qs.toString()}`;
+}

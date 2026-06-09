@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const indexPath = path.join(root, 'index.html');
-const ver = '20260629';
+const ver = '20260630';
 
 const communityMain = `
       <div class="main-content">
@@ -117,13 +117,24 @@ const startupMain = `
       <style>@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:768px){.startup-search-row{grid-template-columns:1fr!important;}}</style>`;
 
 const analysisMain = `
-      <div class="main-content" style="max-width:720px;margin:0 auto;padding:24px 16px 80px;">
-        <div style="text-align:center;margin-bottom:20px;">
-          <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;"><i class="ti ti-map"></i> 상권분석</h2>
-          <p style="font-size:14px;color:#999;">소상공인365 상권지도 · 테마상권 분석</p>
+      <div class="sbiz-analysis-wrap">
+        <div class="sbiz-analysis-tabs" id="sbiz-tabs" role="tablist"></div>
+        <div class="sbiz-iframe-shell">
+          <div id="sbiz-iframe-loading" class="sbiz-iframe-loading">상권지도 불러오는 중...</div>
+          <iframe id="sbiz-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
         </div>
-        <p style="font-size:13px;color:#555;text-align:center;margin-bottom:16px;">아래 분석 마법사가 자동으로 열립니다. 닫히면 사이드바 <b>상권분석</b>을 다시 눌러주세요.</p>
-      </div>`;
+      </div>
+      <style>
+        .page-main-content:has(.sbiz-analysis-wrap){padding:0!important;height:calc(100vh - 56px);overflow:hidden;}
+        .sbiz-analysis-wrap{display:flex;flex-direction:column;height:100%;min-height:0;background:#fff;}
+        .sbiz-analysis-tabs{display:flex;flex-shrink:0;overflow-x:auto;border-bottom:1px solid var(--border);background:#fff;}
+        .sbiz-analysis-tabs::-webkit-scrollbar{display:none;}
+        .sbiz-tab{padding:12px 20px;border:none;background:none;cursor:pointer;font-size:14px;color:var(--text2);border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;}
+        .sbiz-tab.act{color:var(--chd);font-weight:600;border-bottom-color:var(--ch);}
+        .sbiz-iframe-shell{flex:1;min-height:0;position:relative;background:#F7F3EB;}
+        #sbiz-iframe{width:100%;height:100%;border:none;display:block;}
+        .sbiz-iframe-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#F7F3EB;color:#999;font-size:14px;z-index:1;}
+      </style>`;
 
 const eventsMain = `
       <div class="main-content">
@@ -176,7 +187,6 @@ const pages = [
   ['by-industry.html', '업종별 - 골목대장', 'by-industry', industryMain, 'js/pages/by_industry.js'],
   ['events.html', '이벤트·행사 - 골목대장', 'events', eventsMain, 'js/pages/events.js'],
   ['policy.html', '정책·지원 - 골목대장', 'policy', policyMain, 'js/pages/policy.js'],
-  ['startup.html', '창업기상도 - 골목대장', 'weather', startupMain, 'js/pages/startup.js'],
   ['analysis.html', '상권분석 - 골목대장', 'analysis', analysisMain, 'js/pages/analysis_page.js'],
 ];
 
