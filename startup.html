@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/device_redirect.js"></script>
-<title>이벤트·행사 - 골목대장</title>
+<title>창업기상도 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -433,13 +433,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="nsec">메뉴</div>
     <a class="ni menu-item" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
     <a class="ni menu-item nav-analysis" data-page="analysis" href="analysis.html"><i class="ti ti-map"></i> 상권분석</a>
-    <a class="ni menu-item" data-page="weather" href="startup.html"><i class="ti ti-cloud"></i> 창업기상도</a>
+    <a class="ni menu-item act" data-page="weather" href="startup.html"><i class="ti ti-cloud"></i> 창업기상도</a>
     <a class="ni menu-item" data-page="hot" href="coming-soon.html?page=hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
     <div class="nsec">커뮤니티</div>
     <a class="ni menu-item" data-page="community" href="community.html" id="nav-all"><i class="ti ti-world"></i> 전체 게시판</a>
     <a class="ni menu-item" data-page="neighborhood" href="neighborhood.html" id="nav-dong"><i class="ti ti-map-pin"></i> 우리동네</a>
     <a class="ni menu-item" data-page="by-industry" href="by-industry.html"><i class="ti ti-tag"></i> 업종별</a>
-    <a class="ni menu-item act" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
+    <a class="ni menu-item" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
     <a class="ni menu-item" data-page="policy" href="policy.html"><i class="ti ti-file-text"></i> 정책·지원</a>
     <div class="nsec">내 활동</div>
     <a class="ni menu-item" id="nav-saved-posts" href="index.html"><i class="ti ti-bookmark"></i> 저장한 글</a>
@@ -462,28 +462,48 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <main class="center">
     <div class="fscroll page-main-content">
 
-      <div class="main-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <h2 style="font-size:20px;font-weight:700;">이벤트·행사</h2>
-            <p style="font-size:13px;color:#999;margin-top:4px;">우리동네 이벤트와 행사 정보</p>
+      <div class="main-content startup-wrap" style="max-width:720px;margin:0 auto;padding:24px 16px 80px;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:48px;margin-bottom:8px;">🌤️</div>
+          <h2 style="font-size:24px;font-weight:700;margin-bottom:6px;">창업기상도</h2>
+          <p style="font-size:14px;color:#999;">내 업종과 지역의 창업 성공 가능성을 날씨로 확인하세요</p>
+        </div>
+        <div style="background:#fff;border-radius:16px;border:1px solid #E8E4DC;padding:24px;margin-bottom:20px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:16px;color:#C17F24;display:flex;align-items:center;gap:6px;"><i class="ti ti-search"></i> 분석 조건 입력</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;" class="startup-search-row">
+            <div><label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:5px;">업종 <span style="color:#E24B4A;">*</span></label>
+              <select id="startup-upjong" style="width:100%;border:1px solid #E8E4DC;border-radius:10px;padding:10px 14px;font-size:14px;">
+                <option value="">업종 선택</option>
+                <option value="I2">음식</option><option value="G2">소매</option><option value="S2">수리·개인</option>
+                <option value="R1">예술·스포츠</option><option value="P1">교육</option><option value="L1">부동산</option>
+                <option value="I1">숙박</option><option value="M1">과학·기술</option><option value="Q1">보건의료</option><option value="N1">시설관리·임대</option>
+              </select></div>
+            <div><label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:5px;">지역 <span style="color:#E24B4A;">*</span></label>
+              <input id="startup-region" type="text" placeholder="예: 경기 화성시 동탄2동" style="width:100%;border:1px solid #E8E4DC;border-radius:10px;padding:10px 14px;font-size:14px;"></div>
           </div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
+          <button type="button" id="btn-startup-search" style="width:100%;background:#F5A623;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;"><i class="ti ti-cloud"></i> 창업기상도 분석</button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;">
-          <button type="button" class="event-filter-btn act" data-type="all" style="padding:7px 16px;border-radius:20px;font-size:13px;border:none;background:#F5A623;color:#fff;cursor:pointer;white-space:nowrap;font-weight:500;">전체</button>
-          <button type="button" class="event-filter-btn" data-type="discount" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🏷️ 할인이벤트</button>
-          <button type="button" class="event-filter-btn" data-type="groupbuy" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🛒 공동구매</button>
-          <button type="button" class="event-filter-btn" data-type="meeting" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">👥 모임·행사</button>
-          <button type="button" class="event-filter-btn" data-type="issue" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">⚠️ 이슈</button>
-        </div>
-        <div id="events-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"></div>
-        <div id="events-empty" style="display:none;text-align:center;padding:60px 20px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;margin-top:12px;">
-          <div style="font-size:48px;margin-bottom:12px;">📢</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">등록된 이벤트가 없습니다</div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;cursor:pointer;margin-top:12px;">이벤트 등록하기</button>
+        <div id="startup-loading" style="text-align:center;padding:40px;display:none;"><div style="width:36px;height:36px;border:3px solid #E8E4DC;border-top-color:#F5A623;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div><div style="font-size:14px;color:#999;">분석 중입니다...</div></div>
+        <div id="startup-result" style="display:none;background:#fff;border-radius:16px;border:1px solid #E8E4DC;padding:24px;">
+          <div style="text-align:center;padding:20px 0;margin-bottom:20px;">
+            <div id="weather-icon" style="font-size:64px;margin-bottom:8px;">🌤️</div>
+            <div id="weather-label" style="font-size:22px;font-weight:700;margin-bottom:6px;">맑음</div>
+            <div id="weather-score" style="font-size:48px;font-weight:700;color:#F5A623;line-height:1;margin-bottom:6px;">72</div>
+            <div style="font-size:12px;color:#999;margin-bottom:8px;">/100점</div>
+            <div id="weather-desc" style="font-size:14px;color:#555;line-height:1.7;max-width:400px;margin:0 auto;"></div>
+          </div>
+          <div style="background:#FFF8E7;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#8B5A10;display:flex;align-items:center;gap:6px;"><i class="ti ti-map-pin"></i><span id="analysis-condition-text"></span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+            <div style="background:#EBF4FF;border-radius:12px;padding:14px;text-align:center;"><div style="font-size:11px;color:#555;margin-bottom:6px;"><i class="ti ti-users" style="color:#378ADD;"></i> 일 유동인구</div><div id="stat-population" style="font-size:20px;font-weight:700;"></div><div id="stat-pop-change" style="font-size:11px;margin-top:3px;"></div></div>
+            <div style="background:#FFF8E7;border-radius:12px;padding:14px;text-align:center;"><div style="font-size:11px;color:#555;margin-bottom:6px;"><i class="ti ti-chart-bar" style="color:#C17F24;"></i> 월 평균 매출</div><div id="stat-revenue" style="font-size:20px;font-weight:700;"></div><div id="stat-rev-change" style="font-size:11px;margin-top:3px;"></div></div>
+            <div style="background:#FFF1F1;border-radius:12px;padding:14px;text-align:center;"><div style="font-size:11px;color:#555;margin-bottom:6px;"><i class="ti ti-store" style="color:#E24B4A;"></i> 동종 업소수</div><div id="stat-stores" style="font-size:20px;font-weight:700;"></div><div id="stat-store-change" style="font-size:11px;margin-top:3px;"></div></div>
+          </div>
+          <div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:700;margin-bottom:10px;">⏰ 시간대별 유동인구</div><div id="hourly-bars" style="display:flex;gap:4px;align-items:flex-end;height:80px;"></div><div id="peak-info" style="font-size:12px;color:#555;margin-top:10px;padding:8px 12px;background:#FFF8E7;border-radius:8px;"></div></div>
+          <div style="background:linear-gradient(135deg,#F5A623,#E8920E);border-radius:12px;padding:16px;color:#fff;"><div style="font-size:12px;opacity:.85;margin-bottom:6px;"><i class="ti ti-robot"></i> 골목대장 AI 분석</div><div id="ai-analysis-text" style="font-size:14px;line-height:1.7;"></div></div>
+          <button type="button" id="btn-startup-reset" style="width:100%;margin-top:14px;background:#fff;border:1px solid #E8E4DC;border-radius:12px;padding:12px;font-size:14px;color:#555;cursor:pointer;"><i class="ti ti-refresh"></i> 다시 검색</button>
         </div>
       </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:768px){.startup-search-row{grid-template-columns:1fr!important;}}</style>
     </div>
   </main>
 
@@ -721,6 +741,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/events.js?v=20260629"></script>
+<script type="module" src="js/pages/startup.js?v=20260629"></script>
 </body>
 </html>

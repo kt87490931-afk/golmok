@@ -1,3 +1,6 @@
+import { getWeatherForecast, getThemeAnalysis, getStartupMapUrl, getApiMode } from './sojanggong-api.js?v=20260629';
+import { getCurrentUser } from './community.js?v=20260624';
+
 const UPJONG_OPTIONS = [
   { cd: 'I2', nm: '음식' },
   { cd: 'G2', nm: '소매' },
@@ -19,6 +22,96 @@ let analysisStep = 0;
 
 function toast(msg) {
   if (typeof window.showToast === 'function') window.showToast(msg);
+}
+
+function mapWeatherToAnalysis(data) {
+  return {
+    dailyPopulation: data.dailyPopulation || 0,
+    populationChangeRate: data.populationChange ?? 0,
+    monthlyRevenue: data.monthlyRevenue || 0,
+    revenueChangeRate: data.revenueChange ?? 0,
+    storeCount: data.storeCount || 0,
+    closureRate: Math.abs(data.storeChange ?? 0),
+    peakDay: data.peakDay || '금요일',
+    peakTime: data.peakTime || '18~23시',
+    weekdayRatio: 62,
+    weekendRatio: 38,
+    hourlyData: data.hourlyData?.length
+      ? data.hourlyData
+      : [
+          { time: '06', rate: 12 },
+          { time: '09', rate: 28 },
+          { time: '12', rate: 45 },
+          { time: '15', rate: 38 },
+          { time: '18', rate: 72 },
+          { time: '21', rate: 95 },
+          { time: '24', rate: 40 },
+        ],
+  };
+}
+
+function renderThemeData(data) {
+  const el = document.getElementById('theme-analysis-wrap');
+  if (!el || !data) return;
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;">
+      <div style="background:#FFF8E7;border-radius:12px;padding:14px;">
+        <div style="font-size:11px;color:#C17F24;margin-bottom:4px;">경쟁 점수</div>
+        <div style="font-size:24px;font-weight:700;">${data.competitionScore ?? '-'}/100</div>
+      </div>
+      <div style="background:#E8F8F0;border-radius:12px;padding:14px;">
+        <div style="font-size:11px;color:#1D9E75;margin-bottom:4px;">12개월 생존율</div>
+        <div style="font-size:24px;font-weight:700;">${data.survivalRate12m ?? '-'}%</div>
+      </div>
+      <div style="background:#EBF4FF;border-radius:12px;padding:14px;">
+        <div style="font-size:11px;color:#378ADD;margin-bottom:4px;">지역 내 순위</div>
+        <div style="font-size:24px;font-weight:700;">${data.rankInRegion ?? '-'}위 / ${data.totalInRegion ?? '-'}</div>
+      </div>
+      <div style="background:#F5F1E8;border-radius:12px;padding:14px;">
+        <div style="font-size:11px;color:#555;margin-bottom:4px;">평균 매출</div>
+        <div style="font-size:20px;font-weight:700;">${Math.round((data.avgRevenue || 0) / 10000)}만원</div>
+      </div>
+    </div>`;
+}
+
+async function loadSbizAnalysis() {
+  const loading = document.getElementById('analysis-map-loading');
+  const iframe = document.getElementById('analysis-map-iframe');
+  const mode = await getApiMode();
+
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return getMockAnalysisData();
+    }
+
+    const [weatherRes, themeRes, mapUrl] = await Promise.all([
+      getWeatherForecast({ regionCode: condition.regionFull, upjongCode: condition.upjong1cd }),
+      getThemeAnalysis({
+        regionCode: condition.regionFull,
+        radius: condition.radius || 500,
+        upjongCode: condition.upjong1cd,
+      }),
+      getStartupMapUrl({ lat: 37.1995, lng: 127.075, radius: condition.radius || 500 }),
+    ]);
+
+    if (themeRes?.data) renderThemeData(themeRes.data);
+
+    if (mapUrl && iframe) {
+      iframe.src = mapUrl;
+      iframe.style.display = 'block';
+      if (loading) loading.style.display = 'none';
+    } else if (loading) {
+      loading.textContent = mode === 'mock' ? 'Mock 모드 — 지도는 Real 모드에서 표시됩니다' : '지도를 불러올 수 없습니다';
+    }
+
+    if (weatherRes?.data) return mapWeatherToAnalysis(weatherRes.data);
+  } catch (e) {
+    console.error('loadSbizAnalysis', e);
+  }
+  return getMockAnalysisData();
 }
 
 function getMockAnalysisData() {
@@ -97,6 +190,13 @@ function renderAnalysisResult(data) {
     ai.textContent = `이 상권 ${condition.upjong1nm || '음식'} 업종은 전년 대비 매출이 ${data.revenueChangeRate < 0 ? '감소' : '증가'}하고 있어요. 피크타임은 ${data.peakDay} ${data.peakTime}예요. 업소수도 줄어들어 경쟁이 낮아진 상황 — 지금이 오히려 진입 타이밍일 수 있어요!`;
   }
 
+  const modeBadge = document.getElementById('analysis-mode-badge');
+  if (modeBadge) {
+    getApiMode().then((m) => {
+      modeBadge.textContent = m === 'real' ? '소상공인365' : 'Mock 데이터';
+    });
+  }
+
   const wizard = document.getElementById('analysis-wizard');
   const result = document.getElementById('analysis-result');
   if (wizard) wizard.style.display = 'none';
@@ -150,10 +250,12 @@ function renderWizardStep() {
       <button type="button" class="analysis-radius-btn" data-r="2000">2km</button>
     </div>`;
   body.querySelectorAll('.analysis-radius-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       condition.radius = parseInt(btn.dataset.r, 10);
-      renderAnalysisResult(getMockAnalysisData());
-      toast('Mock 상권분석 결과를 표시합니다');
+      const data = await loadSbizAnalysis();
+      renderAnalysisResult(data);
+      const mode = await getApiMode();
+      toast(mode === 'real' ? '소상공인365 상권분석 결과입니다' : 'Mock 상권분석 결과를 표시합니다');
     });
   });
 }
@@ -170,8 +272,20 @@ export function resetAnalysis() {
   analysisStep = 0;
   const wizard = document.getElementById('analysis-wizard');
   const result = document.getElementById('analysis-result');
+  const iframe = document.getElementById('analysis-map-iframe');
+  const mapLoading = document.getElementById('analysis-map-loading');
+  const themeWrap = document.getElementById('theme-analysis-wrap');
   if (wizard) wizard.style.display = 'block';
   if (result) result.style.display = 'none';
+  if (iframe) {
+    iframe.src = '';
+    iframe.style.display = 'none';
+  }
+  if (mapLoading) {
+    mapLoading.style.display = 'flex';
+    mapLoading.textContent = '지도를 불러오는 중...';
+  }
+  if (themeWrap) themeWrap.innerHTML = '';
   renderWizardStep();
 }
 

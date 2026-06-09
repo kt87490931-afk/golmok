@@ -195,9 +195,11 @@ function getWriteOverlay() {
   return el;
 }
 
-function openWriteOverlay() {
+async function openWriteOverlay() {
   const ov = getWriteOverlay();
   if (!ov) return;
+  await resolveUserRegion();
+  updateWriteAutoTagsUI();
   ov.classList.add('open');
   window.dispatchEvent(new CustomEvent('golmok:write-open'));
 }
@@ -228,11 +230,64 @@ async function resolveUserRegion() {
       region_sigungu: profile?.region_sigungu || DEFAULT_REGION.region_sigungu,
       region_dong: profile?.region_dong || DEFAULT_REGION.region_dong,
       region_full: profile?.region_full || DEFAULT_REGION.region_full,
+      upjong1cd: profile?.upjong1cd || null,
+      upjong1nm: profile?.upjong1nm || null,
+      upjong3nm: profile?.upjong3nm || null,
     };
   } catch (e) {
     userRegion = { ...DEFAULT_REGION };
   }
   return userRegion;
+}
+
+function updateWriteAutoTagsUI() {
+  const wrap = document.getElementById('write-auto-tags');
+  if (!wrap) return;
+
+  const loc = userRegion.region_full || userRegion.region_dong || '';
+  const upjong = userRegion.upjong3nm || userRegion.upjong1nm || '';
+  const chipStyle =
+    'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:500;';
+
+  if (!loc && !upjong) {
+    wrap.style.display = 'block';
+    wrap.innerHTML =
+      '<span style="font-size:11px;color:var(--text3,var(--t3));line-height:1.5;">프로필에 위치·업종을 설정하면 글에 자동으로 붙습니다. <a href="profile.html" style="color:var(--chd);font-weight:500;">프로필 설정</a></span>';
+    return;
+  }
+
+  const chips = [];
+  if (loc) {
+    chips.push(
+      `<span style="${chipStyle}background:#EBF4FF;color:#0C447C;"><i class="ti ti-map-pin"></i>${escapeHtml(loc)}</span>`
+    );
+  }
+  if (upjong) {
+    chips.push(
+      `<span style="${chipStyle}background:var(--chl);color:var(--chdd);"><i class="ti ti-tag"></i>${escapeHtml(upjong)}</span>`
+    );
+  }
+
+  wrap.style.display = 'flex';
+  wrap.innerHTML = `<span style="font-size:10px;color:var(--text3,var(--t3));font-weight:600;align-self:center;margin-right:4px;">자동 적용</span>${chips.join('')}`;
+}
+
+function showLocationTagInfo() {
+  const loc = userRegion.region_full || userRegion.region_dong;
+  if (!loc) {
+    toast('위치가 없습니다. 프로필 설정에서 동네를 선택해주세요.');
+    return;
+  }
+  toast(`프로필 위치가 이 글에 자동 적용됩니다: ${loc}`);
+}
+
+function showUpjongTagInfo() {
+  const upjong = userRegion.upjong3nm || userRegion.upjong1nm;
+  if (!upjong) {
+    toast('업종이 없습니다. 프로필 설정에서 업종을 선택해주세요.');
+    return;
+  }
+  toast(`프로필 업종이 이 글에 자동 적용됩니다: ${upjong}`);
 }
 
 async function fetchPostsPage(page) {
@@ -370,7 +425,7 @@ function createPostCard(post, likedSet, savedSet) {
   const user = post.users || {};
   const liked = likedSet?.has(post.id);
   const saved = savedSet?.has(post.id);
-  const badgeText = user.upjong3nm || getCategoryLabel(post.category);
+  const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
 
   div.innerHTML = `
     <div class="pctop">
@@ -856,6 +911,13 @@ function bindWriteModal() {
   document.getElementById('close-modal')?.addEventListener('click', () => getWriteOverlay()?.classList.remove('open'));
   getWriteOverlay()?.addEventListener('click', (e) => {
     if (e.target === getWriteOverlay()) getWriteOverlay().classList.remove('open');
+  });
+
+  document.getElementById('btn-location-tag')?.addEventListener('click', showLocationTagInfo);
+  document.getElementById('btn-upjong-tag')?.addEventListener('click', showUpjongTagInfo);
+
+  window.addEventListener('golmok:profile-updated', () => {
+    resolveUserRegion().then(() => updateWriteAutoTagsUI());
   });
 }
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/device_redirect.js"></script>
-<title>이벤트·행사 - 골목대장</title>
+<title>상권분석 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -432,14 +432,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <aside class="sidebar">
     <div class="nsec">메뉴</div>
     <a class="ni menu-item" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
-    <a class="ni menu-item nav-analysis" data-page="analysis" href="analysis.html"><i class="ti ti-map"></i> 상권분석</a>
+    <a class="ni menu-item act nav-analysis" data-page="analysis" href="analysis.html"><i class="ti ti-map"></i> 상권분석</a>
     <a class="ni menu-item" data-page="weather" href="startup.html"><i class="ti ti-cloud"></i> 창업기상도</a>
     <a class="ni menu-item" data-page="hot" href="coming-soon.html?page=hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
     <div class="nsec">커뮤니티</div>
     <a class="ni menu-item" data-page="community" href="community.html" id="nav-all"><i class="ti ti-world"></i> 전체 게시판</a>
     <a class="ni menu-item" data-page="neighborhood" href="neighborhood.html" id="nav-dong"><i class="ti ti-map-pin"></i> 우리동네</a>
     <a class="ni menu-item" data-page="by-industry" href="by-industry.html"><i class="ti ti-tag"></i> 업종별</a>
-    <a class="ni menu-item act" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
+    <a class="ni menu-item" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
     <a class="ni menu-item" data-page="policy" href="policy.html"><i class="ti ti-file-text"></i> 정책·지원</a>
     <div class="nsec">내 활동</div>
     <a class="ni menu-item" id="nav-saved-posts" href="index.html"><i class="ti ti-bookmark"></i> 저장한 글</a>
@@ -462,27 +462,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <main class="center">
     <div class="fscroll page-main-content">
 
-      <div class="main-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <h2 style="font-size:20px;font-weight:700;">이벤트·행사</h2>
-            <p style="font-size:13px;color:#999;margin-top:4px;">우리동네 이벤트와 행사 정보</p>
-          </div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
+      <div class="main-content" style="max-width:720px;margin:0 auto;padding:24px 16px 80px;">
+        <div style="text-align:center;margin-bottom:20px;">
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;"><i class="ti ti-map"></i> 상권분석</h2>
+          <p style="font-size:14px;color:#999;">소상공인365 상권지도 · 테마상권 분석</p>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;">
-          <button type="button" class="event-filter-btn act" data-type="all" style="padding:7px 16px;border-radius:20px;font-size:13px;border:none;background:#F5A623;color:#fff;cursor:pointer;white-space:nowrap;font-weight:500;">전체</button>
-          <button type="button" class="event-filter-btn" data-type="discount" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🏷️ 할인이벤트</button>
-          <button type="button" class="event-filter-btn" data-type="groupbuy" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🛒 공동구매</button>
-          <button type="button" class="event-filter-btn" data-type="meeting" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">👥 모임·행사</button>
-          <button type="button" class="event-filter-btn" data-type="issue" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">⚠️ 이슈</button>
-        </div>
-        <div id="events-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"></div>
-        <div id="events-empty" style="display:none;text-align:center;padding:60px 20px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;margin-top:12px;">
-          <div style="font-size:48px;margin-bottom:12px;">📢</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">등록된 이벤트가 없습니다</div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;cursor:pointer;margin-top:12px;">이벤트 등록하기</button>
-        </div>
+        <p style="font-size:13px;color:#555;text-align:center;margin-bottom:16px;">아래 분석 마법사가 자동으로 열립니다. 닫히면 사이드바 <b>상권분석</b>을 다시 눌러주세요.</p>
       </div>
     </div>
   </main>
@@ -721,6 +706,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/events.js?v=20260629"></script>
+<script type="module" src="js/pages/analysis_page.js?v=20260629"></script>
 </body>
 </html>

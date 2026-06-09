@@ -448,6 +448,7 @@ async function saveProfile() {
       setTimeout(() => { msgEl.style.display = 'none'; }, 3000);
     }
     await refreshGlobalUI();
+    window.dispatchEvent(new CustomEvent('golmok:profile-updated'));
   } catch (err) {
     console.error('saveProfile', err);
     showToast('저장에 실패했습니다. 다시 시도해주세요');
