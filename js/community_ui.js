@@ -332,7 +332,7 @@ export async function loadFeed(reset = true) {
     } else {
       const liked = await getLikedPostIds(posts.map((p) => p.id));
       const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-      posts.forEach((post) => list.appendChild(createPostCard(post, liked, saved)));
+      posts.forEach((post) => list.appendChild(createPostCard(post, liked, saved, 'post-list')));
       hasMore = posts.length >= 20;
       currentPage += 1;
     }
@@ -416,13 +416,143 @@ function avatarHtml(user) {
   return `<div class="pcav" style="background:#FAEEDA;color:#633806;">${escapeHtml(ch)}</div>`;
 }
 
-export function getPostPageUrl(postId) {
+const SHELL_BOARD_PAGES = {
+  'index.html': { listViewId: 'shell-feed-view', defaultPage: 'index.html' },
+  'community.html': { listViewId: 'board-list-view', defaultPage: 'community.html' },
+  'neighborhood.html': { listViewId: 'board-list-view', defaultPage: 'neighborhood.html' },
+  'by-industry.html': { listViewId: 'board-list-view', defaultPage: 'by-industry.html' },
+  'events.html': { listViewId: 'board-list-view', defaultPage: 'events.html' },
+};
+
+const POST_LIST_PAGE_MAP = {
+  'community-post-list': 'community.html',
+  'post-list': 'index.html',
+  'neighborhood-post-list': 'neighborhood.html',
+  'industry-post-list': 'by-industry.html',
+};
+
+function getCurrentPageFile() {
+  const file = window.location.pathname.split('/').pop();
+  return file || 'index.html';
+}
+
+export function getShellLayout() {
+  if (!document.getElementById('shell-post-detail')) return null;
+  const page = getCurrentPageFile();
+  const cfg = SHELL_BOARD_PAGES[page];
+  if (!cfg) return null;
+  return { page, listViewId: cfg.listViewId, detailRootId: 'shell-post-detail' };
+}
+
+export function getPostPageUrl(postId, basePage) {
+  const page = basePage || getCurrentPageFile();
+  if (SHELL_BOARD_PAGES[page]) {
+    const url = new URL(page, window.location.origin);
+    if (page === getCurrentPageFile()) {
+      const cur = new URL(window.location.href);
+      cur.searchParams.set('id', postId);
+      cur.searchParams.delete('post');
+      return `${cur.pathname}${cur.search}`;
+    }
+    url.searchParams.set('id', postId);
+    return `${url.pathname}?${url.searchParams.toString()}`;
+  }
   return `post.html?id=${encodeURIComponent(postId)}`;
+}
+
+export function hideShellPostDetail({ skipPush = false } = {}) {
+  const shell = getShellLayout();
+  if (!shell) return;
+  const listEl = document.getElementById(shell.listViewId);
+  const root = document.getElementById(shell.detailRootId);
+  if (listEl) listEl.style.display = '';
+  if (root) {
+    root.style.display = 'none';
+    root.innerHTML = '';
+  }
+  if (!skipPush) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('id');
+    url.searchParams.delete('post');
+    window.history.pushState({ view: 'list' }, '', url);
+  }
+}
+
+export async function showShellPostDetail(postId, { skipPush = false } = {}) {
+  const shell = getShellLayout();
+  if (!shell) {
+    window.location.href = getPostPageUrl(postId);
+    return;
+  }
+
+  const listEl = document.getElementById(shell.listViewId);
+  const root = document.getElementById(shell.detailRootId);
+  if (!root) {
+    window.location.href = getPostPageUrl(postId, shell.page);
+    return;
+  }
+
+  if (listEl) listEl.style.display = 'none';
+  root.style.display = 'block';
+  root.innerHTML = '<div class="pd-loading">불러오는 중...</div>';
+
+  if (!skipPush) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', postId);
+    url.searchParams.delete('post');
+    window.history.pushState({ view: 'post', postId }, '', url);
+  }
+
+  try {
+    const post = await getPost(postId);
+    const comments = await getComments(postId);
+    const liked = await isLiked(postId);
+    const authorId = post.users?.id;
+    const following = authorId ? await isFollowing(authorId) : false;
+    const titleText = post.title || getPostDisplayTitle(post);
+    document.title = `${titleText} — 골목대장`;
+    mountPostDetailPage(root, post, comments, liked, following, { inShell: true });
+    root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    console.error(e);
+    root.innerHTML =
+      '<div class="pd-error">게시글을 불러오지 못했습니다.<br><button type="button" class="pd-back-btn" id="pd-back-to-list">목록으로</button></div>';
+    root.querySelector('#pd-back-to-list')?.addEventListener('click', () => hideShellPostDetail());
+  }
 }
 
 export function navigateToPost(postId) {
   if (!postId) return;
+  if (getShellLayout()) {
+    showShellPostDetail(postId);
+    return;
+  }
   window.location.href = getPostPageUrl(postId);
+}
+
+function resolvePostUrl(postId, listContainerId) {
+  const mapped = listContainerId ? POST_LIST_PAGE_MAP[listContainerId] : null;
+  return getPostPageUrl(postId, mapped || undefined);
+}
+
+function tryBootShellPostDetail() {
+  const shell = getShellLayout();
+  if (!shell) return false;
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('id') || params.get('post');
+  if (!postId) return false;
+  showShellPostDetail(postId, { skipPush: true });
+  return true;
+}
+
+function bindShellPopState() {
+  if (window.__golmokShellPopBound) return;
+  window.__golmokShellPopBound = true;
+  window.addEventListener('popstate', () => {
+    const postId = new URLSearchParams(window.location.search).get('id');
+    if (postId) showShellPostDetail(postId, { skipPush: true });
+    else hideShellPostDetail({ skipPush: true });
+  });
 }
 
 function getPostDisplayTitle(post) {
@@ -446,7 +576,7 @@ function getPostPreview(post) {
   return rest.length > 120 ? `${rest.slice(0, 120)}…` : rest;
 }
 
-function createPostCard(post, likedSet, savedSet) {
+function createPostCard(post, likedSet, savedSet, listContainerId) {
   const div = document.createElement('div');
   div.className = 'pc';
   div.dataset.postId = post.id;
@@ -459,7 +589,7 @@ function createPostCard(post, likedSet, savedSet) {
   const displayTitle = getPostDisplayTitle(post);
   const preview = getPostPreview(post);
   const imageCount = post.images?.length || 0;
-  const postUrl = getPostPageUrl(post.id);
+  const postUrl = resolvePostUrl(post.id, listContainerId);
 
   div.innerHTML = `
     <div class="pctop">
@@ -582,7 +712,7 @@ export async function renderPostList(posts, containerId, { reset = true, append 
 
   const liked = await getLikedPostIds(posts.map((p) => p.id));
   const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-  posts.forEach((post) => container.appendChild(createPostCard(post, liked, saved)));
+  posts.forEach((post) => container.appendChild(createPostCard(post, liked, saved, containerId)));
 }
 
 export function openPostDetail(postId) {
@@ -653,11 +783,12 @@ function buildCommentsHtml(comments) {
     .join('');
 }
 
-function mountPostDetailPage(root, post, comments, liked, following = false) {
+function mountPostDetailPage(root, post, comments, liked, following = false, { inShell = false } = {}) {
   const user = post.users || {};
   const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
 
   root.innerHTML = `
+    ${inShell ? '<button type="button" class="pd-back-btn" id="pd-back-to-list"><i class="ti ti-arrow-left"></i> 목록으로</button>' : ''}
     <article class="pd-article">
       <div class="pd-author">
         ${avatarHtml(user)}
@@ -695,11 +826,15 @@ function mountPostDetailPage(root, post, comments, liked, following = false) {
       <div class="pd-comments-head">댓글 <span id="pd-comment-count">${post.comment_count || 0}</span>개</div>
       <div id="comment-list-${post.id}" class="pd-comment-list">${buildCommentsHtml(comments)}</div>
     </article>
-    <div class="pd-comment-bar">
+    <div class="pd-comment-bar${inShell ? ' pd-comment-bar--inline' : ''}">
       <input id="comment-input-${post.id}" type="text" placeholder="댓글을 입력하세요..." class="pd-comment-input">
       <button type="button" id="comment-submit-${post.id}" class="pd-comment-submit">등록</button>
     </div>
   `;
+
+  if (inShell) {
+    root.querySelector('#pd-back-to-list')?.addEventListener('click', () => hideShellPostDetail());
+  }
 
   bindPostDetailEvents(root, post);
 }
@@ -791,7 +926,12 @@ function bindPostDetailEvents(scope, post) {
 }
 
 function sharePost(postId) {
-  const shareUrl = new URL(getPostPageUrl(postId), window.location.origin).href;
+  const shell = getShellLayout();
+  const page = shell?.page || getCurrentPageFile();
+  const shareUrl = new URL(
+    getPostPageUrl(postId, SHELL_BOARD_PAGES[page] ? page : 'community.html'),
+    window.location.origin
+  ).href;
   navigator.clipboard?.writeText(shareUrl).then(() => toast('링크가 복사되었습니다'));
 }
 
@@ -1258,14 +1398,32 @@ export async function loadNeighborSection() {
 
 function redirectLegacyPostQuery() {
   const params = new URLSearchParams(window.location.search);
-  const postId = params.get('post');
-  if (!postId || document.getElementById('post-detail-root')) return false;
-  window.location.replace(getPostPageUrl(postId));
-  return true;
+  const legacyPost = params.get('post');
+  if (!legacyPost) return false;
+  if (getShellLayout()) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', legacyPost);
+    url.searchParams.delete('post');
+    window.location.replace(`${url.pathname}${url.search}`);
+    return true;
+  }
+  if (!document.getElementById('post-detail-root')) {
+    window.location.replace(getPostPageUrl(legacyPost));
+    return true;
+  }
+  return false;
 }
 
 function initCommunityShell() {
   if (redirectLegacyPostQuery()) return;
+  bindShellPopState();
+  if (tryBootShellPostDetail()) {
+    bindWriteModal();
+    bindImageUpload();
+    bindFollowButtons();
+    initSidebarWidgets();
+    return;
+  }
   bindWriteModal();
   bindImageUpload();
   bindFollowButtons();
@@ -1274,13 +1432,15 @@ function initCommunityShell() {
 
 export function initCommunity() {
   if (redirectLegacyPostQuery()) return;
+  bindShellPopState();
   bindFeedTabs();
   bindCategoryTabs();
   bindWriteModal();
   bindImageUpload();
-  bindInfiniteScroll();
   bindFollowButtons();
   initSidebarWidgets();
+  if (tryBootShellPostDetail()) return;
+  bindInfiniteScroll();
   loadFeed(true);
 }
 
@@ -1289,6 +1449,8 @@ window.golmokCommunity = {
   openPostDetail,
   navigateToPost,
   getPostPageUrl,
+  showShellPostDetail,
+  hideShellPostDetail,
   initCommunity,
   initPostDetailPage,
   openWriteOverlay,
@@ -1310,7 +1472,7 @@ window.renderPostList = renderPostList;
 function bootCommunity() {
   if (window.__golmokCommunityBooted) return;
   window.__golmokCommunityBooted = true;
-  if (document.getElementById('post-detail-root')) {
+  if (/\/post\.html$/i.test(window.location.pathname) && document.getElementById('post-detail-root')) {
     initPostDetailPage();
     return;
   }

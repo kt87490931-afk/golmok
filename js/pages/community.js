@@ -3,6 +3,7 @@ import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
 
 const urlParams = new URLSearchParams(window.location.search);
+const initialPostId = urlParams.get('id') || urlParams.get('post');
 let currentCategory = urlParams.get('category') || 'all';
 let currentPage = 0;
 let isLoading = false;
@@ -54,9 +55,13 @@ bootPage(() => {
   initPageShell('community');
   activateTabs('.cat-tab', currentCategory);
   bindCategoryTabs();
-  loadCommunityFeed(true);
-  bindInfiniteScroll((reset) => {
-    if (hasMore && !isLoading) loadCommunityFeed(false);
+  if (!initialPostId) {
+    loadCommunityFeed(true);
+    bindInfiniteScroll((reset) => {
+      if (hasMore && !isLoading) loadCommunityFeed(false);
+    });
+  }
+  window.addEventListener('golmok:posts-changed', () => {
+    if (!new URLSearchParams(window.location.search).get('id')) loadCommunityFeed(true);
   });
-  window.addEventListener('golmok:posts-changed', () => loadCommunityFeed(true));
 });

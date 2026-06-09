@@ -43,7 +43,7 @@ async function loadNeighborhoodFeed(reset = true) {
 
 async function initNeighborhood() {
   initPageShell('neighborhood');
-  const wrap = document.getElementById('neighborhood-content');
+  const wrap = document.getElementById('board-list-view');
   const user = await getCurrentUser();
 
   if (!user) {
@@ -88,5 +88,7 @@ async function initNeighborhood() {
 }
 
 bootPage(() => {
+  initPageShell('neighborhood');
+  if (new URLSearchParams(window.location.search).get('id')) return;
   initNeighborhood().catch(console.error);
 });
