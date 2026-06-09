@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="js/device_redirect.js"></script>
+<title>게시글 — 골목대장</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:#F7F3EB;color:#1A1A1A;min-height:100vh;}
+.post-page-header{position:sticky;top:0;z-index:100;height:56px;background:#fff;border-bottom:1px solid #E8E4DC;display:flex;align-items:center;padding:0 16px;gap:12px;}
+.post-back{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid #E8E4DC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#555;text-decoration:none;flex-shrink:0;}
+.post-back:hover{background:#FFF8E7;}
+.post-page-title{font-size:16px;font-weight:700;flex:1;}
+.post-page-wrap{max-width:720px;margin:0 auto;padding:0 0 88px;}
+#post-detail-root{min-height:calc(100vh - 56px);}
+.pd-loading,.pd-error{padding:48px 20px;text-align:center;color:#999;font-size:14px;line-height:1.6;}
+.pd-article{background:#fff;border-bottom:1px solid #E8E4DC;padding:20px 16px 24px;}
+.pd-author{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.pd-author .pcav{width:44px;height:44px;}
+.pd-author-meta{flex:1;min-width:0;}
+.pd-author-name{font-size:15px;font-weight:600;color:#1A1A1A;}
+.pd-author-info{font-size:12px;color:#999;margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.pd-follow-btn{display:flex;align-items:center;gap:4px;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:500;flex-shrink:0;}
+.pcbdg{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;}
+.pd-title{font-size:20px;font-weight:700;line-height:1.45;margin-bottom:12px;color:#1A1A1A;}
+.pd-body{font-size:15px;line-height:1.75;color:#333;margin-bottom:16px;white-space:pre-wrap;word-break:break-word;}
+.pd-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 0;border-top:1px solid #E8E4DC;border-bottom:1px solid #E8E4DC;margin-bottom:16px;}
+.pd-act-btn{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #E8E4DC;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;color:#555;font-family:inherit;}
+.pd-act-btn:hover{border-color:#F5A623;color:#C17F24;}
+.pd-comments-head{font-size:15px;font-weight:700;margin-bottom:12px;}
+.pd-comment-list{background:#fff;padding:0 16px 16px;}
+.pcimgs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px;max-width:100%;}
+.pcimgs--single{display:block;}
+.pcimg-wrap{border-radius:8px;overflow:hidden;max-width:100%;}
+.pcimg-wrap--hero{grid-column:1/-1;}
+.pcimg{max-width:100%;width:100%;height:auto;border-radius:8px;display:block;object-fit:contain;}
+.pcav{width:40px;height:40px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.pcav-img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.pd-comment-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E8E4DC;padding:10px 16px;display:flex;gap:8px;z-index:100;}
+.pd-comment-input{flex:1;border:1px solid #E8E4DC;border-radius:20px;padding:10px 14px;font-size:14px;outline:none;font-family:inherit;}
+.pd-comment-input:focus{border-color:#F5A623;}
+.pd-comment-submit{background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0;font-family:inherit;}
+.pd-comment-submit:hover{opacity:.9;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+@media(min-width:768px){
+  .post-page-wrap{padding:16px 16px 88px;}
+  .pd-article,.pd-comment-list{border-radius:12px;border:1px solid #E8E4DC;margin-bottom:12px;}
+  .pd-comment-bar{left:50%;transform:translateX(-50%);max-width:720px;border-radius:12px 12px 0 0;}
+}
+</style>
+</head>
+<body>
+<header class="post-page-header">
+  <a href="index.html" class="post-back" id="post-back" aria-label="뒤로"><i class="ti ti-arrow-left"></i></a>
+  <span class="post-page-title">게시글</span>
+</header>
+<div class="post-page-wrap">
+  <div id="post-detail-root"><div class="pd-loading">불러오는 중...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+document.getElementById('post-back')?.addEventListener('click',function(e){
+  if(window.history.length>1){e.preventDefault();window.history.back();}
+});
+</script>
+<script type="module" src="js/auth.js?v=20260628"></script>
+<script type="module" src="js/community_ui.js?v=20260632"></script>
+</body>
+</html>

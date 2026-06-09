@@ -416,12 +416,34 @@ function avatarHtml(user) {
   return `<div class="pcav" style="background:#FAEEDA;color:#633806;">${escapeHtml(ch)}</div>`;
 }
 
+export function getPostPageUrl(postId) {
+  return `post.html?id=${encodeURIComponent(postId)}`;
+}
+
+export function navigateToPost(postId) {
+  if (!postId) return;
+  window.location.href = getPostPageUrl(postId);
+}
+
 function getPostDisplayTitle(post) {
   if (post.title?.trim()) return post.title.trim();
   const text = (post.content || '').trim();
   if (!text) return '(내용 없음)';
   const line = text.split('\n').find((l) => l.trim()) || text;
   return line.length > 72 ? `${line.slice(0, 72)}…` : line;
+}
+
+function getPostPreview(post) {
+  const text = (post.content || '').trim();
+  if (!text) return '';
+  if (post.title?.trim()) {
+    return text.length > 120 ? `${text.slice(0, 120)}…` : text;
+  }
+  const lines = text.split('\n').filter((l) => l.trim());
+  if (lines.length <= 1) return '';
+  const rest = lines.slice(1).join(' ').trim();
+  if (!rest) return '';
+  return rest.length > 120 ? `${rest.slice(0, 120)}…` : rest;
 }
 
 function createPostCard(post, likedSet, savedSet) {
@@ -435,7 +457,9 @@ function createPostCard(post, likedSet, savedSet) {
   const saved = savedSet?.has(post.id);
   const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
   const displayTitle = getPostDisplayTitle(post);
+  const preview = getPostPreview(post);
   const imageCount = post.images?.length || 0;
+  const postUrl = getPostPageUrl(post.id);
 
   div.innerHTML = `
     <div class="pctop">
@@ -449,15 +473,11 @@ function createPostCard(post, likedSet, savedSet) {
         ${post.region_dong ? `<span class="pcpin"><i class="ti ti-map-pin"></i> ${escapeHtml(post.region_dong)}</span>` : ''}
       </div>
     </div>
-    <button type="button" class="pc-toggle-head" aria-expanded="false">
-      <span class="pctit">${escapeHtml(displayTitle)}</span>
-      <i class="ti ti-chevron-down pc-chevron" aria-hidden="true"></i>
-    </button>
-    ${imageCount ? `<div class="pc-collapsed-hint"><i class="ti ti-photo"></i> 사진 ${imageCount}장 · 클릭하여 펼치기</div>` : ''}
-    <div class="pc-detail">
-      <div class="pcbody">${escapeHtml(post.content)}</div>
-      ${renderPostImagesHtml(post.images)}
-    </div>
+    <a href="${postUrl}" class="pc-link-head">
+      <div class="pctit">${escapeHtml(displayTitle)}</div>
+      ${preview ? `<div class="pc-preview">${escapeHtml(preview)}</div>` : ''}
+      ${imageCount ? `<div class="pc-meta-hint"><i class="ti ti-photo"></i> 사진 ${imageCount}장</div>` : ''}
+    </a>
     <div class="pcbot">
       <span class="pca like-btn" data-post-id="${post.id}" style="${liked ? 'color:#E24B4A' : ''}">
         <i class="ti ti-heart" style="${liked ? 'color:#E24B4A' : ''}"></i>
@@ -533,14 +553,9 @@ function createPostCard(post, likedSet, savedSet) {
   });
 
   div.querySelector('.comment-btn')?.addEventListener('click', (e) => {
+    e.preventDefault();
     e.stopPropagation();
-    openPostDetail(post.id);
-  });
-
-  div.querySelector('.pc-toggle-head')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const expanded = div.classList.toggle('pc-expanded');
-    e.currentTarget.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    navigateToPost(post.id);
   });
 
   return div;
@@ -570,17 +585,37 @@ export async function renderPostList(posts, containerId, { reset = true, append 
   posts.forEach((post) => container.appendChild(createPostCard(post, liked, saved)));
 }
 
-export async function openPostDetail(postId) {
+export function openPostDetail(postId) {
+  navigateToPost(postId);
+}
+
+export async function initPostDetailPage() {
+  const root = document.getElementById('post-detail-root');
+  if (!root) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('id') || params.get('post');
+  if (!postId) {
+    root.innerHTML =
+      '<div class="pd-error">게시글을 찾을 수 없습니다.<br><a href="index.html" style="color:#C17F24;margin-top:8px;display:inline-block;">홈으로</a></div>';
+    return;
+  }
+
+  root.innerHTML = '<div class="pd-loading">불러오는 중...</div>';
+
   try {
     const post = await getPost(postId);
     const comments = await getComments(postId);
     const liked = await isLiked(postId);
     const authorId = post.users?.id;
     const following = authorId ? await isFollowing(authorId) : false;
-    showPostDetailModal(post, comments, liked, following);
+    const titleText = post.title || getPostDisplayTitle(post);
+    document.title = `${titleText} — 골목대장`;
+    mountPostDetailPage(root, post, comments, liked, following);
   } catch (e) {
     console.error(e);
-    toast('게시글을 불러오지 못했습니다');
+    root.innerHTML =
+      '<div class="pd-error">게시글을 불러오지 못했습니다.<br><a href="index.html" style="color:#C17F24;margin-top:8px;display:inline-block;">홈으로</a></div>';
   }
 }
 
@@ -618,79 +653,79 @@ function buildCommentsHtml(comments) {
     .join('');
 }
 
-function showPostDetailModal(post, comments, liked, following = false) {
-  document.getElementById('post-detail-modal')?.remove();
-
-  const modal = document.createElement('div');
-  modal.id = 'post-detail-modal';
-  modal.className = 'modal-bg open';
-  modal.style.zIndex = '250';
-
+function mountPostDetailPage(root, post, comments, liked, following = false) {
   const user = post.users || {};
-  const isMobile = window.innerWidth <= 768;
-  const boxW = isMobile ? '100%' : '600px';
-  const boxH = isMobile ? '100%' : 'auto';
-  const maxH = isMobile ? '100vh' : '80vh';
-  const radius = isMobile ? '0' : '16px';
+  const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
 
-  modal.innerHTML = `
-    <div class="modal" style="width:${boxW};max-width:100%;max-height:${maxH};height:${boxH};border-radius:${radius};display:flex;flex-direction:column;overflow:hidden;padding:0;">
-      <div class="modal-head" style="padding:16px 20px;border-bottom:1px solid #E8E4DC;flex-shrink:0;">
-        <span class="modal-title">${escapeHtml(user.nickname || '대장님')}</span>
-        <button type="button" class="modal-close" id="close-post-detail"><i class="ti ti-x"></i></button>
-      </div>
-      <div style="padding:16px 20px;overflow-y:auto;flex:1;">
-        ${post.title ? `<div style="font-size:18px;font-weight:700;margin-bottom:10px;">${escapeHtml(post.title)}</div>` : ''}
-        <div style="font-size:14px;line-height:1.7;color:#333;margin-bottom:14px;">${escapeHtml(post.content)}</div>
-        ${renderPostImagesHtml(post.images)}
-        <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;border-top:1px solid #E8E4DC;border-bottom:1px solid #E8E4DC;margin-bottom:14px;">
-          <button type="button" class="detail-like-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;${liked ? 'color:#E24B4A' : ''}">
-            <i class="ti ti-heart"></i> 공감 <span class="detail-like-count">${post.like_count || 0}</span>
-          </button>
-          <button type="button" class="detail-bookmark-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;">
-            <i class="ti ti-bookmark"></i> 저장
-          </button>
-          <button type="button" class="detail-share-btn" data-post-id="${post.id}" style="display:flex;align-items:center;gap:5px;background:none;border:1px solid #E8E4DC;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;">
-            <i class="ti ti-share"></i> 공유
-          </button>
-          ${
-            user.id
-              ? `<button type="button" class="detail-follow-btn" data-user-id="${user.id}" data-following="${following ? 'true' : 'false'}" style="display:flex;align-items:center;gap:5px;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;transition:background .15s,color .15s,border-color .15s;${
-                  following
-                    ? 'background:#F5F1E8;border:1px solid #E8E4DC;color:#555;'
-                    : 'background:var(--ch);color:#fff;border:none;'
-                }"><i class="ti ti-user-plus"></i> ${following ? '팔로잉' : '팔로우'}</button>`
-              : ''
-          }
+  root.innerHTML = `
+    <article class="pd-article">
+      <div class="pd-author">
+        ${avatarHtml(user)}
+        <div class="pd-author-meta">
+          <div class="pd-author-name">${escapeHtml(user.nickname || '대장님')}</div>
+          <div class="pd-author-info">
+            <span class="pcbdg" style="${getCategoryStyle(post.category)}">${escapeHtml(badgeText)}</span>
+            ${escapeHtml(user.region_full || post.region_full || '')} · ${getTimeAgo(post.created_at)}
+          </div>
         </div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">댓글 ${post.comment_count || 0}개</div>
-        <div id="comment-list-${post.id}">${buildCommentsHtml(comments)}</div>
+        ${
+          user.id
+            ? `<button type="button" class="detail-follow-btn pd-follow-btn" data-user-id="${user.id}" data-following="${following ? 'true' : 'false'}" style="${
+                following
+                  ? 'background:#F5F1E8;border:1px solid #E8E4DC;color:#555;'
+                  : 'background:#F5A623;color:#fff;border:none;'
+              }"><i class="ti ti-user-plus"></i> ${following ? '팔로잉' : '팔로우'}</button>`
+            : ''
+        }
       </div>
-      <div style="padding:12px 16px;border-top:1px solid #E8E4DC;display:flex;gap:8px;flex-shrink:0;">
-        <input id="comment-input-${post.id}" type="text" placeholder="댓글을 입력하세요..." style="flex:1;border:1px solid #E8E4DC;border-radius:20px;padding:8px 14px;font-size:13px;outline:none;">
-        <button type="button" id="comment-submit-${post.id}" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:500;">등록</button>
+      ${post.title ? `<h1 class="pd-title">${escapeHtml(post.title)}</h1>` : ''}
+      <div class="pd-body">${escapeHtml(post.content)}</div>
+      ${renderPostImagesHtml(post.images)}
+      <div class="pd-actions">
+        <button type="button" class="detail-like-btn pd-act-btn" data-post-id="${post.id}" style="${liked ? 'color:#E24B4A;border-color:#E24B4A;' : ''}">
+          <i class="ti ti-heart"></i> 공감 <span class="detail-like-count">${post.like_count || 0}</span>
+        </button>
+        <button type="button" class="detail-bookmark-btn pd-act-btn" data-post-id="${post.id}">
+          <i class="ti ti-bookmark"></i> 저장
+        </button>
+        <button type="button" class="detail-share-btn pd-act-btn" data-post-id="${post.id}">
+          <i class="ti ti-share"></i> 공유
+        </button>
       </div>
+      <div class="pd-comments-head">댓글 <span id="pd-comment-count">${post.comment_count || 0}</span>개</div>
+      <div id="comment-list-${post.id}" class="pd-comment-list">${buildCommentsHtml(comments)}</div>
+    </article>
+    <div class="pd-comment-bar">
+      <input id="comment-input-${post.id}" type="text" placeholder="댓글을 입력하세요..." class="pd-comment-input">
+      <button type="button" id="comment-submit-${post.id}" class="pd-comment-submit">등록</button>
     </div>
   `;
 
-  modal.querySelector('#close-post-detail')?.addEventListener('click', () => modal.remove());
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
+  bindPostDetailEvents(root, post);
+}
 
-  modal.querySelector('.detail-like-btn')?.addEventListener('click', async () => {
+function bindPostDetailEvents(scope, post) {
+  scope.querySelector('.detail-like-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
     const res = await toggleLike(post.id);
     if (res?.error === 'login') {
       toast('로그인이 필요합니다');
       window.openLoginModal?.('login');
       return;
     }
-    const count = modal.querySelector('.detail-like-count');
+    const count = scope.querySelector('.detail-like-count');
     const n = parseInt(count.textContent, 10) || 0;
     count.textContent = res.liked ? n + 1 : Math.max(0, n - 1);
+    if (res.liked) {
+      btn.style.color = '#E24B4A';
+      btn.style.borderColor = '#E24B4A';
+    } else {
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
   });
 
-  modal.querySelector('.detail-bookmark-btn')?.addEventListener('click', async () => {
+  scope.querySelector('.detail-bookmark-btn')?.addEventListener('click', async () => {
     const res = await toggleBookmark(post.id);
     if (res?.error === 'login') {
       toast('로그인이 필요합니다');
@@ -700,28 +735,31 @@ function showPostDetailModal(post, comments, liked, following = false) {
     toast(res.saved ? '저장했습니다' : '저장 취소');
   });
 
-  modal.querySelector('.detail-share-btn')?.addEventListener('click', () => sharePost(post.id));
+  scope.querySelector('.detail-share-btn')?.addEventListener('click', () => sharePost(post.id));
 
-  modal.querySelector('.detail-follow-btn')?.addEventListener('click', (e) => {
+  scope.querySelector('.detail-follow-btn')?.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const uid = e.currentTarget.dataset.userId;
-    handleFollowClick(e.currentTarget, uid);
+    handleFollowClick(e.currentTarget, e.currentTarget.dataset.userId);
   });
 
-  modal.querySelectorAll('.reply-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      replyTargetId = btn.dataset.replyId;
-      const input = modal.querySelector(`#comment-input-${post.id}`);
-      if (input) {
-        input.placeholder = '답글을 입력하세요...';
-        input.focus();
-      }
+  const bindReplyButtons = () => {
+    scope.querySelectorAll('.reply-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        replyTargetId = btn.dataset.replyId;
+        const input = scope.querySelector(`#comment-input-${post.id}`);
+        if (input) {
+          input.placeholder = '답글을 입력하세요...';
+          input.focus();
+        }
+      });
     });
-  });
+  };
+
+  bindReplyButtons();
 
   const submitComment = async () => {
-    const input = modal.querySelector(`#comment-input-${post.id}`);
+    const input = scope.querySelector(`#comment-input-${post.id}`);
     const content = input?.value?.trim();
     if (!content) return;
     const res = await createComment({ postId: post.id, content, parentId: replyTargetId });
@@ -734,7 +772,10 @@ function showPostDetailModal(post, comments, liked, following = false) {
     replyTargetId = null;
     input.placeholder = '댓글을 입력하세요...';
     const updated = await getComments(post.id);
-    modal.querySelector(`#comment-list-${post.id}`).innerHTML = buildCommentsHtml(updated);
+    scope.querySelector(`#comment-list-${post.id}`).innerHTML = buildCommentsHtml(updated);
+    const countEl = scope.querySelector('#pd-comment-count');
+    if (countEl) countEl.textContent = String(updated.length);
+    bindReplyButtons();
     const me = await getCurrentUser();
     if (me && post.user_id && post.user_id !== me.id) {
       const profile = await getUserProfile(me.id);
@@ -743,17 +784,15 @@ function showPostDetailModal(post, comments, liked, following = false) {
     toast('댓글이 등록되었습니다');
   };
 
-  modal.querySelector(`#comment-submit-${post.id}`)?.addEventListener('click', submitComment);
-  modal.querySelector(`#comment-input-${post.id}`)?.addEventListener('keydown', (e) => {
+  scope.querySelector(`#comment-submit-${post.id}`)?.addEventListener('click', submitComment);
+  scope.querySelector(`#comment-input-${post.id}`)?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submitComment();
   });
-
-  document.body.appendChild(modal);
 }
 
 function sharePost(postId) {
-  const url = `${window.location.origin}${window.location.pathname}?post=${postId}`;
-  navigator.clipboard?.writeText(url).then(() => toast('링크가 복사되었습니다'));
+  const shareUrl = new URL(getPostPageUrl(postId), window.location.origin).href;
+  navigator.clipboard?.writeText(shareUrl).then(() => toast('링크가 복사되었습니다'));
 }
 
 async function submitNewPost() {
@@ -1217,17 +1256,24 @@ export async function loadNeighborSection() {
   }
 }
 
+function redirectLegacyPostQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('post');
+  if (!postId || document.getElementById('post-detail-root')) return false;
+  window.location.replace(getPostPageUrl(postId));
+  return true;
+}
+
 function initCommunityShell() {
+  if (redirectLegacyPostQuery()) return;
   bindWriteModal();
   bindImageUpload();
   bindFollowButtons();
   initSidebarWidgets();
-  const params = new URLSearchParams(window.location.search);
-  const postId = params.get('post');
-  if (postId) openPostDetail(postId);
 }
 
 export function initCommunity() {
+  if (redirectLegacyPostQuery()) return;
   bindFeedTabs();
   bindCategoryTabs();
   bindWriteModal();
@@ -1235,20 +1281,16 @@ export function initCommunity() {
   bindInfiniteScroll();
   bindFollowButtons();
   initSidebarWidgets();
-
-  const params = new URLSearchParams(window.location.search);
-  const postId = params.get('post');
-  if (postId) {
-    openPostDetail(postId);
-  } else {
-    loadFeed(true);
-  }
+  loadFeed(true);
 }
 
 window.golmokCommunity = {
   loadFeed,
   openPostDetail,
+  navigateToPost,
+  getPostPageUrl,
   initCommunity,
+  initPostDetailPage,
   openWriteOverlay,
   openWriteWithPhoto,
   renderPostList,
@@ -1258,6 +1300,7 @@ window.golmokCommunity = {
   initSidebarWidgets,
 };
 window.openPostDetail = openPostDetail;
+window.navigateToPost = navigateToPost;
 window.searchArea = searchArea;
 window.sharePost = sharePost;
 window.openWriteOverlay = openWriteOverlay;
@@ -1267,6 +1310,10 @@ window.renderPostList = renderPostList;
 function bootCommunity() {
   if (window.__golmokCommunityBooted) return;
   window.__golmokCommunityBooted = true;
+  if (document.getElementById('post-detail-root')) {
+    initPostDetailPage();
+    return;
+  }
   if (document.getElementById('post-list')) initCommunity();
   else initCommunityShell();
 }
