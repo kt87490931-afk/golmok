@@ -1,5 +1,5 @@
 /**
- * 모바일: 햄버거 사이드바 + 하단 네비 (단일 도메인 반응형)
+ * 모바일: golmok-mobile(구 m.) UI 기준 — 햄버거 드로어 + 하단 네비
  */
 (function () {
   if (typeof window === 'undefined') return;
@@ -13,6 +13,15 @@
   function currentPage() {
     var file = (window.location.pathname.split('/').pop() || 'index.html').split('?')[0];
     return file || 'index.html';
+  }
+
+  function updateHeaderHeight() {
+    var topnav = document.querySelector('.topnav');
+    if (!topnav || !isMobile()) {
+      document.documentElement.style.removeProperty('--mobile-header-h');
+      return;
+    }
+    document.documentElement.style.setProperty('--mobile-header-h', topnav.offsetHeight + 'px');
   }
 
   function setupSidebarDrawer() {
@@ -31,6 +40,7 @@
     }
 
     function openSidebar() {
+      updateHeaderHeight();
       sidebar.classList.add('open');
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -49,12 +59,14 @@
       btn.id = 'mobile-menu-btn';
       btn.setAttribute('aria-label', '메뉴 열기');
       btn.innerHTML = '<i class="ti ti-menu-2"></i>';
-      var logo = topnav.querySelector('.logo-row');
-      if (logo && logo.nextSibling) {
-        topnav.insertBefore(btn, logo.nextSibling);
+
+      var tnavR = topnav.querySelector('.tnav-r');
+      if (tnavR) {
+        tnavR.appendChild(btn);
       } else {
-        topnav.prepend(btn);
+        topnav.appendChild(btn);
       }
+
       btn.addEventListener('click', function () {
         if (sidebar.classList.contains('open')) closeSidebar();
         else openSidebar();
@@ -74,8 +86,14 @@
     nav.setAttribute('aria-label', '하단 메뉴');
 
     var homeAct = page === 'index.html' ? ' act' : '';
-    var commAct = page === 'community.html' ? ' act' : '';
+    var commAct =
+      page === 'community.html' ||
+      page === 'neighborhood.html' ||
+      page === 'by-industry.html'
+        ? ' act'
+        : '';
     var analysisAct = page === 'analysis.html' ? ' act' : '';
+    var profileAct = page === 'profile.html' ? ' act' : '';
 
     nav.innerHTML =
       '<div class="bottom-mnav-inner">' +
@@ -89,7 +107,9 @@
       '<a href="analysis.html" class="bm-item' +
       analysisAct +
       '"><i class="ti ti-map"></i><span>상권</span></a>' +
-      '<a href="profile.html" class="bm-item"><i class="ti ti-user"></i><span>프로필</span></a>' +
+      '<a href="profile.html" class="bm-item' +
+      profileAct +
+      '"><i class="ti ti-user"></i><span>프로필</span></a>' +
       '</div>';
 
     document.body.appendChild(nav);
@@ -107,14 +127,19 @@
     document.getElementById('mobile-menu-btn')?.remove();
     document.getElementById('bottom-mnav')?.remove();
     document.body.classList.remove('has-bottom-nav');
+    document.body.classList.remove('gm-mobile');
     document.querySelector('.sidebar')?.classList.remove('open');
     document.body.style.overflow = '';
+    document.documentElement.style.removeProperty('--mobile-header-h');
   }
 
   function apply() {
     if (isMobile()) {
+      document.body.classList.add('gm-mobile');
       setupSidebarDrawer();
       setupBottomNav();
+      updateHeaderHeight();
+      window.setTimeout(updateHeaderHeight, 100);
     } else {
       teardownMobileChrome();
     }
@@ -125,6 +150,8 @@
   } else {
     apply();
   }
+
+  window.addEventListener('resize', updateHeaderHeight);
 
   if (typeof MQ.addEventListener === 'function') {
     MQ.addEventListener('change', apply);

@@ -1,0 +1,427 @@
+/* golmok-mobile(구 m.) UI 기준 — 768px 이하 단일 도메인 모바일 셸
+ * PC topnav/sidebar DOM을 모바일 앱 레이아웃으로 재구성
+ */
+@media (max-width: 768px) {
+  :root {
+    --mobile-app-max: 430px;
+  }
+
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  body.gm-mobile {
+    background: var(--bg, #f7f3eb);
+  }
+
+  /* ── 상단: golmok-mobile .topbar 스타일 ── */
+  .topnav {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    height: auto !important;
+    min-height: 56px !important;
+    padding: 8px 14px 12px !important;
+    gap: 8px 10px !important;
+    background: var(--ch, #f5a623) !important;
+    border-bottom: none !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+  }
+
+  .tnav-links,
+  .vbtn,
+  .logo-sub {
+    display: none !important;
+  }
+
+  .logo-row {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    order: 1 !important;
+  }
+
+  .logo-row > div:last-child {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .logo-name {
+    color: #fff !important;
+    font-size: 17px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .logo-cat {
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* tnav-r 자식을 topnav flex에 직접 참여 */
+  .tnav-r {
+    display: contents !important;
+  }
+
+  .tnav-r .icobtn,
+  .tnav-r .pchip {
+    order: 2 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mobile-menu-btn {
+    order: 3 !important;
+    display: flex !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #fff !important;
+  }
+
+  .icobtn {
+    width: 36px !important;
+    height: 36px !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    background: transparent !important;
+    color: #fff !important;
+  }
+
+  .pchip {
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    padding: 4px 8px 4px 4px !important;
+  }
+
+  .pchip .pname,
+  .pchip .ti-chevron-down {
+    display: none !important;
+  }
+
+  .pchip .pav {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #fff !important;
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
+
+  /* 검색: topbar 아래 전체 너비 (golmok-mobile .srch-wrap) */
+  .tnav-r .sbar {
+    order: 10 !important;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    background: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    margin: 0 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .tnav-r .sbar input {
+    font-size: 13px !important;
+  }
+
+  /* ── 본문 레이아웃 ── */
+  .body {
+    flex-direction: column !important;
+    min-height: calc(100vh - var(--mobile-header-h, 120px)) !important;
+    max-width: var(--mobile-app-max) !important;
+    margin: 0 auto !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    left: -290px !important;
+    top: var(--mobile-header-h, 56px) !important;
+    bottom: 0 !important;
+    z-index: 220 !important;
+    width: min(290px, 88vw) !important;
+    height: auto !important;
+    transition: left 0.25s ease !important;
+    box-shadow: none !important;
+  }
+
+  .sidebar.open {
+    left: 0 !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18) !important;
+  }
+
+  .sidebar-overlay {
+    top: var(--mobile-header-h, 56px) !important;
+  }
+
+  .rcol {
+    display: none !important;
+  }
+
+  .center {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .ftabs {
+    position: relative !important;
+    top: auto !important;
+    padding: 0 !important;
+    background: var(--white, #fff) !important;
+    border-bottom: 1px solid var(--border, #e8e4dc) !important;
+  }
+
+  .ft {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 12px 0 !important;
+    font-size: 14px !important;
+  }
+
+  /* ── 동네 범위: golmok-mobile .range-wrap ── */
+  .rbar {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 3px !important;
+    background: #f0ede6 !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border, #e8e4dc) !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 10px 14px 12px !important;
+  }
+
+  .rlabel {
+    display: none !important;
+  }
+
+  .lchip {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    margin: 0 0 8px !important;
+    justify-content: flex-start !important;
+    background: var(--chl, #fff8e7) !important;
+    border: 1px solid var(--chb, #fac775) !important;
+    border-radius: 20px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: var(--chdd, #8b5a10) !important;
+  }
+
+  .rpill {
+    text-align: center !important;
+    padding: 8px 4px !important;
+    font-size: 11px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    background: transparent !important;
+    color: var(--text3, #999) !important;
+    margin: 0 !important;
+  }
+
+  .rpill.act {
+    background: var(--white, #fff) !important;
+    color: var(--chd, #c17f24) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .fscroll,
+  .page-main-content {
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+
+  /* ── 통계 카드: golmok-mobile 2+1 그리드 ── */
+  .stats-strip {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .stats-strip .stat-card:nth-child(3) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .stats-strip .stat-card:nth-child(3) .stat-card-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 14px !important;
+  }
+
+  .stats-strip .stat-card:nth-child(3) .stat-icon-wrap {
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .stats-strip .stat-card:nth-child(3) .stat-label,
+  .stats-strip .stat-card:nth-child(3) .stat-value {
+    text-align: left !important;
+  }
+
+  .stats-strip .stat-card:nth-child(3) .stat-value {
+    font-size: 20px !important;
+  }
+
+  .stats-strip .stat-card:nth-child(3) .stat-card-bottom {
+    padding-top: 0 !important;
+    border-top: none !important;
+    justify-content: flex-end !important;
+  }
+
+  .stat-card {
+    border-radius: 14px !important;
+  }
+
+  .stat-card-top {
+    padding: 12px 14px 8px !important;
+  }
+
+  .stat-icon-wrap {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 9px !important;
+    margin-bottom: 7px !important;
+  }
+
+  .stat-icon-wrap i {
+    font-size: 16px !important;
+  }
+
+  .stat-label {
+    font-size: 10px !important;
+  }
+
+  .stat-value {
+    font-size: 22px !important;
+  }
+
+  .stat-chg {
+    font-size: 11px !important;
+  }
+
+  .stat-date {
+    font-size: 9px !important;
+  }
+
+  /* ── AI·이벤트 카드 ── */
+  .ai-analysis-card {
+    border-radius: 14px !important;
+    margin: 0 !important;
+  }
+
+  .event-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .event-grid .ev-card-new {
+    min-width: 220px !important;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .event-section {
+    border-radius: 14px !important;
+  }
+
+  /* ── 하단 네비: golmok-mobile .bottom-nav ── */
+  .bottom-mnav {
+    display: flex !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    max-width: var(--mobile-app-max) !important;
+    width: 100% !important;
+    height: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .bottom-mnav-inner {
+    width: 100% !important;
+    align-items: flex-end !important;
+    padding: 0 4px 4px !important;
+    height: 62px !important;
+  }
+
+  .bm-item {
+    flex: 1 !important;
+    min-width: 0 !important;
+    padding-bottom: 4px !important;
+    font-size: 10px !important;
+  }
+
+  .bm-item i {
+    font-size: 22px !important;
+  }
+
+  .bm-plus-wrap {
+    flex: 0 0 56px !important;
+    max-width: 56px !important;
+    position: relative !important;
+    z-index: 2 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .bm-plus {
+    width: 48px !important;
+    height: 48px !important;
+    margin-top: -18px !important;
+    border: 3px solid var(--white, #fff) !important;
+  }
+
+  .bm-plus i {
+    font-size: 24px !important;
+  }
+
+  .bm-plus-wrap > span {
+    margin-top: 2px !important;
+    font-size: 10px !important;
+  }
+
+  body.has-bottom-nav {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .toast {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    font-size: 12px !important;
+  }
+
+  /* 게시판·기타 */
+  .ctabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .main-content h2 {
+    font-size: 18px !important;
+  }
+
+  #events-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  .modal-bg {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .pd-comment-bar--inline {
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
