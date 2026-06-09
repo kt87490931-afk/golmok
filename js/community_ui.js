@@ -416,6 +416,14 @@ function avatarHtml(user) {
   return `<div class="pcav" style="background:#FAEEDA;color:#633806;">${escapeHtml(ch)}</div>`;
 }
 
+function getPostDisplayTitle(post) {
+  if (post.title?.trim()) return post.title.trim();
+  const text = (post.content || '').trim();
+  if (!text) return '(내용 없음)';
+  const line = text.split('\n').find((l) => l.trim()) || text;
+  return line.length > 72 ? `${line.slice(0, 72)}…` : line;
+}
+
 function createPostCard(post, likedSet, savedSet) {
   const div = document.createElement('div');
   div.className = 'pc';
@@ -426,6 +434,8 @@ function createPostCard(post, likedSet, savedSet) {
   const liked = likedSet?.has(post.id);
   const saved = savedSet?.has(post.id);
   const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
+  const displayTitle = getPostDisplayTitle(post);
+  const imageCount = post.images?.length || 0;
 
   div.innerHTML = `
     <div class="pctop">
@@ -439,9 +449,15 @@ function createPostCard(post, likedSet, savedSet) {
         ${post.region_dong ? `<span class="pcpin"><i class="ti ti-map-pin"></i> ${escapeHtml(post.region_dong)}</span>` : ''}
       </div>
     </div>
-    ${post.title ? `<div class="pctit">${escapeHtml(post.title)}</div>` : ''}
-    <div class="pcbody">${escapeHtml(post.content)}</div>
-    ${renderPostImagesHtml(post.images)}
+    <button type="button" class="pc-toggle-head" aria-expanded="false">
+      <span class="pctit">${escapeHtml(displayTitle)}</span>
+      <i class="ti ti-chevron-down pc-chevron" aria-hidden="true"></i>
+    </button>
+    ${imageCount ? `<div class="pc-collapsed-hint"><i class="ti ti-photo"></i> 사진 ${imageCount}장 · 클릭하여 펼치기</div>` : ''}
+    <div class="pc-detail">
+      <div class="pcbody">${escapeHtml(post.content)}</div>
+      ${renderPostImagesHtml(post.images)}
+    </div>
     <div class="pcbot">
       <span class="pca like-btn" data-post-id="${post.id}" style="${liked ? 'color:#E24B4A' : ''}">
         <i class="ti ti-heart" style="${liked ? 'color:#E24B4A' : ''}"></i>
@@ -521,7 +537,11 @@ function createPostCard(post, likedSet, savedSet) {
     openPostDetail(post.id);
   });
 
-  div.addEventListener('click', () => openPostDetail(post.id));
+  div.querySelector('.pc-toggle-head')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const expanded = div.classList.toggle('pc-expanded');
+    e.currentTarget.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  });
 
   return div;
 }

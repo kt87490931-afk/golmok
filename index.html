@@ -254,7 +254,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pcbdg{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:4px;}
 .pcpin{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--chd);}
 .pcpin i{font-size:13px;}
-.pctit{font-size:14px;font-weight:500;color:var(--text1);margin-bottom:5px;}
+.pc-toggle-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;margin:0 0 6px;padding:0;border:none;background:none;text-align:left;cursor:pointer;font-family:inherit;}
+.pc-toggle-head .pctit{font-size:14px;font-weight:600;color:var(--text1);margin:0;flex:1;line-height:1.45;}
+.pc-chevron{font-size:16px;color:var(--text3);flex-shrink:0;margin-top:2px;transition:transform .2s,color .15s;}
+.pc-toggle-head:hover .pc-chevron{color:var(--chd);}
+.pc.pc-expanded .pc-chevron{transform:rotate(180deg);color:var(--chd);}
+.pc-collapsed-hint{font-size:11px;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:4px;}
+.pc.pc-expanded .pc-collapsed-hint{display:none;}
+.pc-detail{display:none;margin-bottom:8px;}
+.pc.pc-expanded .pc-detail{display:block;}
 .pcbody{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
 .pcbot{display:flex;align-items:center;gap:14px;}
 .pca{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text3);cursor:pointer;transition:color .12s;}
@@ -871,7 +879,7 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260629"></script>
+<script type="module" src="js/community_ui.js?v=20260631"></script>
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
