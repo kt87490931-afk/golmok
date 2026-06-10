@@ -39,6 +39,7 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg)
         <div class="tab-group-menu open" id="menu-status">
           <button type="button" class="tab-sub-btn active" data-tab="map"><i class="ti ti-map-2"></i> 상권지도 <span class="tab-badge live">LIVE</span></button>
           <button type="button" class="tab-sub-btn" data-tab="weather"><i class="ti ti-cloud"></i> 창업기상도 <span class="tab-badge live">LIVE</span></button>
+          <button type="button" class="tab-sub-btn" data-tab="hotplace"><i class="ti ti-flame"></i> 핫플레이스 <span class="tab-badge live">LIVE</span></button>
         </div>
       </div>
       <div class="tab-group-divider"></div>
@@ -82,6 +83,6 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg)
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 </script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/pages/analysis_page.js?v=20260645"></script>
+<script type="module" src="js/pages/analysis_page.js?v=20260646"></script>
 </body>
 </html>

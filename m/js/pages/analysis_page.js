@@ -17,6 +17,13 @@ const TAB_ENTRIES = {
     keyName: 'SOJANGGONG_WEATHER_KEY',
     live: true,
   },
+  hotplace: {
+    group: 'status',
+    label: '핫플레이스',
+    hashPath: '/hotplace/gis',
+    keyName: 'SOJANGGONG_STARTUP_KEY',
+    live: true,
+  },
   store: {
     group: 'analysis',
     label: '업소현황',
@@ -103,6 +110,9 @@ async function buildTabUrl(entry) {
   const certKey = await getApiKey(entry.keyName);
   if (!certKey || certKey.startsWith('YOUR_') || certKey.startsWith('REPLACE_')) return '';
   const qs = new URLSearchParams({ certKey });
+  if (entry.hashPath) {
+    return `https://bigdata.sbiz.or.kr/#${entry.hashPath}?${qs.toString()}`;
+  }
   return `https://bigdata.sbiz.or.kr/#/openApi/${entry.endpoint}?${qs.toString()}`;
 }
 
