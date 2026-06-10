@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -417,10 +417,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 }
 </style>
 <link rel="stylesheet" href="css/responsive.css?v=20260642">
-<link rel="stylesheet" href="css/mobile-shell.css?v=20260642">
-<script src="js/mobile-nav.js?v=20260642" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main-v3.css?v=20260654">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260654">
 </head>
-<body>
+<body data-gm-active="community" data-gm-shell="standard">
 
 <!-- TOPNAV -->
 <nav class="topnav">
@@ -747,5 +749,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
 <script type="module" src="js/pages/community.js?v=20260633"></script>
+<script type="module" src="js/shell_loader.js?v=20260654"></script>
 </body>
 </html>

@@ -2,32 +2,22 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#F5A623">
 <script src="js/desktop-route.js"></script>
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
 <title>상권분석 - 골목대장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../css/analysis-tabs.css?v=20260645">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{--ch:#F5A623;--chd:#C17F24;--bg:#F7F3EB;--border:#E8E4DC;--t2:#555;--t3:#999;}
-html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:#1A1A1A;}
-.app.mobile-analysis{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;background:#fff;}
-.m-hd{height:48px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;}
-.m-hd a{color:#1A1A1A;text-decoration:none;font-size:20px;display:flex;}
-.m-hd-title{flex:1;text-align:center;font-size:15px;font-weight:700;margin-right:28px;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(26,26,26,.92);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;opacity:0;pointer-events:none;transition:all .25s;z-index:300;}
-.toast.show{opacity:1;}
-.app.mobile-analysis .analysis-tab-bar{top:0;position:relative;}
-</style>
+<link rel="stylesheet" href="../css/main-v3.css?v=20260654">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260654">
+<link rel="stylesheet" href="../css/shell-pages.css?v=20260654">
+<link rel="stylesheet" href="../css/analysis-tabs.css?v=20260654">
 </head>
-<body>
-<div class="app mobile-analysis">
-  <header class="m-hd">
-    <a href="index.html" aria-label="홈"><i class="ti ti-arrow-left"></i></a>
-    <div class="m-hd-title">상권분석</div>
-  </header>
+<body class="m-shell" data-gm-active="analysis" data-gm-shell="analysis">
+
+<template id="gm-page-tpl">
   <div class="sbiz-analysis-wrap">
     <div class="analysis-tab-bar" role="tablist">
       <div class="tab-group" id="group-status">
@@ -77,12 +67,10 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg)
       <iframe id="analysis-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
     </div>
   </div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
-</script>
-<script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/pages/analysis_page.js?v=20260647"></script>
+</template>
+
+<script type="module" src="../js/shell_loader.js?v=20260654"></script>
+<script type="module" src="js/auth.js?v=20260654"></script>
+<script type="module" src="../js/pages/analysis_page.js?v=20260654"></script>
 </body>
 </html>

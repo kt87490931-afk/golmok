@@ -248,7 +248,11 @@ async function initSbizAnalysisPage() {
 }
 
 bootPage(() => {
-  const isMobileApp = !!document.querySelector('.app.mobile-analysis');
-  if (!isMobileApp) initPageShell('analysis');
-  initSbizAnalysisPage();
+  const start = () => {
+    const isMobileApp = document.body.classList.contains('m-shell');
+    if (!isMobileApp) initPageShell('analysis');
+    initSbizAnalysisPage();
+  };
+  if (document.body.dataset.gmShellDone === '1') start();
+  else document.addEventListener('gm-shell-ready', start, { once: true });
 });

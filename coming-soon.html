@@ -51,10 +51,12 @@ h1 { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 10px; }
 }
 </style>
 <link rel="stylesheet" href="css/responsive.css?v=20260642">
-<link rel="stylesheet" href="css/mobile-shell.css?v=20260642">
-<script src="js/mobile-nav.js?v=20260642" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main-v3.css?v=20260654">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260654">
 </head>
-<body>
+<body data-gm-active="home" data-gm-shell="auth">
 <div class="card">
   <div class="icon" id="page-icon">🔧</div>
   <h1 id="page-name">준비 중입니다</h1>
@@ -77,5 +79,6 @@ document.getElementById('page-icon').textContent = config.icon;
 document.getElementById('page-name').textContent = config.name;
 document.getElementById('page-desc').textContent = config.desc;
 </script>
+<script type="module" src="js/shell_loader.js?v=20260654"></script>
 </body>
 </html>

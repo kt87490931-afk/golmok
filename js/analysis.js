@@ -1,5 +1,6 @@
 import { getWeatherForecast, getThemeAnalysis, getStartupMapUrl, getApiMode } from './sojanggong-api.js?v=20260629';
 import { getCurrentUser } from './community.js?v=20260624';
+import { waitForShell } from './shell_boot.js';
 
 const UPJONG_OPTIONS = [
   { cd: 'I2', nm: '음식' },
@@ -314,4 +315,12 @@ export function initAnalysis() {
   bindAnalysisUI();
 }
 
-document.addEventListener('DOMContentLoaded', initAnalysis);
+async function scheduleAnalysisBoot() {
+  await waitForShell();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAnalysis, { once: true });
+  } else {
+    initAnalysis();
+  }
+}
+scheduleAnalysisBoot();

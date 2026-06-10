@@ -1,4 +1,5 @@
 import { getMyNotifications, getUnreadNotificationCount, markAllNotificationsRead } from './notifications.js';
+import { waitForShell } from './shell_boot.js';
 
 function toast(msg) {
   if (typeof window.showToast === 'function') window.showToast(msg);
@@ -124,6 +125,14 @@ export function initNotificationsUI() {
   refreshNotificationBadge().catch(() => {});
 }
 
-document.addEventListener('DOMContentLoaded', initNotificationsUI);
+async function scheduleNotificationsBoot() {
+  await waitForShell();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNotificationsUI, { once: true });
+  } else {
+    initNotificationsUI();
+  }
+}
+scheduleNotificationsBoot();
 
 export { refreshNotificationBadge };

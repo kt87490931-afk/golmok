@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="google-site-verification" content="7_bUIeA-EHmgGeP9RFu_B3IodiO7-cQL3pBrrIuqqU4" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#F5A623">
@@ -11,107 +11,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../css/main-v3.css?v=20260653">
-<link rel="stylesheet" href="../css/main-v3-m.css?v=20260653">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260655">
+<link rel="stylesheet" href="../css/shell-pages.css?v=20260655">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260655">
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
-</head><body class="m-shell">
+</head>
+<body class="m-shell" data-gm-active="home" data-gm-shell="home">
 
-
-<!-- ── 헤더 ── -->
-<header class="hd">
-  <a href="index.html" class="hd-logo">
-    <img src="assets/gmlogo.png" alt="골목대장">
-    <div>
-      <div class="hd-logo-text">골목대장</div>
-      <div class="hd-logo-sub">
-        <span class="hd-logo-sub-pc">우리는 모두 골목대장, 데이터로 보는 상권의 힘</span>
-        <span class="hd-logo-sub-m">우리는 모두 골목대장,<br>데이터로 보는 상권의 힘</span>
-      </div>
-    </div>
-  </a>
-
-  <nav class="hd-nav">
-    <a href="index.html" class="act">홈</a>
-    <a href="analysis.html">상권분석</a>
-    <a href="analysis.html?tab=weather">창업기상도</a>
-    <a href="analysis.html?tab=hotplace">핫플레이스</a>
-    <a href="../policy.html">정책·지원</a>
-  </nav>
-
-  <div class="hd-right">
-    <div class="hd-search-btn" onclick="focusHeroSearch()">
-      <i class="ti ti-search"></i>
-      <span>상권, 업종, 질문 검색...</span>
-    </div>
-    <div class="icobtn nbadge" id="open-notifications" title="알림" style="position:relative"><i class="ti ti-bell"></i></div><button class="btn-voice" onclick="startVoice()">
-      <i class="ti ti-microphone"></i>
-      <span>음성검색</span>
-    </button>
-    <div class="hd-user" id="user-chip">
-      <div class="hd-user-av" id="user-pav">?</div>
-      <span id="user-pname" class="pname">로그인</span>
-      <i class="ti ti-chevron-down" style="font-size:13px;color:var(--gray-5)"></i>
-    </div>
-  </div>
-</header>
-
-<!-- ── 레이아웃 ── -->
-<div class="layout">
-
-<!-- 사이드바 -->
-<aside class="sidebar">
-  <div class="sb-sec">
-    <div class="sb-label">메뉴</div>
-    <a href="index.html" class="sb-a act">
-      <i class="ti ti-home"></i> 홈 피드
-    </a>
-    <a href="analysis.html" class="sb-a">
-      <i class="ti ti-map"></i> 상권분석
-    </a>
-    <a href="analysis.html?tab=weather" class="sb-a">
-      <i class="ti ti-cloud"></i> 창업기상도
-    </a>
-    <a href="analysis.html?tab=hotplace" class="sb-a">
-      <i class="ti ti-flame"></i> 핫플레이스
-    </a>
-  </div>
-  <div class="sb-sec">
-    <div class="sb-label">커뮤니티</div>
-    <a href="index.html" class="sb-a" id="nav-all">
-      <i class="ti ti-world"></i> 전체 게시판
-    </a>
-    <a href="index.html" class="sb-a" id="nav-dong">
-      <i class="ti ti-map-pin"></i> 우리동네
-    </a>
-    <a href="index.html" class="sb-a">
-      <i class="ti ti-tag"></i> 업종별
-    </a>
-    <a href="events.html" class="sb-a">
-      <i class="ti ti-speakerphone"></i> 이벤트·행사
-    </a>
-    <a href="../policy.html" class="sb-a">
-      <i class="ti ti-file-text"></i> 정책·지원
-    </a>
-  </div>
-  <div class="sb-sec">
-    <div class="sb-label">내 활동</div>
-    <a href="profile.html" class="sb-a" id="sb-profile-link"><div class="sb-av" id="sb-av" style="width:28px;height:28px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:4px">?</div>
-      <i class="ti ti-user"></i>
-      <span id="sb-name">로그인</span>
-    </a>
-    <a href="index.html" id="nav-my-posts" class="sb-a">
-      <i class="ti ti-pencil"></i> 내 게시글
-    </a>
-    <a href="index.html" id="nav-saved-posts" class="sb-a">
-      <i class="ti ti-bookmark"></i> 저장한 글
-    </a>
-    <a href="#" id="sb-logout" class="sb-a" style="display:none;color:var(--red)">
-      <i class="ti ti-logout" style="color:var(--red)"></i> 로그아웃
-    </a>
-  </div>
-</aside>
-
-<!-- ── 메인 ── -->
+<template id="gm-page-tpl">
 <main class="main">
 
   <!-- ① 히어로 — AI 검색 + 지도 배경 -->
@@ -377,176 +284,9 @@
     </div>
   </div>
 </main>
+</template>
 
-</div>
-
-<!-- 모바일 하단 탭바 (인스타그램형 플로팅 캡슐) -->
-<nav class="mobile-tabs" aria-label="하단 메뉴">
-  <div class="mobile-tabs-pill">
-    <a href="index.html" class="mb-tab act" aria-label="홈">
-      <i class="ti ti-home"></i>
-      <span class="mb-tab-label">홈</span>
-    </a>
-    <a href="analysis.html" class="mb-tab" aria-label="상권분석">
-      <i class="ti ti-map"></i>
-      <span class="mb-tab-label">상권분석</span>
-    </a>
-    <button type="button" class="mb-tab mb-fab" id="write-btn-m" aria-label="글쓰기">
-      <i class="ti ti-plus"></i>
-    </button>
-    <a href="index.html#hero" class="mb-tab" aria-label="AI검색" onclick="setTimeout(function(){focusHeroSearch()},80)">
-      <i class="ti ti-robot"></i>
-      <span class="mb-tab-label">AI검색</span>
-    </a>
-    <a href="profile.html" class="mb-tab" aria-label="내정보">
-      <i class="ti ti-user"></i>
-      <span class="mb-tab-label">내정보</span>
-    </a>
-  </div>
-</nav>
-
-<!-- 글쓰기 모달 -->
-<div class="modal-bg" id="write-modal">
-  <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title">게시글 작성</span>
-      <button class="modal-close" id="close-modal"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="write-cats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-      <button type="button" class="cat-select-btn" data-cat="info">정보공유</button>
-      <button type="button" class="cat-select-btn act" data-cat="qna">질문·고민</button>
-      <button type="button" class="cat-select-btn" data-cat="startup">창업준비</button>
-      <button type="button" class="cat-select-btn" data-cat="issue">이슈</button>
-      <button type="button" class="cat-select-btn" data-cat="event">이벤트</button>
-    </div>
-    <input id="post-title" type="text" placeholder="제목 (선택)" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:8px;outline:none;font-family:inherit;">
-    <textarea id="post-content" placeholder="대장님들과 이야기를 나눠보세요..."></textarea>
-    <div id="write-auto-tags" class="write-auto-tags"></div>
-    <input type="file" id="image-file-input" accept="image/*" multiple style="display:none;">
-    <div id="image-preview-wrap" style="display:none;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
-    <div id="event-date-wrap" style="display:none;margin-top:8px;">
-      <label style="font-size:12px;color:var(--text3);">이벤트 종료일</label>
-      <input id="event-end-date" type="date" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;margin-top:4px;">
-    </div>
-    <div class="modal-acts">
-      <button type="button" class="mab" id="btn-photo-upload"><i class="ti ti-photo"></i> 사진 <span id="image-count" style="color:#F5A623;"></span></button>
-      <button type="button" class="mab" id="btn-location-tag"><i class="ti ti-map-pin"></i> 위치</button>
-      <button type="button" class="mab" id="btn-upjong-tag"><i class="ti ti-tag"></i> 업종태그</button>
-      <button class="mab"><i class="ti ti-speakerphone"></i> 이벤트</button>
-      <button class="modal-submit" id="submit-post">게시하기</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function () {
-  function openWriteModalSafe() {
-    document.getElementById('write-modal')?.classList.add('open');
-  }
-  function bindWriteFallback() {
-    document.getElementById('open-write')?.addEventListener('click', openWriteModalSafe);
-    document.getElementById('open-write-btn')?.addEventListener('click', openWriteModalSafe);
-    document.getElementById('feed-photo-btn')?.addEventListener('click', function () {
-      openWriteModalSafe();
-      setTimeout(function () {
-        document.getElementById('image-file-input')?.click();
-      }, 120);
-    });
-    document.getElementById('close-modal')?.addEventListener('click', function () {
-      document.getElementById('write-modal')?.classList.remove('open');
-    });
-    document.getElementById('write-modal')?.addEventListener('click', function (e) {
-      if (e.target.id === 'write-modal') e.target.classList.remove('open');
-    });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindWriteFallback);
-  else bindWriteFallback();
-})();
-</script>
-
-<!-- 내 게시글 / 저장한 글 -->
-<div class="modal-bg" id="my-activity-overlay">
-  <div class="activity-modal-panel" style="background:#fff;width:100%;display:flex;flex-direction:column;overflow:hidden;">
-    <div style="width:36px;height:4px;background:#E8E4DC;border-radius:4px;margin:16px auto 0;"></div>
-    <div style="padding:16px 20px;border-bottom:1px solid #E8E4DC;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:16px;font-weight:700;">내 활동</div>
-      <button type="button" id="close-activity-overlay" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
-    </div>
-    <div style="display:flex;border-bottom:1px solid #E8E4DC;">
-      <button type="button" class="activity-tab act" data-tab="my-posts" style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;border-bottom:2px solid #F5A623;color:#C17F24;">내 게시글</button>
-      <button type="button" class="activity-tab" data-tab="saved-posts" style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:14px;color:#999;border-bottom:2px solid transparent;">저장한 글</button>
-    </div>
-    <div id="activity-list" style="flex:1;overflow-y:auto;padding:12px 16px;"></div>
-  </div>
-</div>
-
-<!-- 상권분석 Mock -->
-<div class="modal-bg" id="analysis-overlay">
-  <div class="analysis-modal-panel" style="background:#fff;padding:20px;margin:0;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:17px;font-weight:700;"><i class="ti ti-map"></i> 상권분석</div>
-      <button type="button" id="close-analysis-overlay" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
-    </div>
-    <div id="analysis-wizard">
-      <div id="analysis-wizard-body"></div>
-    </div>
-    <div id="analysis-result" style="display:none;">
-      <div style="width:100%;height:360px;border-radius:14px;overflow:hidden;border:1px solid #E8E4DC;margin-bottom:16px;position:relative;">
-        <iframe id="analysis-map-iframe" style="width:100%;height:100%;border:none;display:none;" title="소진공 상권지도" loading="lazy" allow="geolocation"></iframe>
-        <div id="analysis-map-loading" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F7F3EB;color:#999;font-size:14px;">지도를 불러오는 중...</div>
-      </div>
-      <div id="theme-analysis-wrap"></div>
-      <div style="background:#FFF8E7;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid #FAC775;">
-        <div style="font-size:12px;color:#8B5A10;margin-bottom:4px;">분석 조건</div>
-        <div id="analysis-condition" style="font-size:14px;font-weight:700;color:#C17F24;"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <div style="background:#EBF4FF;border-radius:12px;padding:14px;border:1px solid #C5DFFF;">
-          <div style="font-size:11px;color:#378ADD;margin-bottom:4px;"><i class="ti ti-users"></i> 일 평균 유동인구</div>
-          <div id="stat-population" style="font-size:22px;font-weight:700;"></div>
-          <div id="stat-population-change" style="font-size:11px;margin-top:3px;"></div>
-        </div>
-        <div style="background:#FFF8E7;border-radius:12px;padding:14px;border:1px solid #FAC775;">
-          <div style="font-size:11px;color:#C17F24;margin-bottom:4px;"><i class="ti ti-chart-bar"></i> 월 평균 매출</div>
-          <div id="stat-revenue" style="font-size:22px;font-weight:700;"></div>
-          <div id="stat-revenue-change" style="font-size:11px;margin-top:3px;"></div>
-        </div>
-        <div style="background:#FFF1F1;border-radius:12px;padding:14px;border:1px solid #FFD0D0;grid-column:1/-1;">
-          <div style="font-size:11px;color:#E24B4A;margin-bottom:4px;"><i class="ti ti-store"></i> 동종 업소수</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div id="stat-stores" style="font-size:22px;font-weight:700;"></div>
-            <div id="stat-stores-change" style="font-size:11px;"></div>
-          </div>
-        </div>
-      </div>
-      <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid #E8E4DC;margin-bottom:12px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">⏰ 시간대별 유동인구</div>
-        <div id="hourly-chart" style="display:flex;gap:6px;align-items:flex-end;height:80px;"></div>
-        <div id="peak-info" style="font-size:12px;color:#555;margin-top:10px;padding:8px 12px;background:#FFF8E7;border-radius:8px;"></div>
-      </div>
-      <div style="background:linear-gradient(135deg,#F5A623,#E8920E);border-radius:12px;padding:14px;">
-        <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;"><i class="ti ti-robot"></i> 골목대장 AI 분석 <span id="analysis-mode-badge" style="background:rgba(255,255,255,.25);padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;">...</span></div>
-        <div id="ai-comment" style="font-size:13px;color:#fff;line-height:1.7;"></div>
-      </div>
-      <button type="button" id="btn-reset-analysis" style="width:100%;margin-top:12px;background:#fff;border:1px solid #E8E4DC;border-radius:12px;padding:12px;font-size:14px;color:#555;cursor:pointer;"><i class="ti ti-search"></i> 다시 검색</button>
-    </div>
-  </div>
-</div>
-
-<!-- 알림 -->
-<div class="modal-bg" id="notification-overlay">
-  <div class="notification-modal-panel">
-    <div style="padding:16px 20px;border-bottom:1px solid #E8E4DC;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div style="font-size:16px;font-weight:700;"><i class="ti ti-bell"></i> 알림</div>
-      <button type="button" id="close-notification-overlay" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
-    </div>
-    <div id="notification-list" style="flex:1;overflow-y:auto;padding:12px 20px;"></div>
-  </div>
-</div>
-
-<!-- 토스트 -->
-<div class="toast" id="toast"></div>
-
+<script type="module" src="../js/shell_loader.js?v=20260655"></script>
 <script>
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -575,12 +315,12 @@ window.sendAI = function () {
 document.getElementById('ai-send-preview')?.addEventListener('click', () => window.doSearch?.());
 document.getElementById('write-btn-m')?.addEventListener('click', () => document.getElementById('open-write')?.click());
 </script>
-<script type="module" src="js/profile_ui.js?v=20260649"></script>
-<script type="module" src="js/auth.js?v=20260649"></script>
-<script type="module" src="js/community_ui.js?v=20260649"></script>
-<script type="module" src="js/analysis.js?v=20260649"></script>
-<script type="module" src="js/notifications_ui.js?v=20260649"></script>
-<script type="module" src="js/fcm.js?v=20260649"></script>
+<script type="module" src="js/profile_ui.js?v=20260655"></script>
+<script type="module" src="js/auth.js?v=20260655"></script>
+<script type="module" src="js/community_ui.js?v=20260655"></script>
+<script type="module" src="js/analysis.js?v=20260655"></script>
+<script type="module" src="js/notifications_ui.js?v=20260655"></script>
+<script type="module" src="js/fcm.js?v=20260655"></script>
 <script type="module">
 import { getApiKey } from './js/api-config.js';
 async function loadHeroMap() {

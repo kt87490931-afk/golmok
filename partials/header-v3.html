@@ -1,0 +1,35 @@
+<header class="hd">
+  <a href="@@HOME@@" class="hd-logo">
+    <img src="@@ASSETS@@gmlogo.png" alt="골목대장">
+    <div>
+      <div class="hd-logo-text">골목대장</div>
+      <div class="hd-logo-sub">
+        <span class="hd-logo-sub-pc">우리는 모두 골목대장, 데이터로 보는 상권의 힘</span>
+        <span class="hd-logo-sub-m">우리는 모두 골목대장,<br>데이터로 보는 상권의 힘</span>
+      </div>
+    </div>
+  </a>
+  <nav class="hd-nav">
+    <a href="@@HOME@@" data-gm-nav="home">홈</a>
+    <a href="@@ANALYSIS@@" data-gm-nav="analysis">상권분석</a>
+    <a href="@@WEATHER@@" data-gm-nav="weather">창업기상도</a>
+    <a href="@@HOTPLACE@@" data-gm-nav="hotplace">핫플레이스</a>
+    <a href="@@POLICY@@" data-gm-nav="policy">정책·지원</a>
+  </nav>
+  <div class="hd-right">
+    <div class="hd-search-btn" onclick="focusHeroSearch()">
+      <i class="ti ti-search"></i>
+      <span>상권, 업종, 질문 검색...</span>
+    </div>
+    <div class="icobtn nbadge" id="open-notifications" title="알림" style="position:relative"><i class="ti ti-bell"></i></div>
+    <button class="btn-voice" type="button" onclick="startVoice()">
+      <i class="ti ti-microphone"></i>
+      <span>음성검색</span>
+    </button>
+    <div class="hd-user" id="user-chip">
+      <div class="hd-user-av" id="user-pav">?</div>
+      <span id="user-pname" class="pname">로그인</span>
+      <i class="ti ti-chevron-down" style="font-size:13px;color:var(--gray-5)"></i>
+    </div>
+  </div>
+</header>

@@ -4,6 +4,10 @@ export function initPageShell(activePage) {
     const on = el.dataset.page === activePage;
     el.classList.toggle('act', on);
   });
+  document.querySelectorAll('[data-gm-nav]').forEach((el) => {
+    const on = el.dataset.gmNav === activePage;
+    el.classList.toggle('act', on);
+  });
 
   document.querySelectorAll('[data-open-write]').forEach((btn) => {
     btn.addEventListener('click', (e) => {

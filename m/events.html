@@ -390,8 +390,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pcimgs--duo .pcimg,.pcimgs--multi .pcimg{max-height:200px;}
 }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260654">
+<link rel="stylesheet" href="../css/shell-pages.css?v=20260654">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260654">
 </head>
-<body>
+<body class="m-shell" data-gm-active="events" data-gm-shell="standard">
 
 <!-- TOPNAV -->
 <nav class="topnav">
@@ -713,5 +718,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
 <script type="module" src="js/pages/events.js?v=20260619"></script>
+<script type="module" src="../js/shell_loader.js?v=20260654"></script>
 </body>
 </html>

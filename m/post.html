@@ -42,8 +42,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F7F3EB;color:#1A1A1A;min-
 .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;}
 .toast.show{opacity:1;}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260654">
+<link rel="stylesheet" href="../css/shell-pages.css?v=20260654">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260654">
 </head>
-<body>
+<body class="m-shell" data-gm-active="post" data-gm-shell="minimal">
 <header class="post-page-header">
   <a href="index.html" class="post-back" id="post-back" aria-label="뒤로"><i class="ti ti-arrow-left"></i></a>
   <span class="post-page-title">게시글</span>
@@ -58,5 +63,6 @@ document.getElementById('post-back')?.addEventListener('click',function(e){
 </script>
 <script type="module" src="js/auth.js?v=20260628"></script>
 <script type="module" src="js/community_ui.js?v=20260632"></script>
+<script type="module" src="../js/shell_loader.js?v=20260654"></script>
 </body>
 </html>

@@ -1,0 +1,90 @@
+/**
+ * v3 셸 — 서브페이지 전용 오버라이드 (main-v3.css 보완)
+ */
+body.gm-shell-loaded .topnav,
+body.gm-shell-loaded .body > .sidebar:not(.sidebar),
+body.gm-shell-loaded .rcol {
+  display: none !important;
+}
+
+body.gm-shell-loaded .body {
+  display: contents;
+}
+
+/* 레거시 center → v3 main */
+body.gm-shell-loaded main.center {
+  display: contents;
+}
+
+body.gm-shell-loaded .gm-page-inner {
+  width: 100%;
+  min-width: 0;
+}
+
+body.gm-shell-loaded .fscroll.page-main-content {
+  min-height: auto;
+  overflow: visible;
+}
+
+/* 상권분석 — iframe 전체 높이 */
+body.gm-shell-analysis .gm-page-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--hd-h) - 24px);
+}
+
+body.gm-shell-analysis .sbiz-analysis-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+body.gm-shell-analysis .sbiz-iframe-shell {
+  flex: 1;
+  min-height: 480px;
+}
+
+body.gm-shell-analysis .analysis-tab-bar {
+  top: var(--hd-h);
+}
+
+body.m-shell.gm-shell-analysis .analysis-tab-bar {
+  top: 0;
+  position: relative;
+}
+
+body.m-shell.gm-shell-analysis .gm-page-inner {
+  min-height: calc(100dvh - var(--bn-h) - 80px);
+}
+
+/* 미니멀 셸 (게시글·프로필) */
+body.gm-shell-minimal.m-shell .post-page-header,
+body.gm-shell-minimal.m-shell .profile-page-header .back-btn {
+  display: none;
+}
+
+body.gm-shell-minimal .post-page-wrap,
+body.gm-shell-minimal .profile-page-wrap {
+  max-width: 100%;
+}
+
+body.gm-shell-minimal.m-shell .pd-comment-bar {
+  bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px));
+  max-width: 430px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+body.gm-shell-minimal.m-shell #post-detail-root {
+  padding-bottom: calc(var(--bn-h) + 72px);
+}
+
+/* 로그인·약관 — 셸 없이 CSS만 */
+body.gm-shell-auth {
+  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px));
+}
+
+body.gm-shell-auth.m-shell .mobile-tabs {
+  display: flex;
+}

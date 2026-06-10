@@ -23,6 +23,7 @@ import {
 } from './community.js?v=20260624';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
+import { waitForShell } from './shell_boot.js';
 
 const DEFAULT_REGION = {
   region_sido: '경기',
@@ -1545,8 +1546,12 @@ function bootCommunity() {
   else initCommunityShell();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bootCommunity);
-} else {
-  bootCommunity();
+async function scheduleCommunityBoot() {
+  await waitForShell();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootCommunity, { once: true });
+  } else {
+    bootCommunity();
+  }
 }
+scheduleCommunityBoot();
