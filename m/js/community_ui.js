@@ -332,7 +332,7 @@ export async function loadFeed(reset = true) {
     } else {
       const liked = await getLikedPostIds(posts.map((p) => p.id));
       const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-      posts.forEach((post) => list.appendChild(createPostCard(post, liked, saved)));
+      posts.forEach((post) => list.appendChild(createPostCard(post, liked, saved, 'post-list')));
       hasMore = posts.length >= 20;
       currentPage += 1;
     }
@@ -390,6 +390,16 @@ async function loadEventSection() {
             </div>
           </div>`;
         }
+        const isV3Evt = grid.classList.contains('evt-grid') || !!grid.closest('.evt-wrap');
+        if (isV3Evt) {
+          return `<div class="evt-card" data-post-id="${ev.id}" style="cursor:pointer;">
+          <div class="evt-top" style="background:#FFF8E7">
+            <span class="evt-chip" style="background:var(--gold)">이벤트</span>
+            <div class="evt-name">${title}</div>
+          </div>
+          <div class="evt-bot">${shop} · ${date}</div>
+        </div>`;
+        }
         return `<div class="ev-card-new" data-post-id="${ev.id}" style="cursor:pointer;">
           <div class="ev-card-top discount">
             <div class="ev-type-row"><span class="ev-type-chip discount"><i class="ti ti-speakerphone"></i> 이벤트</span></div>
@@ -419,13 +429,143 @@ function avatarHtml(user) {
   return `<div class="pcav" style="background:#FAEEDA;color:#633806;">${escapeHtml(ch)}</div>`;
 }
 
-export function getPostPageUrl(postId) {
+const SHELL_BOARD_PAGES = {
+  'index.html': { listViewId: 'shell-feed-view', defaultPage: 'index.html' },
+  'community.html': { listViewId: 'board-list-view', defaultPage: 'community.html' },
+  'neighborhood.html': { listViewId: 'board-list-view', defaultPage: 'neighborhood.html' },
+  'by-industry.html': { listViewId: 'board-list-view', defaultPage: 'by-industry.html' },
+  'events.html': { listViewId: 'board-list-view', defaultPage: 'events.html' },
+};
+
+const POST_LIST_PAGE_MAP = {
+  'community-post-list': 'community.html',
+  'post-list': 'index.html',
+  'neighborhood-post-list': 'neighborhood.html',
+  'industry-post-list': 'by-industry.html',
+};
+
+function getCurrentPageFile() {
+  const file = window.location.pathname.split('/').pop();
+  return file || 'index.html';
+}
+
+export function getShellLayout() {
+  if (!document.getElementById('shell-post-detail')) return null;
+  const page = getCurrentPageFile();
+  const cfg = SHELL_BOARD_PAGES[page];
+  if (!cfg) return null;
+  return { page, listViewId: cfg.listViewId, detailRootId: 'shell-post-detail' };
+}
+
+export function getPostPageUrl(postId, basePage) {
+  const page = basePage || getCurrentPageFile();
+  if (SHELL_BOARD_PAGES[page]) {
+    const url = new URL(page, window.location.origin);
+    if (page === getCurrentPageFile()) {
+      const cur = new URL(window.location.href);
+      cur.searchParams.set('id', postId);
+      cur.searchParams.delete('post');
+      return `${cur.pathname}${cur.search}`;
+    }
+    url.searchParams.set('id', postId);
+    return `${url.pathname}?${url.searchParams.toString()}`;
+  }
   return `post.html?id=${encodeURIComponent(postId)}`;
+}
+
+export function hideShellPostDetail({ skipPush = false } = {}) {
+  const shell = getShellLayout();
+  if (!shell) return;
+  const listEl = document.getElementById(shell.listViewId);
+  const root = document.getElementById(shell.detailRootId);
+  if (listEl) listEl.style.display = '';
+  if (root) {
+    root.style.display = 'none';
+    root.innerHTML = '';
+  }
+  if (!skipPush) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('id');
+    url.searchParams.delete('post');
+    window.history.pushState({ view: 'list' }, '', url);
+  }
+}
+
+export async function showShellPostDetail(postId, { skipPush = false } = {}) {
+  const shell = getShellLayout();
+  if (!shell) {
+    window.location.href = getPostPageUrl(postId);
+    return;
+  }
+
+  const listEl = document.getElementById(shell.listViewId);
+  const root = document.getElementById(shell.detailRootId);
+  if (!root) {
+    window.location.href = getPostPageUrl(postId, shell.page);
+    return;
+  }
+
+  if (listEl) listEl.style.display = 'none';
+  root.style.display = 'block';
+  root.innerHTML = '<div class="pd-loading">불러오는 중...</div>';
+
+  if (!skipPush) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', postId);
+    url.searchParams.delete('post');
+    window.history.pushState({ view: 'post', postId }, '', url);
+  }
+
+  try {
+    const post = await getPost(postId);
+    const comments = await getComments(postId);
+    const liked = await isLiked(postId);
+    const authorId = post.users?.id;
+    const following = authorId ? await isFollowing(authorId) : false;
+    const titleText = post.title || getPostDisplayTitle(post);
+    document.title = `${titleText} — 골목대장`;
+    mountPostDetailPage(root, post, comments, liked, following, { inShell: true });
+    root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    console.error(e);
+    root.innerHTML =
+      '<div class="pd-error">게시글을 불러오지 못했습니다.<br><button type="button" class="pd-back-btn" id="pd-back-to-list">목록으로</button></div>';
+    root.querySelector('#pd-back-to-list')?.addEventListener('click', () => hideShellPostDetail());
+  }
 }
 
 export function navigateToPost(postId) {
   if (!postId) return;
+  if (getShellLayout()) {
+    showShellPostDetail(postId);
+    return;
+  }
   window.location.href = getPostPageUrl(postId);
+}
+
+function resolvePostUrl(postId, listContainerId) {
+  const mapped = listContainerId ? POST_LIST_PAGE_MAP[listContainerId] : null;
+  return getPostPageUrl(postId, mapped || undefined);
+}
+
+function tryBootShellPostDetail() {
+  const shell = getShellLayout();
+  if (!shell) return false;
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('id') || params.get('post');
+  if (!postId) return false;
+  showShellPostDetail(postId, { skipPush: true });
+  return true;
+}
+
+function bindShellPopState() {
+  if (window.__golmokShellPopBound) return;
+  window.__golmokShellPopBound = true;
+  window.addEventListener('popstate', () => {
+    const postId = new URLSearchParams(window.location.search).get('id');
+    if (postId) showShellPostDetail(postId, { skipPush: true });
+    else hideShellPostDetail({ skipPush: true });
+  });
 }
 
 function getPostDisplayTitle(post) {
@@ -449,7 +589,7 @@ function getPostPreview(post) {
   return rest.length > 120 ? `${rest.slice(0, 120)}…` : rest;
 }
 
-function createPostCard(post, likedSet, savedSet) {
+function createPostCard(post, likedSet, savedSet, listContainerId) {
   const div = document.createElement('div');
   div.className = 'pc';
   div.dataset.postId = post.id;
@@ -462,7 +602,7 @@ function createPostCard(post, likedSet, savedSet) {
   const displayTitle = getPostDisplayTitle(post);
   const preview = getPostPreview(post);
   const imageCount = post.images?.length || 0;
-  const postUrl = getPostPageUrl(post.id);
+  const postUrl = resolvePostUrl(post.id, listContainerId);
 
   div.innerHTML = `
     <div class="pctop">
@@ -585,7 +725,7 @@ export async function renderPostList(posts, containerId, { reset = true, append 
 
   const liked = await getLikedPostIds(posts.map((p) => p.id));
   const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-  posts.forEach((post) => container.appendChild(createPostCard(post, liked, saved)));
+  posts.forEach((post) => container.appendChild(createPostCard(post, liked, saved, containerId)));
 }
 
 export function openPostDetail(postId) {
@@ -656,11 +796,12 @@ function buildCommentsHtml(comments) {
     .join('');
 }
 
-function mountPostDetailPage(root, post, comments, liked, following = false) {
+function mountPostDetailPage(root, post, comments, liked, following = false, { inShell = false } = {}) {
   const user = post.users || {};
   const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
 
   root.innerHTML = `
+    ${inShell ? '<button type="button" class="pd-back-btn" id="pd-back-to-list"><i class="ti ti-arrow-left"></i> 목록으로</button>' : ''}
     <article class="pd-article">
       <div class="pd-author">
         ${avatarHtml(user)}
@@ -698,11 +839,15 @@ function mountPostDetailPage(root, post, comments, liked, following = false) {
       <div class="pd-comments-head">댓글 <span id="pd-comment-count">${post.comment_count || 0}</span>개</div>
       <div id="comment-list-${post.id}" class="pd-comment-list">${buildCommentsHtml(comments)}</div>
     </article>
-    <div class="pd-comment-bar">
+    <div class="pd-comment-bar${inShell ? ' pd-comment-bar--inline' : ''}">
       <input id="comment-input-${post.id}" type="text" placeholder="댓글을 입력하세요..." class="pd-comment-input">
       <button type="button" id="comment-submit-${post.id}" class="pd-comment-submit">등록</button>
     </div>
   `;
+
+  if (inShell) {
+    root.querySelector('#pd-back-to-list')?.addEventListener('click', () => hideShellPostDetail());
+  }
 
   bindPostDetailEvents(root, post);
 }
@@ -794,7 +939,12 @@ function bindPostDetailEvents(scope, post) {
 }
 
 function sharePost(postId) {
-  const shareUrl = new URL(getPostPageUrl(postId), window.location.origin).href;
+  const shell = getShellLayout();
+  const page = shell?.page || getCurrentPageFile();
+  const shareUrl = new URL(
+    getPostPageUrl(postId, SHELL_BOARD_PAGES[page] ? page : 'community.html'),
+    window.location.origin
+  ).href;
   navigator.clipboard?.writeText(shareUrl).then(() => toast('링크가 복사되었습니다'));
 }
 
@@ -966,6 +1116,7 @@ function bindWriteModal() {
   document.getElementById('open-write')?.addEventListener('click', openWriteOverlay);
   document.getElementById('open-write-btn')?.addEventListener('click', openWriteOverlay);
   document.getElementById('write-btn')?.addEventListener('click', openWriteOverlay);
+  document.getElementById('write-btn-m')?.addEventListener('click', openWriteOverlay);
   document.getElementById('feed-photo-btn')?.addEventListener('click', openWriteWithPhoto);
 
   document.querySelectorAll('.wbox .wab[data-write-action]').forEach((btn) => {
@@ -1138,48 +1289,89 @@ export async function loadHotPosts() {
   }
 }
 
-export async function loadPopularAreas() {
-  const list = document.getElementById('popular-areas-list');
-  if (!list) return;
+function popularAreaTagClass(badge) {
+  if (badge === '급상승') return 'up';
+  if (badge === '인기') return 'hot';
+  if (badge === '신규') return 'new';
+  return '';
+}
 
-  list.innerHTML = '<div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>';
+function popularAreaBadgeStyle(badge) {
+  if (badge === '급상승') return 'background:#FFF1F1;color:#E24B4A;';
+  if (badge === '인기') return 'background:#FFF8E7;color:#C17F24;';
+  if (badge === '신규') return 'background:#E8F8F0;color:#1D9E75;';
+  return 'background:#F5F1E8;color:#555;';
+}
 
-  try {
-    const areas = await getPopularAreas(5);
-    if (!areas.length) {
-      list.innerHTML =
-        '<div style="padding:10px 0;color:#999;font-size:12px;">등록된 인기 상권이 없습니다</div>';
-      return;
-    }
-
-    const badgeStyle = (badge) => {
-      if (badge === '급상승') return 'background:#FFF1F1;color:#E24B4A;';
-      if (badge === '인기') return 'background:#FFF8E7;color:#C17F24;';
-      if (badge === '신규') return 'background:#E8F8F0;color:#1D9E75;';
-      return 'background:#F5F1E8;color:#555;';
-    };
-
-    list.innerHTML = areas
-      .map(
-        (area, idx) => `<div class="tri popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
+function renderPopularAreasHtml(areas, listEl) {
+  const useV3 = !!listEl.closest('.two-col, .widget, .card') && !listEl.closest('.wcard');
+  if (useV3) {
+    return areas
+      .map((area, idx) => {
+        const tagCls = popularAreaTagClass(area.badge);
+        return `<div class="rank-row popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
+          <span class="rank-n">${idx + 1}</span>
+          <span class="rank-name">${escapeHtml(area.name)}</span>
+          ${area.badge ? `<span class="rank-tag ${tagCls}">${escapeHtml(area.badge)}</span>` : ''}
+        </div>`;
+      })
+      .join('');
+  }
+  return areas
+    .map(
+      (area, idx) => `<div class="tri popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
           <span class="trr">${idx + 1}</span>
           <span class="trt">${escapeHtml(area.name)}</span>
           ${
             area.badge
-              ? `<span class="trtg" style="${badgeStyle(area.badge)}">${escapeHtml(area.badge)}</span>`
+              ? `<span class="trtg" style="${popularAreaBadgeStyle(area.badge)}">${escapeHtml(area.badge)}</span>`
               : ''
           }
         </div>`
-      )
-      .join('');
+    )
+    .join('');
+}
 
-    list.querySelectorAll('.popular-area-item').forEach((el) => {
-      el.addEventListener('click', () => searchArea(el.dataset.areaName));
+function bindPopularAreaClicks(list) {
+  list.querySelectorAll('.popular-area-item').forEach((el) => {
+    el.addEventListener('click', () => searchArea(el.dataset.areaName));
+  });
+}
+
+export async function loadPopularAreas() {
+  const lists = [
+    document.getElementById('popular-areas-list'),
+    document.getElementById('popular-areas-list-aside'),
+  ].filter(Boolean);
+  if (!lists.length) return;
+
+  const loadingHtml = '<div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>';
+  lists.forEach((list) => {
+    list.innerHTML = loadingHtml;
+  });
+
+  try {
+    const areas = await getPopularAreas(5);
+    if (!areas.length) {
+      const emptyHtml =
+        '<div style="padding:10px 0;color:#999;font-size:12px;">등록된 인기 상권이 없습니다</div>';
+      lists.forEach((list) => {
+        list.innerHTML = emptyHtml;
+      });
+      return;
+    }
+
+    lists.forEach((list) => {
+      list.innerHTML = renderPopularAreasHtml(areas, list);
+      bindPopularAreaClicks(list);
     });
   } catch (err) {
     console.error('loadPopularAreas', err);
-    list.innerHTML =
+    const errHtml =
       '<div style="padding:10px 0;color:#999;font-size:12px;">데이터를 불러올 수 없습니다</div>';
+    lists.forEach((list) => {
+      list.innerHTML = errHtml;
+    });
   }
 }
 
@@ -1271,14 +1463,32 @@ export async function loadNeighborSection() {
 
 function redirectLegacyPostQuery() {
   const params = new URLSearchParams(window.location.search);
-  const postId = params.get('post');
-  if (!postId || document.getElementById('post-detail-root')) return false;
-  window.location.replace(getPostPageUrl(postId));
-  return true;
+  const legacyPost = params.get('post');
+  if (!legacyPost) return false;
+  if (getShellLayout()) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', legacyPost);
+    url.searchParams.delete('post');
+    window.location.replace(`${url.pathname}${url.search}`);
+    return true;
+  }
+  if (!document.getElementById('post-detail-root')) {
+    window.location.replace(getPostPageUrl(legacyPost));
+    return true;
+  }
+  return false;
 }
 
 function initCommunityShell() {
   if (redirectLegacyPostQuery()) return;
+  bindShellPopState();
+  if (tryBootShellPostDetail()) {
+    bindWriteModal();
+    bindImageUpload();
+    bindFollowButtons();
+    initSidebarWidgets();
+    return;
+  }
   bindWriteModal();
   bindImageUpload();
   bindFollowButtons();
@@ -1287,13 +1497,15 @@ function initCommunityShell() {
 
 export function initCommunity() {
   if (redirectLegacyPostQuery()) return;
+  bindShellPopState();
   bindFeedTabs();
   bindCategoryTabs();
   bindWriteModal();
   bindImageUpload();
-  bindInfiniteScroll();
   bindFollowButtons();
   initSidebarWidgets();
+  if (tryBootShellPostDetail()) return;
+  bindInfiniteScroll();
   loadFeed(true);
 }
 
@@ -1302,6 +1514,8 @@ window.golmokCommunity = {
   openPostDetail,
   navigateToPost,
   getPostPageUrl,
+  showShellPostDetail,
+  hideShellPostDetail,
   initCommunity,
   initPostDetailPage,
   openWriteOverlay,
@@ -1323,7 +1537,7 @@ window.renderPostList = renderPostList;
 function bootCommunity() {
   if (window.__golmokCommunityBooted) return;
   window.__golmokCommunityBooted = true;
-  if (document.getElementById('post-detail-root')) {
+  if (/\/post\.html$/i.test(window.location.pathname) && document.getElementById('post-detail-root')) {
     initPostDetailPage();
     return;
   }

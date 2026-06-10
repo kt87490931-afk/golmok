@@ -1,0 +1,217 @@
+/**
+ * /m/ 전용 — 뷰포트와 무관하게 v3 모바일 레이아웃 강제
+ * (PC 반응형 통합 없이 /m 경로만 모바일 UI)
+ */
+body.m-shell {
+  padding-bottom: var(--bn-h);
+  max-width: 430px;
+  margin: 0 auto;
+  background: #f7f3eb;
+}
+
+body.m-shell .sidebar,
+body.m-shell .aside {
+  display: none !important;
+}
+
+body.m-shell .layout {
+  display: block !important;
+  grid-template-columns: 1fr !important;
+  grid-template-areas: 'main' !important;
+  padding-bottom: var(--bn-h);
+  min-height: calc(100dvh - var(--hd-h) - var(--bn-h));
+}
+
+body.m-shell .main {
+  width: 100%;
+  min-width: 0;
+}
+
+body.m-shell .hd {
+  max-width: 430px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+body.m-shell .hd-nav {
+  display: none !important;
+}
+
+body.m-shell .hd-logo-sub {
+  display: none;
+}
+
+body.m-shell .hd-search-btn span {
+  display: none;
+}
+
+body.m-shell .hd-user span,
+body.m-shell .hd-user .ti-chevron-down {
+  display: none;
+}
+
+body.m-shell .btn-voice {
+  display: none;
+}
+
+body.m-shell .mobile-tabs {
+  display: flex !important;
+  max-width: 430px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+body.m-shell .hero {
+  min-height: 300px;
+  padding: 24px 16px;
+}
+
+body.m-shell .hero-title {
+  font-size: 22px;
+}
+
+body.m-shell .hero-sub {
+  font-size: 13px;
+}
+
+body.m-shell .hero-chip {
+  font-size: 11px;
+  padding: 5px 10px;
+}
+
+body.m-shell .quick-wrap {
+  padding: 16px 14px 0;
+}
+
+body.m-shell .quick-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+body.m-shell .quick-icon {
+  font-size: 24px;
+}
+
+body.m-shell .quick-name {
+  font-size: 11px;
+}
+
+body.m-shell .stat-wrap {
+  padding: 14px 14px 0;
+}
+
+body.m-shell .stat-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+body.m-shell .stat-val {
+  font-size: 18px;
+}
+
+body.m-shell .two-col {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 14px 14px 0;
+}
+
+body.m-shell .evt-wrap {
+  padding: 14px 14px 0;
+}
+
+body.m-shell .evt-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+body.m-shell .feed-wrap {
+  padding: 14px 14px 0;
+}
+
+body.m-shell .write-acts {
+  display: none;
+}
+
+body.m-shell .m-widgets {
+  padding: 0 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body.m-shell .m-range-wrap {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 14px 12px;
+}
+
+body.m-shell .m-range-wrap .seg-control {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #f0ede6;
+  border-radius: 12px;
+  padding: 3px;
+  position: relative;
+}
+
+body.m-shell .m-range-wrap .seg-slider {
+  position: absolute;
+  top: 3px;
+  height: calc(100% - 6px);
+  width: calc(33.333% - 2px);
+  background: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  left: 3px;
+}
+
+body.m-shell .m-range-wrap .seg-slider.pos-0 {
+  transform: translateX(0);
+}
+
+body.m-shell .m-range-wrap .seg-slider.pos-1 {
+  transform: translateX(calc(100% + 2px));
+}
+
+body.m-shell .m-range-wrap .seg-slider.pos-2 {
+  transform: translateX(calc(200% + 4px));
+}
+
+body.m-shell .m-range-wrap .seg-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+
+body.m-shell .m-range-wrap .seg-btn i {
+  font-size: 16px;
+  color: var(--gray-5);
+}
+
+body.m-shell .m-range-wrap .seg-btn-label {
+  font-size: 11px;
+  color: var(--gray-5);
+  font-weight: 500;
+}
+
+body.m-shell .m-range-wrap .seg-btn.active i,
+body.m-shell .m-range-wrap .seg-btn.active .seg-btn-label {
+  color: var(--gold-d);
+  font-weight: 700;
+}
+
+body.m-shell .toast {
+  bottom: calc(var(--bn-h) + 12px);
+}
