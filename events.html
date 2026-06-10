@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -400,6 +400,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main-v3.css?v=20260657">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260657">
+<link rel="stylesheet" href="css/community.css?v=20260664">
 </head>
 <body class="gm-shell-loaded" data-gm-active="events" data-gm-shell="standard">
 
@@ -471,26 +472,37 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <main class="main">
 <div class="gm-page-inner">
-<div class="main-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <h2 style="font-size:20px;font-weight:700;">이벤트·행사</h2>
-            <p style="font-size:13px;color:#999;margin-top:4px;">우리동네 이벤트와 행사 정보</p>
+<div class="main-content" id="board-list-view">
+        <div class="comm-wrap">
+          <div class="comm-page-hd">
+            <h2 class="comm-page-title">이벤트·행사</h2>
+            <p class="comm-page-sub">우리동네 이벤트와 행사 정보</p>
           </div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;">
-          <button type="button" class="event-filter-btn act" data-type="all" style="padding:7px 16px;border-radius:20px;font-size:13px;border:none;background:#F5A623;color:#fff;cursor:pointer;white-space:nowrap;font-weight:500;">전체</button>
-          <button type="button" class="event-filter-btn" data-type="discount" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🏷️ 할인이벤트</button>
-          <button type="button" class="event-filter-btn" data-type="groupbuy" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🛒 공동구매</button>
-          <button type="button" class="event-filter-btn" data-type="meeting" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">👥 모임·행사</button>
-          <button type="button" class="event-filter-btn" data-type="issue" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">⚠️ 이슈</button>
-        </div>
-        <div id="events-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"></div>
-        <div id="events-empty" style="display:none;text-align:center;padding:60px 20px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;margin-top:12px;">
-          <div style="font-size:48px;margin-bottom:12px;">📢</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">등록된 이벤트가 없습니다</div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;cursor:pointer;margin-top:12px;">이벤트 등록하기</button>
+
+          <div class="write-inducer">
+            <div class="write-inducer-av" id="write-inducer-av"><span id="write-av-initial">?</span></div>
+            <div class="write-inducer-ph">이벤트·행사를 등록해보세요</div>
+            <div class="write-inducer-actions">
+              <span class="write-inducer-act" data-action="photo"><i class="ti ti-photo"></i> 사진</span>
+              <span class="write-inducer-act"><i class="ti ti-map-pin"></i> 위치</span>
+            </div>
+            <button type="button" class="write-inducer-btn" onclick="openEventWriteModal()">이벤트 등록</button>
+          </div>
+
+          <div class="comm-range-wrap" style="margin-top:14px;">
+            <button type="button" class="comm-range-btn event-filter-btn act" data-type="all">전체</button>
+            <button type="button" class="comm-range-btn event-filter-btn" data-type="discount">🏷️ 할인이벤트</button>
+            <button type="button" class="comm-range-btn event-filter-btn" data-type="groupbuy">🛒 공동구매</button>
+            <button type="button" class="comm-range-btn event-filter-btn" data-type="meeting">👥 모임·행사</button>
+            <button type="button" class="comm-range-btn event-filter-btn" data-type="issue">⚠️ 이슈</button>
+          </div>
+
+          <div id="events-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 20px 0;"></div>
+          <div id="events-empty" style="display:none;text-align:center;padding:60px 20px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;margin:12px 20px 0;">
+            <div style="font-size:48px;margin-bottom:12px;">📢</div>
+            <div style="font-size:16px;font-weight:700;margin-bottom:8px;">등록된 이벤트가 없습니다</div>
+            <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;cursor:pointer;margin-top:12px;">이벤트 등록하기</button>
+          </div>
         </div>
       </div>
 </div>
@@ -749,10 +761,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260632"></script>
+<script type="module" src="js/community_ui.js?v=20260664"></script>
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/events.js?v=20260630"></script>
+<script type="module" src="js/pages/events.js?v=20260664"></script>
 </body>
 </html>

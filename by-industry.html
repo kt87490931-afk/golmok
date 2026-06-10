@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -400,6 +400,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main-v3.css?v=20260657">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260657">
+<link rel="stylesheet" href="css/community.css?v=20260664">
 </head>
 <body class="gm-shell-loaded" data-gm-active="by-industry" data-gm-shell="standard">
 
@@ -471,12 +472,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <main class="main">
 <div class="gm-page-inner">
-<div class="main-content">
-        <div style="margin-bottom:20px;">
-          <h2 style="font-size:20px;font-weight:700;">업종별 게시판</h2>
-          <p style="font-size:13px;color:#999;margin-top:4px;">같은 업종 대장님들의 이야기를 모아보세요</p>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;">
+<div class="main-content" id="board-list-view">
+        <div class="comm-wrap">
+          <div class="comm-page-hd">
+            <h2 class="comm-page-title">업종별 게시판</h2>
+            <p class="comm-page-sub">같은 업종 대장님들의 이야기를 모아보세요</p>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 20px 0;">
           <button type="button" class="industry-btn act" data-code="" data-name="전체" style="padding:14px 8px;border-radius:12px;border:1px solid #F5A623;background:#FFF8E7;cursor:pointer;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🏪</div><div class="industry-label" style="font-size:12px;font-weight:500;color:#C17F24;">전체</div></button>
           <button type="button" class="industry-btn" data-code="I2" data-name="음식" style="padding:14px 8px;border-radius:12px;border:1px solid #E8E4DC;background:#fff;cursor:pointer;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🍽️</div><div class="industry-label" style="font-size:12px;font-weight:500;color:#555;">음식</div></button>
           <button type="button" class="industry-btn" data-code="G2" data-name="소매" style="padding:14px 8px;border-radius:12px;border:1px solid #E8E4DC;background:#fff;cursor:pointer;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🛍️</div><div class="industry-label" style="font-size:12px;font-weight:500;color:#555;">소매</div></button>
@@ -487,13 +490,24 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <button type="button" class="industry-btn" data-code="I1" data-name="숙박" style="padding:14px 8px;border-radius:12px;border:1px solid #E8E4DC;background:#fff;cursor:pointer;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🛏️</div><div class="industry-label" style="font-size:12px;font-weight:500;color:#555;">숙박</div></button>
           <button type="button" class="industry-btn" data-code="Q1" data-name="보건의료" style="padding:14px 8px;border-radius:12px;border:1px solid #E8E4DC;background:#fff;cursor:pointer;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🏥</div><div class="industry-label" style="font-size:12px;font-weight:500;color:#555;">보건의료</div></button>
           <button type="button" class="industry-btn" data-code="M1" data-name="과학·기술" style="padding:14px 8px;border-radius:12px;border:1px solid #E8E4DC;background:#fff;cursor:pointer;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🔬</div><div class="industry-label" style="font-size:12px;font-weight:500;color:#555;">과학·기술</div></button>
+          </div>
+
+          <div class="write-inducer">
+            <div class="write-inducer-av" id="write-inducer-av"><span id="write-av-initial">?</span></div>
+            <div class="write-inducer-ph">업종 대장님들과 정보를 나눠보세요</div>
+            <div class="write-inducer-actions">
+              <span class="write-inducer-act" data-action="photo"><i class="ti ti-photo"></i> 사진</span>
+              <span class="write-inducer-act"><i class="ti ti-map-pin"></i> 위치</span>
+            </div>
+            <button type="button" class="write-inducer-btn">게시하기</button>
+          </div>
+
+          <div class="comm-list-hd">
+            <div class="comm-total"><span id="selected-industry-name">전체</span> 게시글 · <strong id="industry-post-count">0</strong>개</div>
+          </div>
+          <div id="industry-post-list" class="comm-board-list"></div>
+          <div id="store-status-wrap" style="margin:16px 20px 0;"></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="font-size:14px;font-weight:700;"><span id="selected-industry-name">전체</span> 게시글</div>
-          <div id="industry-post-count" style="font-size:12px;color:#999;"></div>
-        </div>
-        <div id="industry-post-list" class="plist" style="border-radius:12px;overflow:hidden;border:1px solid var(--border);"></div>
-        <div id="store-status-wrap"></div>
       </div>
 </div>
 </main>
@@ -751,10 +765,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260632"></script>
+<script type="module" src="js/community_ui.js?v=20260664"></script>
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/by_industry.js?v=20260630"></script>
+<script type="module" src="js/pages/by_industry.js?v=20260664"></script>
 </body>
 </html>

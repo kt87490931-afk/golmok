@@ -1,8 +1,8 @@
-﻿import { getPostsByIndustry } from '../community.js?v=20260624';
-import { renderPostList } from '../community_ui.js';
+﻿import { getPostsByIndustry } from '../community.js?v=20260664';
+import { renderPostList, renderCommSkeleton, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js';
 import { initPageShell, bootPage } from '../page_common.js';
 import { loadStoreStatus } from '../store-status.js?v=20260629';
-import { getCurrentUser, getUserProfile } from '../community.js?v=20260624';
+import { getCurrentUser, getUserProfile } from '../community.js?v=20260664';
 
 let selectedIndustryCode = '';
 let userRegionFull = '경기 화성시 동탄2동';
@@ -23,17 +23,17 @@ function activateIndustryBtn(btn) {
 }
 
 async function loadIndustryFeed() {
-  const list = document.getElementById('industry-post-list');
-  if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:#999;background:#fff;">불러오는 중...</div>';
+  renderCommSkeleton('industry-post-list');
 
   try {
     const posts = await getPostsByIndustry(selectedIndustryCode || null, { page: 0, limit: 30 });
     const countEl = document.getElementById('industry-post-count');
-    if (countEl) countEl.textContent = `${posts.length}개의 게시글`;
+    if (countEl) countEl.textContent = String(posts.length);
     await renderPostList(posts, 'industry-post-list', { reset: true });
     await loadStoreStatus(selectedIndustryCode, userRegionFull);
   } catch (e) {
     console.error(e);
+    const list = document.getElementById('industry-post-list');
     if (list) list.innerHTML = '<div style="padding:24px;text-align:center;color:#E24B4A;background:#fff;">불러오지 못했습니다</div>';
   }
 }
@@ -51,6 +51,8 @@ async function resolveUserRegion() {
 
 bootPage(() => {
   initPageShell('by-industry');
+  bindCommWriteInducer();
+  updateWriteInducer().catch(() => {});
   resolveUserRegion();
   document.querySelectorAll('.industry-btn').forEach((btn) => {
     btn.addEventListener('click', () => {

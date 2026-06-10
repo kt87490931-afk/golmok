@@ -421,6 +421,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main-v3.css?v=20260657">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260657">
+<link rel="stylesheet" href="css/community.css?v=20260664">
 </head>
 <body class="gm-shell-loaded" data-gm-active="community" data-gm-shell="standard">
 
@@ -493,23 +494,51 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <main class="main">
 <div class="gm-page-inner">
 <div class="main-content" id="board-list-view">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <h2 style="font-size:20px;font-weight:700;">전체 게시판</h2>
-            <p style="font-size:13px;color:#999;margin-top:4px;">전국 소상공인 대장님들의 이야기</p>
+        <div class="comm-wrap">
+          <div class="comm-page-hd">
+            <h2 class="comm-page-title">전체 게시판</h2>
+            <p class="comm-page-sub">전국 소상공인 대장님들의 이야기</p>
           </div>
-          <button type="button" data-open-write style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;"><i class="ti ti-pencil"></i> 글쓰기</button>
+
+          <div class="write-inducer">
+            <div class="write-inducer-av" id="write-inducer-av">
+              <span id="write-av-initial">?</span>
+            </div>
+            <div class="write-inducer-ph">대장님, 오늘 어떠셨나요?</div>
+            <div class="write-inducer-actions">
+              <span class="write-inducer-act" data-action="photo"><i class="ti ti-photo"></i> 사진</span>
+              <span class="write-inducer-act"><i class="ti ti-map-pin"></i> 위치</span>
+            </div>
+            <button type="button" class="write-inducer-btn">게시하기</button>
+          </div>
+
+          <div class="hot-highlight" id="hot-highlight-section">
+            <div class="hot-highlight-hd">
+              <div class="hot-highlight-title"><i class="ti ti-flame"></i> 지금 뜨는 글</div>
+              <button type="button" class="hot-highlight-more">전체보기</button>
+            </div>
+            <div id="hot-highlight-list"></div>
+          </div>
+
+          <div class="comm-cat-wrap">
+            <button type="button" class="comm-cat-tab" data-cat="all">전체</button>
+            <button type="button" class="comm-cat-tab" data-cat="qna">질문·고민</button>
+            <button type="button" class="comm-cat-tab" data-cat="info">정보공유</button>
+            <button type="button" class="comm-cat-tab" data-cat="startup">창업준비</button>
+            <button type="button" class="comm-cat-tab" data-cat="issue">이슈</button>
+            <button type="button" class="comm-cat-tab" data-cat="event">이벤트</button>
+          </div>
+
+          <div class="comm-list-hd">
+            <div class="comm-total">전체 <strong id="post-total-count">-</strong>개</div>
+            <div class="comm-sort">
+              <button type="button" class="comm-sort-btn act" data-sort="latest">최신순</button>
+              <button type="button" class="comm-sort-btn" data-sort="popular">인기순</button>
+            </div>
+          </div>
+
+          <div id="community-post-list" class="comm-board-list"></div>
         </div>
-        <div style="display:flex;border-bottom:1px solid #E8E4DC;margin-bottom:16px;overflow-x:auto;">
-          <button type="button" class="cat-tab" data-cat="all" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:14px;white-space:nowrap;border-bottom:2px solid transparent;">전체</button>
-          <button type="button" class="cat-tab" data-cat="qna" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:14px;white-space:nowrap;border-bottom:2px solid transparent;">질문·고민</button>
-          <button type="button" class="cat-tab" data-cat="info" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:14px;white-space:nowrap;border-bottom:2px solid transparent;">정보공유</button>
-          <button type="button" class="cat-tab" data-cat="startup" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:14px;white-space:nowrap;border-bottom:2px solid transparent;">창업준비</button>
-          <button type="button" class="cat-tab" data-cat="issue" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:14px;white-space:nowrap;border-bottom:2px solid transparent;">이슈</button>
-          <button type="button" class="cat-tab" data-cat="event" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:14px;white-space:nowrap;border-bottom:2px solid transparent;">이벤트</button>
-        </div>
-        <div id="community-post-list" class="plist" style="border-radius:12px;overflow:hidden;border:1px solid var(--border);"></div>
-        <div id="loading-indicator" style="text-align:center;padding:20px;color:#999;display:none;">불러오는 중...</div>
       </div>
       <div class="main-content" id="shell-post-detail" style="display:none;"></div>
 </div>
@@ -768,10 +797,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260633"></script>
+<script type="module" src="js/community_ui.js?v=20260664"></script>
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/community.js?v=20260633"></script>
+<script type="module" src="js/pages/community.js?v=20260664"></script>
 </body>
 </html>

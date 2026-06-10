@@ -1,14 +1,14 @@
-﻿import { getEventsByType } from '../community.js?v=20260624';
-import { openPostDetail } from '../community_ui.js';
-import { initPageShell, bootPage, activatePillButtons } from '../page_common.js';
+﻿import { getEventsByType } from '../community.js?v=20260664';
+import { openPostDetail, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js';
+import { initPageShell, bootPage } from '../page_common.js';
 
 let currentEventType = 'all';
 
 const TYPE_CONFIG = {
-  discount: { label: '?좎씤?대깽??, bg: 'linear-gradient(135deg,#FFF8E7,#FAEEDA)', chip: '#F5A623' },
-  groupbuy: { label: '怨듬룞援щℓ', bg: 'linear-gradient(135deg,#E8F8F0,#D0F0E0)', chip: '#1D9E75' },
-  meeting: { label: '紐⑥엫쨌?됱궗', bg: 'linear-gradient(135deg,#EBF4FF,#D6EAFF)', chip: '#378ADD' },
-  issue: { label: '?댁뒋', bg: 'linear-gradient(135deg,#FFF1F1,#FFE0E0)', chip: '#E24B4A' },
+  discount: { label: '할인이벤트', bg: 'linear-gradient(135deg,#FFF8E7,#FAEEDA)', chip: '#F5A623' },
+  groupbuy: { label: '공동구매', bg: 'linear-gradient(135deg,#E8F8F0,#D0F0E0)', chip: '#1D9E75' },
+  meeting: { label: '모임·행사', bg: 'linear-gradient(135deg,#EBF4FF,#D6EAFF)', chip: '#378ADD' },
+  issue: { label: '이슈', bg: 'linear-gradient(135deg,#FFF1F1,#FFE0E0)', chip: '#E24B4A' },
 };
 
 function escapeHtml(str) {
@@ -32,7 +32,7 @@ function renderEventGrid(events) {
   grid.innerHTML = '';
 
   events.forEach((event) => {
-    const tc = TYPE_CONFIG[event.event_type] || { label: '湲고?', bg: '#F7F3EB', chip: '#999' };
+    const tc = TYPE_CONFIG[event.event_type] || { label: '기타', bg: '#F7F3EB', chip: '#999' };
     const dday = event.event_end_date
       ? Math.ceil((new Date(event.event_end_date) - new Date()) / (1000 * 60 * 60 * 24))
       : null;
@@ -43,14 +43,14 @@ function renderEventGrid(events) {
       <div style="padding:14px;background:${tc.bg};">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <span style="background:${tc.chip};color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;">${tc.label}</span>
-          ${dday !== null ? `<span style="font-size:11px;font-weight:700;color:${dday <= 3 ? '#E24B4A' : '#555'};">${dday <= 0 ? '?ㅻ뒛 留덇컧' : `D-${dday}`}</span>` : ''}
+          ${dday !== null ? `<span style="font-size:11px;font-weight:700;color:${dday <= 3 ? '#E24B4A' : '#555'};">${dday <= 0 ? '오늘 마감' : `D-${dday}`}</span>` : ''}
         </div>
         <div style="font-size:14px;font-weight:700;color:#1A1A1A;line-height:1.4;margin-bottom:6px;">${escapeHtml(event.title || event.content?.slice(0, 30) || '')}</div>
-        <div style="font-size:12px;color:#555;">${escapeHtml(event.users?.nickname || '??λ떂')} 쨌 ${escapeHtml(event.region_dong || '')}</div>
+        <div style="font-size:12px;color:#555;">${escapeHtml(event.users?.nickname || '대장님')} · ${escapeHtml(event.region_dong || '')}</div>
       </div>
       <div style="padding:10px 14px;border-top:1px solid rgba(0,0,0,.06);font-size:11px;color:#999;display:flex;gap:8px;">
-        <span>?ㅿ툘 ${event.like_count || 0}</span>
-        <span>?뮠 ${event.comment_count || 0}</span>
+        <span>❤️ ${event.like_count || 0}</span>
+        <span>💬 ${event.comment_count || 0}</span>
         ${event.event_end_date ? `<span style="margin-left:auto;">~${event.event_end_date}</span>` : ''}
       </div>`;
     card.addEventListener('click', () => openPostDetail(event.id));
@@ -82,12 +82,13 @@ window.openEventWriteModal = function openEventWriteModal() {
 
 bootPage(() => {
   initPageShell('events');
+  bindCommWriteInducer();
+  updateWriteInducer().catch(() => {});
+
   document.querySelectorAll('.event-filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      activatePillButtons('.event-filter-btn', btn);
-      if (btn !== document.querySelector('.event-filter-btn')) {
-        btn.style.border = 'none';
-      }
+      document.querySelectorAll('.event-filter-btn').forEach((b) => b.classList.remove('act'));
+      btn.classList.add('act');
       currentEventType = btn.dataset.type || 'all';
       loadEvents();
     });

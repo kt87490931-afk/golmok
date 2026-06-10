@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -417,6 +417,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main-v3.css?v=20260657">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260657">
+<link rel="stylesheet" href="css/community.css?v=20260664">
 </head>
 <body class="gm-shell-loaded" data-gm-active="neighborhood" data-gm-shell="standard">
 
@@ -489,20 +490,36 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <main class="main">
 <div class="gm-page-inner">
 <div class="main-content" id="board-list-view">
-        <div style="margin-bottom:16px;">
-          <h2 style="font-size:20px;font-weight:700;">우리동네</h2>
-          <p style="font-size:13px;color:#999;margin-top:4px;display:flex;align-items:center;gap:6px;"><i class="ti ti-map-pin" style="color:#F5A623;"></i> <span id="current-region">경기 화성시 동탄2동</span> 기준</p>
+        <div class="comm-wrap">
+          <div class="comm-page-hd">
+            <h2 class="comm-page-title">우리동네</h2>
+            <p class="comm-page-sub"><i class="ti ti-map-pin" style="color:#F5A623;"></i> <span id="current-region">경기 화성시 동탄2동</span> 기준</p>
+          </div>
+
+          <div class="write-inducer">
+            <div class="write-inducer-av" id="write-inducer-av"><span id="write-av-initial">?</span></div>
+            <div class="write-inducer-ph">우리동네 대장님들과 이야기를 나눠보세요</div>
+            <div class="write-inducer-actions">
+              <span class="write-inducer-act" data-action="photo"><i class="ti ti-photo"></i> 사진</span>
+              <span class="write-inducer-act"><i class="ti ti-map-pin"></i> 위치</span>
+            </div>
+            <button type="button" class="write-inducer-btn">게시하기</button>
+          </div>
+
+          <div class="comm-range-wrap">
+            <button type="button" class="comm-range-btn range-btn act" data-range="dong">우리동네</button>
+            <button type="button" class="comm-range-btn range-btn" data-range="sigungu">인근 동네</button>
+            <button type="button" class="comm-range-btn range-btn" data-range="all">전체 지역</button>
+          </div>
+
+          <div class="comm-section-label">이번 주 우리동네 이벤트·이슈</div>
+          <div class="comm-events-scroll" id="neighborhood-events"></div>
+
+          <div class="comm-list-hd" style="border:none;margin-top:8px;padding-top:4px;">
+            <div class="comm-total">동네 게시글</div>
+          </div>
+          <div id="neighborhood-post-list" class="comm-board-list comm-board-list--standalone"></div>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-          <button type="button" class="range-btn act" data-range="dong" style="padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #F5A623;background:#F5A623;color:#fff;">우리동네</button>
-          <button type="button" class="range-btn" data-range="sigungu" style="padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #E8E4DC;background:transparent;color:#555;">인근 동네</button>
-          <button type="button" class="range-btn" data-range="all" style="padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #E8E4DC;background:transparent;color:#555;">전체 지역</button>
-        </div>
-        <div style="margin-bottom:16px;">
-          <div style="font-size:14px;font-weight:700;margin-bottom:8px;">이번 주 우리동네 이벤트·이슈</div>
-          <div id="neighborhood-events"></div>
-        </div>
-        <div id="neighborhood-post-list" class="plist" style="border-radius:12px;overflow:hidden;border:1px solid var(--border);"></div>
       </div>
       <div class="main-content" id="shell-post-detail" style="display:none;"></div>
 </div>
@@ -761,10 +778,10 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260633"></script>
+<script type="module" src="js/community_ui.js?v=20260664"></script>
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/neighborhood.js?v=20260630"></script>
+<script type="module" src="js/pages/neighborhood.js?v=20260664"></script>
 </body>
 </html>

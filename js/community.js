@@ -61,18 +61,29 @@ async function runPostCounterRpc(fn, postId) {
   return false;
 }
 
-export async function getAllPosts({ category = 'all', page = 0, limit = 20 } = {}) {
-  let query = supabase
-    .from('posts')
-    .select(POST_SELECT)
-    .eq('is_deleted', false)
-    .order('created_at', { ascending: false })
-    .range(page * limit, (page + 1) * limit - 1);
+export async function getAllPosts({
+  category = 'all',
+  page = 0,
+  limit = 20,
+  sort = 'latest',
+  withCount = false,
+} = {}) {
+  const selectOpts = withCount ? { count: 'exact' } : undefined;
+  let query = supabase.from('posts').select(POST_SELECT, selectOpts).eq('is_deleted', false);
 
   if (category !== 'all') query = query.eq('category', category);
 
-  const { data, error } = await query;
+  if (sort === 'popular') {
+    query = query.order('like_count', { ascending: false });
+  } else {
+    query = query.order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
+  }
+
+  query = query.range(page * limit, (page + 1) * limit - 1);
+
+  const { data, error, count } = await query;
   if (error) throw error;
+  if (withCount) return { posts: data || [], count: count ?? (data?.length ?? 0) };
   return data || [];
 }
 
@@ -428,7 +439,7 @@ export async function getHotPosts(limit = 3) {
 
   const { data, error } = await supabase
     .from('posts')
-    .select('id, title, content, like_count, comment_count, created_at')
+    .select('id, title, content, like_count, comment_count, created_at, images, users(nickname, region_dong)')
     .eq('is_deleted', false)
     .gte('created_at', sevenDaysAgo.toISOString())
     .order('like_count', { ascending: false })

@@ -317,7 +317,8 @@ export async function loadFeed(reset = true) {
   if (reset) {
     currentPage = 0;
     hasMore = true;
-    list.innerHTML = '<div class="feed-loading" style="padding:24px;text-align:center;color:#999;">불러오는 중...</div>';
+    if (usesV2Cards(list)) renderCommSkeleton(list);
+    else list.innerHTML = '<div class="feed-loading" style="padding:24px;text-align:center;color:#999;">불러오는 중...</div>';
   }
 
   await resolveUserRegion();
@@ -327,13 +328,25 @@ export async function loadFeed(reset = true) {
     if (reset) list.innerHTML = '';
 
     if (!posts.length && currentPage === 0) {
-      list.innerHTML =
-        '<div style="padding:40px 16px;text-align:center;color:#999;"><p>아직 게시글이 없습니다.</p><p>첫 번째 대장님이 되어보세요!</p></div>';
+      list.innerHTML = usesV2Cards(list)
+        ? renderCommEmptyHtml()
+        : '<div style="padding:40px 16px;text-align:center;color:#999;"><p>아직 게시글이 없습니다.</p><p>첫 번째 대장님이 되어보세요!</p></div>';
+      list.querySelector('[data-open-write]')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openWriteOverlay();
+      });
       hasMore = false;
     } else {
       const liked = await getLikedPostIds(posts.map((p) => p.id));
       const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-      posts.forEach((post) => list.appendChild(createPostCard(post, liked, saved, 'post-list')));
+      const useV2 = usesV2Cards(list);
+      posts.forEach((post) =>
+        list.appendChild(
+          useV2
+            ? createPostCardV2(post, liked, saved, 'post-list')
+            : createPostCard(post, liked, saved, 'post-list')
+        )
+      );
       hasMore = posts.length >= 20;
       currentPage += 1;
     }
@@ -590,6 +603,272 @@ function getPostPreview(post) {
   return rest.length > 120 ? `${rest.slice(0, 120)}…` : rest;
 }
 
+function usesV2Cards(container) {
+  if (!container) return false;
+  if (container.classList.contains('comm-board-list')) return true;
+  return !!container.closest('.comm-wrap, .feed-post-shell');
+}
+
+function skeletonCardsHtml(count = 3) {
+  return Array(count)
+    .fill(0)
+    .map(
+      () => `<div class="skeleton-card">
+        <div class="skeleton-hd">
+          <div class="skeleton skeleton-av"></div>
+          <div class="skeleton-lines">
+            <div class="skeleton skeleton-line" style="width:40%"></div>
+            <div class="skeleton skeleton-line" style="width:25%"></div>
+          </div>
+        </div>
+        <div class="skeleton-body">
+          <div class="skeleton-text">
+            <div class="skeleton skeleton-line" style="width:90%"></div>
+            <div class="skeleton skeleton-line" style="width:75%"></div>
+          </div>
+          <div class="skeleton skeleton-thumb"></div>
+        </div>
+      </div>`
+    )
+    .join('');
+}
+
+export function renderCommSkeleton(containerIdOrEl, count = 3) {
+  const container =
+    typeof containerIdOrEl === 'string' ? document.getElementById(containerIdOrEl) : containerIdOrEl;
+  if (!container) return;
+  container.innerHTML = skeletonCardsHtml(count);
+}
+
+function renderCommEmptyHtml() {
+  return `<div class="comm-empty">
+    <div class="comm-empty-icon">📝</div>
+    <div class="comm-empty-title">아직 게시글이 없습니다</div>
+    <div class="comm-empty-sub">첫 번째 대장님이 되어보세요!<br>이웃 대장님들과 이야기를 나눠보세요.</div>
+    <button type="button" class="comm-empty-btn" data-open-write>
+      <i class="ti ti-pencil"></i> 글쓰기
+    </button>
+  </div>`;
+}
+
+function createPostCardV2(post, likedSet, savedSet, listContainerId) {
+  const div = document.createElement('div');
+  div.className = `post-card-v2${post.is_pinned ? ' pinned' : ''}`;
+  div.dataset.postId = post.id;
+  div.dataset.cat = post.category;
+
+  const user = post.users || {};
+  const liked = likedSet?.has(post.id);
+  const saved = savedSet?.has(post.id);
+  const images = post.images || [];
+  const hasTitle = post.title && post.title.trim().length > 0;
+  const preview = getPostPreview(post) || (post.content || '').trim().slice(0, 120);
+  const displayTitle = hasTitle ? post.title.trim() : getPostDisplayTitle(post);
+
+  const avHtml = user.profile_image
+    ? `<img src="${escapeHtml(user.profile_image)}" alt="">`
+    : `<span>${escapeHtml((user.nickname || '대').charAt(0))}</span>`;
+
+  let thumbHtml = '';
+  if (images.length === 1) {
+    thumbHtml = `<img class="pcv2-thumb" src="${escapeHtml(images[0])}" alt="이미지" loading="lazy"
+      onerror="this.style.display='none'">`;
+  } else if (images.length >= 2) {
+    thumbHtml = `<div class="pcv2-thumb-grid">
+      <img src="${escapeHtml(images[0])}" alt="" loading="lazy">
+      <img src="${escapeHtml(images[1])}" alt="" loading="lazy">
+    </div>`;
+  }
+
+  div.innerHTML = `
+    <div class="pcv2-hd">
+      <div class="pcv2-av">${avHtml}</div>
+      <div class="pcv2-info">
+        <div class="pcv2-name">
+          ${escapeHtml(user.nickname || '대장님')}
+          <span class="pcv2-badge" style="${getCategoryStyle(post.category)}">${escapeHtml(getCategoryLabel(post.category))}</span>
+          ${post.is_pinned ? '<span class="pcv2-badge" style="background:#FFF8E7;color:#C17F24;">📌 공지</span>' : ''}
+        </div>
+        <div class="pcv2-meta">
+          ${escapeHtml(user.region_full || post.region_full || user.region_dong || '')}
+          ${user.follower_count !== undefined ? `· 팔로워 ${user.follower_count || 0}명` : ''}
+        </div>
+      </div>
+      ${post.region_dong ? `<div class="pcv2-loc"><i class="ti ti-map-pin"></i>${escapeHtml(post.region_dong)}</div>` : ''}
+    </div>
+    <div class="pcv2-body-row">
+      <div class="pcv2-text">
+        ${hasTitle || displayTitle ? `<div class="pcv2-title">${escapeHtml(displayTitle)}</div>` : ''}
+        ${preview ? `<div class="pcv2-preview">${escapeHtml(preview)}</div>` : ''}
+      </div>
+      ${thumbHtml}
+    </div>
+    <div class="pcv2-ft">
+      <button type="button" class="pcv2-action like-btn${liked ? ' liked' : ''}" data-post-id="${post.id}">
+        <i class="ti ti-heart"></i>
+        <span class="like-count">${post.like_count || 0}</span>
+      </button>
+      <button type="button" class="pcv2-action comment-btn" data-post-id="${post.id}">
+        <i class="ti ti-message-circle"></i>
+        <span>${post.comment_count || 0}</span>
+      </button>
+      <button type="button" class="pcv2-action share-btn" data-post-id="${post.id}">
+        <i class="ti ti-share"></i>
+      </button>
+      <button type="button" class="pcv2-action save-btn bookmark-btn${saved ? ' saved' : ''}" data-post-id="${post.id}">
+        <i class="ti ti-bookmark"></i>
+      </button>
+      ${post.view_count ? `<span class="pcv2-views"><i class="ti ti-eye"></i> ${post.view_count}</span>` : ''}
+      <span class="pcv2-time">${getTimeAgo(post.created_at)}</span>
+    </div>`;
+
+  div.querySelector('.like-btn')?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const res = await toggleLike(post.id);
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
+    const btn = e.currentTarget;
+    const count = btn.querySelector('.like-count');
+    const n = parseInt(count.textContent, 10) || 0;
+    if (res.liked) {
+      btn.classList.add('liked');
+      count.textContent = n + 1;
+      toast('공감했습니다');
+    } else {
+      btn.classList.remove('liked');
+      count.textContent = Math.max(0, n - 1);
+    }
+  });
+
+  div.querySelector('.bookmark-btn')?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const res = await toggleBookmark(post.id);
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
+    const btn = e.currentTarget;
+    if (res.saved) {
+      btn.classList.add('saved');
+      toast('저장했습니다');
+    } else {
+      btn.classList.remove('saved');
+      toast('저장 취소');
+    }
+  });
+
+  div.querySelector('.share-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sharePost(post.id);
+  });
+
+  div.querySelector('.comment-btn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigateToPost(post.id);
+  });
+
+  div.addEventListener('click', () => navigateToPost(post.id));
+
+  return div;
+}
+
+export async function loadHotHighlight() {
+  const section = document.getElementById('hot-highlight-section');
+  const container = document.getElementById('hot-highlight-list');
+  if (!container) return;
+
+  try {
+    const posts = await getHotPosts(3);
+    if (!posts.length) {
+      if (section) section.style.display = 'none';
+      return;
+    }
+    if (section) section.style.display = '';
+
+    container.innerHTML = posts
+      .map((post, idx) => {
+        const title = escapeHtml(post.title || post.content?.replace(/<[^>]*>/g, '').slice(0, 50) || '');
+        const thumb = post.images?.[0];
+        return `<div class="hot-post-row" data-post-id="${post.id}" role="button" tabindex="0">
+          <span class="hot-post-rank ${idx === 0 ? 'top' : ''}">${String(idx + 1).padStart(2, '0')}</span>
+          <div class="hot-post-content">
+            <div class="hot-post-title">${title}</div>
+            <div class="hot-post-meta">
+              <span>${escapeHtml(post.users?.nickname || '대장님')}</span>
+              <span>❤️ ${post.like_count || 0}</span>
+              <span>💬 ${post.comment_count || 0}</span>
+              <span>${getTimeAgo(post.created_at)}</span>
+            </div>
+          </div>
+          ${thumb ? `<img class="hot-post-thumb" src="${escapeHtml(thumb)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+        </div>`;
+      })
+      .join('');
+
+    container.querySelectorAll('.hot-post-row[data-post-id]').forEach((el) => {
+      el.addEventListener('click', () => openPostDetail(el.dataset.postId));
+    });
+  } catch (e) {
+    console.error('loadHotHighlight', e);
+    if (section) section.style.display = 'none';
+  }
+}
+
+export async function updateWriteInducer() {
+  const av = document.getElementById('write-inducer-av') || document.getElementById('write-av');
+  const initial = document.getElementById('write-av-initial');
+  if (!av) return;
+
+  try {
+    const user = await getCurrentUser();
+    if (!user) return;
+    const profile = await getUserProfile(user.id);
+    if (profile?.profile_image) {
+      av.innerHTML = `<img src="${escapeHtml(profile.profile_image)}" alt="">`;
+    } else if (initial && profile?.nickname) {
+      initial.textContent = profile.nickname.charAt(0);
+    } else if (profile?.nickname) {
+      av.innerHTML = `<span>${escapeHtml(profile.nickname.charAt(0))}</span>`;
+    }
+  } catch (e) {
+    console.warn('updateWriteInducer', e);
+  }
+}
+
+export function bindCommWriteInducer() {
+  document.querySelectorAll('.write-inducer').forEach((el) => {
+    if (el.dataset.boundWrite) return;
+    el.dataset.boundWrite = '1';
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.write-inducer-btn, .write-inducer-act')) {
+        e.stopPropagation();
+      }
+      if (e.target.closest('.write-inducer-act[data-action="photo"]')) {
+        openWriteWithPhoto();
+        return;
+      }
+      if (e.target.closest('.write-inducer-btn')) {
+        openWriteOverlay();
+        return;
+      }
+      openWriteOverlay();
+    });
+    el.querySelector('.write-inducer-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openWriteOverlay();
+    });
+    el.querySelector('[data-action="photo"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openWriteWithPhoto();
+    });
+  });
+}
+
 function createPostCard(post, likedSet, savedSet, listContainerId) {
   const div = document.createElement('div');
   div.className = 'pc';
@@ -705,18 +984,30 @@ function createPostCard(post, likedSet, savedSet, listContainerId) {
   return div;
 }
 
-export async function renderPostList(posts, containerId, { reset = true, append = false } = {}) {
+export async function renderPostList(posts, containerId, { reset = true, append = false, skeleton = false } = {}) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const useV2 = usesV2Cards(container);
+
+  if (skeleton && reset) {
+    renderCommSkeleton(container);
+    return;
+  }
+
   if (reset && !append) {
     if (!posts?.length) {
-      container.innerHTML = `
-        <div style="padding:40px;text-align:center;color:#999;background:#fff;">
+      container.innerHTML = useV2
+        ? renderCommEmptyHtml()
+        : `<div style="padding:40px;text-align:center;color:#999;background:#fff;">
           <div style="font-size:32px;margin-bottom:10px;">📝</div>
           <div>아직 게시글이 없습니다.</div>
           <div style="font-size:12px;margin-top:4px;">첫 번째 대장님이 되어보세요!</div>
         </div>`;
+      container.querySelector('[data-open-write]')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openWriteOverlay();
+      });
       return;
     }
     container.innerHTML = '';
@@ -726,7 +1017,8 @@ export async function renderPostList(posts, containerId, { reset = true, append 
 
   const liked = await getLikedPostIds(posts.map((p) => p.id));
   const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-  posts.forEach((post) => container.appendChild(createPostCard(post, liked, saved, containerId)));
+  const makeCard = useV2 ? createPostCardV2 : createPostCard;
+  posts.forEach((post) => container.appendChild(makeCard(post, liked, saved, containerId)));
 }
 
 export function openPostDetail(postId) {
@@ -1485,15 +1777,19 @@ function initCommunityShell() {
   bindShellPopState();
   if (tryBootShellPostDetail()) {
     bindWriteModal();
+    bindCommWriteInducer();
     bindImageUpload();
     bindFollowButtons();
     initSidebarWidgets();
+    updateWriteInducer().catch(() => {});
     return;
   }
   bindWriteModal();
+  bindCommWriteInducer();
   bindImageUpload();
   bindFollowButtons();
   initSidebarWidgets();
+  updateWriteInducer().catch(() => {});
 }
 
 export function initCommunity() {
@@ -1502,9 +1798,11 @@ export function initCommunity() {
   bindFeedTabs();
   bindCategoryTabs();
   bindWriteModal();
+  bindCommWriteInducer();
   bindImageUpload();
   bindFollowButtons();
   initSidebarWidgets();
+  updateWriteInducer().catch(() => {});
   if (tryBootShellPostDetail()) return;
   bindInfiniteScroll();
   loadFeed(true);
@@ -1522,6 +1820,10 @@ window.golmokCommunity = {
   openWriteOverlay,
   openWriteWithPhoto,
   renderPostList,
+  renderCommSkeleton,
+  loadHotHighlight,
+  updateWriteInducer,
+  bindCommWriteInducer,
   loadNeighborSection,
   loadHotPosts,
   loadPopularAreas,
