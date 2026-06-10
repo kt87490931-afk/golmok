@@ -14,6 +14,20 @@
     setTimeout(function () { t.classList.remove('show'); }, 2200);
   };
   window.startVoice = window.startVoice || function () { window.showToast('음성검색 준비 중입니다'); };
+  window.setQ = window.setQ || function (q) {
+    var inp = document.getElementById('ai-widget-input') || document.getElementById('ai-input');
+    if (inp) { inp.value = q; inp.focus(); }
+  };
+  window.doSearch = window.doSearch || function () {
+    var inp = document.getElementById('ai-widget-input') || document.getElementById('ai-input');
+    var v = inp && inp.value ? inp.value.trim() : '';
+    if (!v) return;
+    if (typeof window.sendAI === 'function' && document.getElementById('ai-input')) {
+      window.sendAI();
+      return;
+    }
+    window.location.href = 'analysis.html?q=' + encodeURIComponent(v);
+  };
   window.focusHeroSearch = window.focusHeroSearch || function () {
     var onHome = /index\.html$/.test(location.pathname) || /\/m\/?$/.test(location.pathname);
     if (!onHome) {

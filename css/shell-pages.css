@@ -27,22 +27,35 @@ body.gm-shell-loaded .fscroll.page-main-content {
 }
 
 /* 상권분석 — iframe 전체 높이 */
-body.gm-shell-analysis .gm-page-inner {
+body.gm-shell-analysis .main,
+body[data-gm-shell="analysis"] .main {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - var(--hd-h) - 24px);
+  min-height: calc(100dvh - var(--hd-h));
+  padding-bottom: 0;
 }
 
-body.gm-shell-analysis .sbiz-analysis-wrap {
+body.gm-shell-analysis .gm-page-inner,
+body[data-gm-shell="analysis"] .gm-page-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+}
+
+body.gm-shell-analysis .sbiz-analysis-wrap,
+body[data-gm-shell="analysis"] .sbiz-analysis-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-body.gm-shell-analysis .sbiz-iframe-shell {
+body.gm-shell-analysis .sbiz-iframe-shell,
+body[data-gm-shell="analysis"] .sbiz-iframe-shell {
   flex: 1;
-  min-height: 480px;
+  min-height: 500px;
 }
 
 body.gm-shell-analysis .analysis-tab-bar {

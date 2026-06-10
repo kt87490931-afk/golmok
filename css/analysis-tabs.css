@@ -183,9 +183,11 @@
   background: #fff;
 }
 
-.page-main-content:has(.sbiz-analysis-wrap) {
+.page-main-content:has(.sbiz-analysis-wrap),
+body[data-gm-shell="analysis"] .gm-page-inner:has(.sbiz-analysis-wrap),
+body.gm-shell-analysis .gm-page-inner:has(.sbiz-analysis-wrap) {
   padding: 0 !important;
-  height: calc(100vh - 56px);
+  height: calc(100dvh - var(--hd-h, 68px));
   overflow: hidden;
 }
 

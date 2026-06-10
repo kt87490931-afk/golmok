@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const VER = '20260656';
+const VER = '20260657';
 
 const PAGES = [
   { file: 'analysis.html', active: 'analysis', shell: 'analysis', isM: false },
@@ -113,7 +113,8 @@ function buildShell(active, shell, isM) {
   const header = setActiveNav(applyTokens(loadPartial('header-v3.html'), isM), active);
   const sidebar = setActiveNav(applyTokens(loadPartial('sidebar-v3.html'), isM), active);
   const tabs = applyTokens(loadPartial('mobile-tabs-v3.html'), isM);
-  return { header, sidebar, tabs };
+  const aside = isM ? '' : applyTokens(loadPartial('aside-v3.html'), isM);
+  return { header, sidebar, tabs, aside };
 }
 
 function mergeOne({ file, active, shell, isM }) {
@@ -138,8 +139,12 @@ function mergeOne({ file, active, shell, isM }) {
   if (!headM) return;
   const head = patchHead(headM[0], isM);
   const tail = extractTail(html);
-  const { header, sidebar, tabs } = buildShell(active, shell, isM);
-  const bodyCls = isM ? 'm-shell gm-shell-loaded' : 'gm-shell-loaded';
+  const { header, sidebar, tabs, aside } = buildShell(active, shell, isM);
+  const bodyCls = isM
+    ? 'm-shell gm-shell-loaded'
+    : shell === 'analysis'
+      ? 'gm-shell-loaded gm-shell-analysis'
+      : 'gm-shell-loaded';
 
   const js = isM ? '../js/' : 'js/';
   const out = `<!DOCTYPE html>
@@ -155,6 +160,7 @@ ${sidebar}
 ${inner}
 </div>
 </main>
+${aside}
 </div>
 
 ${tabs}
@@ -179,7 +185,7 @@ function mergeMinimal(file, active, isM) {
   if (!bodyM) return;
   let inner = bodyM[1]
     .replace(/<script type="module" src="[^"]*shell_loader\.js[^"]*"><\/script>\s*/g, '');
-  const { header, sidebar, tabs } = buildShell(active, 'minimal', isM);
+  const { header, sidebar, tabs, aside } = buildShell(active, 'minimal', isM);
   const js = isM ? '../js/' : 'js/';
   const bodyCls = isM ? 'm-shell gm-shell-loaded gm-shell-minimal' : 'gm-shell-loaded gm-shell-minimal';
   const out = `<!DOCTYPE html>
@@ -195,6 +201,7 @@ ${sidebar}
 ${inner.trim()}
 </div>
 </main>
+${isM ? '' : aside}
 </div>
 
 ${tabs}
@@ -205,8 +212,37 @@ ${tabs}
   console.log('MERGED MINIMAL', file);
 }
 
+/** 이미 v3 병합된 PC 페이지에 aside·분석 셸 클래스만 패치 */
+function patchExistingV3(file, shell) {
+  const fp = path.join(ROOT, file);
+  if (!fs.existsSync(fp)) return;
+  let html = fs.readFileSync(fp, 'utf8');
+  if (!html.includes('<header class="hd">') || html.includes('<aside class="aside">')) return;
+  const { aside } = buildShell(
+    PAGES.find((p) => p.file === file)?.active || 'home',
+    shell,
+    false,
+  );
+  html = html.replace(
+    /<\/main>\s*\n<\/div>\s*\n\n<nav class="mobile-tabs"/,
+    `</main>\n${aside}\n</div>\n\n<nav class="mobile-tabs"`,
+  );
+  if (shell === 'analysis' && !html.includes('gm-shell-analysis')) {
+    html = html.replace(/<body class="gm-shell-loaded"/, '<body class="gm-shell-loaded gm-shell-analysis"');
+  }
+  html = html.replace(/shell-pages\.css\?v=\d+/g, `shell-pages.css?v=${VER}`);
+  html = html.replace(/shell_globals\.js\?v=\d+/g, `shell_globals.js?v=${VER}`);
+  fs.writeFileSync(fp, html, 'utf8');
+  console.log('PATCHED V3', file);
+}
+
 for (const p of PAGES) mergeOne(p);
 mergeMinimal('profile.html', 'profile', false);
 mergeMinimal('post.html', 'post', false);
 mergeMinimal('m/profile.html', 'profile', true);
 mergeMinimal('m/post.html', 'post', true);
+
+// 이미 병합된 PC 페이지 aside 패치
+for (const p of PAGES.filter((x) => !x.isM)) patchExistingV3(p.file, p.shell);
+patchExistingV3('profile.html', 'minimal');
+patchExistingV3('post.html', 'minimal');

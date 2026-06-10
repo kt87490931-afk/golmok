@@ -94,6 +94,7 @@ function bindWriteModalFallback() {
 async function loadPartials(ctx, shellType) {
   const names = [...PARTIALS];
   if (shellType === 'home') names.push('modals-index-v3.html');
+  if (!ctx.isM) names.push('aside-v3.html');
   const htmls = await Promise.all(names.map((n) => fetchPartial(n, ctx)));
   const parts = {
     header: parseHtmlFragment(htmls[0]),
@@ -101,8 +102,13 @@ async function loadPartials(ctx, shellType) {
     mobileTabs: parseHtmlFragment(htmls[2]),
     modals: parseHtmlFragment(htmls[3]),
   };
-  if (shellType === 'home' && htmls[4]) {
-    parts.indexModals = parseHtmlFragment(htmls[4]);
+  let idx = 4;
+  if (shellType === 'home' && htmls[idx]) {
+    parts.indexModals = parseHtmlFragment(htmls[idx]);
+    idx += 1;
+  }
+  if (!ctx.isM && htmls[idx]) {
+    parts.aside = parseHtmlFragment(htmls[idx]);
   }
   return parts;
 }
@@ -139,7 +145,7 @@ function removeLegacyChrome() {
   }
 }
 
-function buildLayout(parts, contentSource, shellType) {
+function buildLayout(parts, contentSource, shellType, ctx) {
   const layout = document.createElement('div');
   layout.className = 'layout';
   layout.appendChild(parts.sidebar.cloneNode(true));
@@ -150,18 +156,25 @@ function buildLayout(parts, contentSource, shellType) {
     main.className = 'main';
     main.appendChild(contentSource);
     layout.appendChild(main);
+    if (!ctx?.isM && parts.aside) {
+      layout.appendChild(parts.aside.cloneNode(true));
+    }
   }
   return layout;
 }
 
 async function injectShell(parts, contentNode, opts = {}) {
-  const { shellType = 'standard', prependTo = document.body } = opts;
+  const { shellType = 'standard', prependTo = document.body, ctx = detectContext() } = opts;
   const header = parts.header.cloneNode(true);
   const anchor = prependTo.querySelector('#gm-page-tpl') || prependTo.firstElementChild;
   if (anchor) prependTo.insertBefore(header, anchor);
   else prependTo.appendChild(header);
 
-  const layout = buildLayout(parts, contentNode, shellType);
+  if (shellType === 'analysis') {
+    document.body.classList.add('gm-shell-analysis');
+  }
+
+  const layout = buildLayout(parts, contentNode, shellType, ctx);
   prependTo.appendChild(layout);
 
   if (!document.querySelector('.mobile-tabs')) {
@@ -194,7 +207,7 @@ async function modeTransform(ctx, parts, shellType) {
   removeLegacyChrome();
   removeEl?.remove();
   document.querySelector('main.center')?.remove();
-  await injectShell(parts, contentNode, { shellType });
+  await injectShell(parts, contentNode, { shellType, ctx });
   return true;
 }
 
@@ -213,7 +226,7 @@ async function modeTemplate(ctx, parts, shellType) {
       while (content.firstChild) inner.appendChild(content.firstChild);
       return inner;
     })();
-  await injectShell(parts, payload, { shellType });
+  await injectShell(parts, payload, { shellType, ctx });
   return true;
 }
 
@@ -228,7 +241,7 @@ async function modeMinimal(ctx, parts) {
       && !el.classList.contains('layout'),
   );
   movable.forEach((el) => inner.appendChild(el));
-  await injectShell(parts, inner, { shellType: 'minimal' });
+  await injectShell(parts, inner, { shellType: 'minimal', ctx });
   return true;
 }
 

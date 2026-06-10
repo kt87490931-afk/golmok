@@ -415,8 +415,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link rel="stylesheet" href="css/responsive.css?v=20260642">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/main-v3.css?v=20260656">
-<link rel="stylesheet" href="css/shell-pages.css?v=20260656">
+<link rel="stylesheet" href="css/main-v3.css?v=20260657">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260657">
 </head>
 <body class="gm-shell-loaded" data-gm-active="neighborhood" data-gm-shell="standard">
 
@@ -507,6 +507,70 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="main-content" id="shell-post-detail" style="display:none;"></div>
 </div>
 </main>
+<!-- ── 우측 위젯 (PC) ── -->
+<aside class="aside">
+
+  <!-- AI 위젯 -->
+  <div class="ai-widget">
+    <div class="ai-widget-hd">
+      <i class="ti ti-robot" style="color:var(--gold);font-size:16px"></i>
+      <span>골목대장 AI 검색</span>
+    </div>
+    <div class="ai-widget-sub">상권·창업 무엇이든 물어보세요</div>
+    <div class="ai-chips">
+      <span class="ai-chip" onclick="setQ('유동인구 많은 곳')">유동인구 많은 곳</span>
+      <span class="ai-chip" onclick="setQ('창업 성공률')">창업 성공률</span>
+      <span class="ai-chip" onclick="setQ('지원금 신청')">지원금 신청</span>
+    </div>
+    <div class="ai-inp-row">
+      <input type="text" placeholder="메시지 입력..." id="ai-widget-input"
+        onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){setQ(v);this.value='';doSearch();}}">
+      <button type="button" class="ai-send" id="ai-widget-send"
+        onclick="const v=document.getElementById('ai-widget-input')?.value?.trim();if(v){setQ(v);document.getElementById('ai-widget-input').value='';doSearch();}">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 인기 검색 상권 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-trending-up"></i> 인기 검색 상권
+      <span class="widget-more">더보기</span>
+    </div>
+    <div id="popular-areas-list-aside">
+      <div class="rank-row"><span class="rank-n">1</span><span class="rank-name">동탄 센트럴파크</span><span class="rank-tag up">급상승</span></div>
+      <div class="rank-row"><span class="rank-n">2</span><span class="rank-name">수원 행궁동</span><span class="rank-tag hot">인기</span></div>
+      <div class="rank-row"><span class="rank-n">3</span><span class="rank-name">화성 봉담읍</span><span class="rank-tag new">신규</span></div>
+      <div class="rank-row"><span class="rank-n">4</span><span class="rank-name">수원 인계동</span></div>
+      <div class="rank-row"><span class="rank-n">5</span><span class="rank-name">오산 세마동</span></div>
+    </div>
+  </div>
+
+  <!-- 지금 뜨는 글 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-flame"></i> 지금 뜨는 글
+      <a href="community.html" class="widget-more">전체보기</a>
+    </div>
+    <div id="hot-posts-list">
+      <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- 이웃 대장님 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-users"></i> 이웃 대장님
+      <span class="widget-more">더보기</span>
+    </div>
+    <div id="neighbor-list">
+      <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+    </div>
+  </div>
+
+</aside>
+
 </div>
 
 <nav class="mobile-tabs" aria-label="하단 메뉴">
@@ -532,7 +596,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </a>
   </div>
 </nav>
-<script src="js/shell_globals.js?v=20260656"></script>
+<script src="js/shell_globals.js?v=20260657"></script>
 
 <!-- 글쓰기 모달 -->
 <div class="modal-bg" id="write-modal">
@@ -685,27 +749,7 @@ function showToast(msg){
 
 // 글쓰기·피드·필터: community_ui.js
 
-// AI 채팅
-const aiInput=document.getElementById('ai-input');
-const aiSend=document.getElementById('ai-send');
-const aiMsgs=document.getElementById('ai-messages');
-const responses=['더 자세히 알려주세요!','소진공 데이터 기준으로 분석하고 있어요.','해당 업종의 상권 분석을 시작할게요.','잠시만요, 데이터를 불러오고 있어요...','좋은 질문이에요! 관련 정보를 찾아볼게요.'];
-function addMsg(text,isUser){
-  const div=document.createElement('div');
-  div.className=isUser?'musr':'mbot';
-  div.textContent=text;
-  aiMsgs.appendChild(div);
-  aiMsgs.scrollTop=aiMsgs.scrollHeight;
-}
-function sendAI(){
-  const val=aiInput.value.trim();
-  if(!val)return;
-  addMsg(val,true);
-  aiInput.value='';
-  setTimeout(()=>addMsg(responses[Math.floor(Math.random()*responses.length)],false),700);
-}
-aiSend.addEventListener('click',sendAI);
-aiInput.addEventListener('keydown',(e)=>{if(e.key==='Enter')sendAI();});
+// 레거시 rcol AI 제거 — 우측 위젯(ai-widget-input)·shell_globals 사용
 
 // 사이드바 네비 활성화
 document.querySelectorAll('.ni').forEach(ni=>{
