@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../css/main-v3.css?v=20260652">
-<link rel="stylesheet" href="../css/main-v3-m.css?v=20260652">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260653">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260653">
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
 </head><body class="m-shell">
 
@@ -380,27 +380,29 @@
 
 </div>
 
-<!-- 모바일 하단 탭바 -->
-<nav class="mobile-tabs">
-  <a href="index.html" class="mb-tab act">
-    <i class="ti ti-home"></i>
-    <span>홈</span>
-  </a>
-  <a href="analysis.html" class="mb-tab">
-    <i class="ti ti-map"></i>
-    <span>상권분석</span>
-  </a>
-  <button type="button" class="mb-tab mb-fab" id="write-btn-m">
-    <i class="ti ti-plus"></i>
-  </button>
-  <a href="index.html#hero" class="mb-tab" onclick="setTimeout(function(){focusHeroSearch()},80)">
-    <i class="ti ti-robot"></i>
-    <span>AI검색</span>
-  </a>
-  <a href="profile.html" class="mb-tab">
-    <i class="ti ti-user"></i>
-    <span>내정보</span>
-  </a>
+<!-- 모바일 하단 탭바 (인스타그램형 플로팅 캡슐) -->
+<nav class="mobile-tabs" aria-label="하단 메뉴">
+  <div class="mobile-tabs-pill">
+    <a href="index.html" class="mb-tab act" aria-label="홈">
+      <i class="ti ti-home"></i>
+      <span class="mb-tab-label">홈</span>
+    </a>
+    <a href="analysis.html" class="mb-tab" aria-label="상권분석">
+      <i class="ti ti-map"></i>
+      <span class="mb-tab-label">상권분석</span>
+    </a>
+    <button type="button" class="mb-tab mb-fab" id="write-btn-m" aria-label="글쓰기">
+      <i class="ti ti-plus"></i>
+    </button>
+    <a href="index.html#hero" class="mb-tab" aria-label="AI검색" onclick="setTimeout(function(){focusHeroSearch()},80)">
+      <i class="ti ti-robot"></i>
+      <span class="mb-tab-label">AI검색</span>
+    </a>
+    <a href="profile.html" class="mb-tab" aria-label="내정보">
+      <i class="ti ti-user"></i>
+      <span class="mb-tab-label">내정보</span>
+    </a>
+  </div>
 </nav>
 
 <!-- 글쓰기 모달 -->
