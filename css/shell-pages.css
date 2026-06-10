@@ -90,6 +90,16 @@ body.gm-shell-minimal .profile-page-wrap {
   max-width: 100%;
 }
 
+/* 미니멀 셸 (게시글·프로필) — 모바일 하단바 여백 */
+body.gm-shell-minimal.m-shell .profile-page-wrap,
+body.gm-shell-minimal.m-shell .post-page-wrap {
+  padding-bottom: calc(var(--bn-h, 56px) + env(safe-area-inset-bottom, 0px) + 16px) !important;
+}
+
+body.gm-shell-minimal.m-shell .gm-page-inner {
+  padding-bottom: calc(var(--bn-h, 56px) + env(safe-area-inset-bottom, 0px));
+}
+
 body.gm-shell-minimal.m-shell .pd-comment-bar {
   bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px));
   max-width: 430px;

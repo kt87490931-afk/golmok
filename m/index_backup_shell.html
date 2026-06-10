@@ -1,0 +1,612 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="google-site-verification" content="7_bUIeA-EHmgGeP9RFu_B3IodiO7-cQL3pBrrIuqqU4" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F5A623">
+<script src="js/desktop-route.js"></script>
+<title>골목대장 — 우리는 모두 골목대장, 데이터로 보는 상권의 힘</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260653">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260653">
+<link rel="icon" href="assets/gmlogo.png" type="image/png">
+</head><body class="m-shell">
+
+
+<!-- ── 헤더 ── -->
+<header class="hd">
+  <a href="index.html" class="hd-logo">
+    <img src="assets/gmlogo.png" alt="골목대장">
+    <div>
+      <div class="hd-logo-text">골목대장</div>
+      <div class="hd-logo-sub">
+        <span class="hd-logo-sub-pc">우리는 모두 골목대장, 데이터로 보는 상권의 힘</span>
+        <span class="hd-logo-sub-m">우리는 모두 골목대장,<br>데이터로 보는 상권의 힘</span>
+      </div>
+    </div>
+  </a>
+
+  <nav class="hd-nav">
+    <a href="index.html" class="act">홈</a>
+    <a href="analysis.html">상권분석</a>
+    <a href="analysis.html?tab=weather">창업기상도</a>
+    <a href="analysis.html?tab=hotplace">핫플레이스</a>
+    <a href="../policy.html">정책·지원</a>
+  </nav>
+
+  <div class="hd-right">
+    <div class="hd-search-btn" onclick="focusHeroSearch()">
+      <i class="ti ti-search"></i>
+      <span>상권, 업종, 질문 검색...</span>
+    </div>
+    <div class="icobtn nbadge" id="open-notifications" title="알림" style="position:relative"><i class="ti ti-bell"></i></div><button class="btn-voice" onclick="startVoice()">
+      <i class="ti ti-microphone"></i>
+      <span>음성검색</span>
+    </button>
+    <div class="hd-user" id="user-chip">
+      <div class="hd-user-av" id="user-pav">?</div>
+      <span id="user-pname" class="pname">로그인</span>
+      <i class="ti ti-chevron-down" style="font-size:13px;color:var(--gray-5)"></i>
+    </div>
+  </div>
+</header>
+
+<!-- ── 레이아웃 ── -->
+<div class="layout">
+
+<!-- 사이드바 -->
+<aside class="sidebar">
+  <div class="sb-sec">
+    <div class="sb-label">메뉴</div>
+    <a href="index.html" class="sb-a act">
+      <i class="ti ti-home"></i> 홈 피드
+    </a>
+    <a href="analysis.html" class="sb-a">
+      <i class="ti ti-map"></i> 상권분석
+    </a>
+    <a href="analysis.html?tab=weather" class="sb-a">
+      <i class="ti ti-cloud"></i> 창업기상도
+    </a>
+    <a href="analysis.html?tab=hotplace" class="sb-a">
+      <i class="ti ti-flame"></i> 핫플레이스
+    </a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-label">커뮤니티</div>
+    <a href="index.html" class="sb-a" id="nav-all">
+      <i class="ti ti-world"></i> 전체 게시판
+    </a>
+    <a href="index.html" class="sb-a" id="nav-dong">
+      <i class="ti ti-map-pin"></i> 우리동네
+    </a>
+    <a href="index.html" class="sb-a">
+      <i class="ti ti-tag"></i> 업종별
+    </a>
+    <a href="events.html" class="sb-a">
+      <i class="ti ti-speakerphone"></i> 이벤트·행사
+    </a>
+    <a href="../policy.html" class="sb-a">
+      <i class="ti ti-file-text"></i> 정책·지원
+    </a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-label">내 활동</div>
+    <a href="profile.html" class="sb-a" id="sb-profile-link"><div class="sb-av" id="sb-av" style="width:28px;height:28px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:4px">?</div>
+      <i class="ti ti-user"></i>
+      <span id="sb-name">로그인</span>
+    </a>
+    <a href="index.html" id="nav-my-posts" class="sb-a">
+      <i class="ti ti-pencil"></i> 내 게시글
+    </a>
+    <a href="index.html" id="nav-saved-posts" class="sb-a">
+      <i class="ti ti-bookmark"></i> 저장한 글
+    </a>
+    <a href="#" id="sb-logout" class="sb-a" style="display:none;color:var(--red)">
+      <i class="ti ti-logout" style="color:var(--red)"></i> 로그아웃
+    </a>
+  </div>
+</aside>
+
+<!-- ── 메인 ── -->
+<main class="main">
+
+  <!-- ① 히어로 — AI 검색 + 지도 배경 -->
+  <section class="hero" id="hero">
+    <div class="hero-map-bg"></div>
+    <iframe class="hero-map-iframe" id="hero-map-iframe"
+      src="about:blank"
+      title="상권지도 배경" allow="geolocation">
+    </iframe>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <i class="ti ti-robot" style="font-size:14px"></i>
+        <span>골목대장 AI 검색</span>
+      </div>
+      <h1 class="hero-title">
+        <em>상권·창업</em>, 무엇이든<br>물어보세요
+      </h1>
+      <p class="hero-sub">우리는 모두 골목대장, 데이터로 보는 상권의 힘</p>
+      <div class="hero-search">
+        <i class="ti ti-search" style="font-size:17px;color:#CCC;flex-shrink:0"></i>
+        <input type="text" id="ai-input"
+          placeholder="예: 동탄에서 카페 창업하면 어떨까요?"
+          onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="hero-search-go" onclick="doSearch()">분석하기</button>
+      </div>
+      <div class="hero-chips">
+        <div class="hero-chip" onclick="setQ('유동인구 많은 상권 찾아줘')">
+          <i class="ti ti-users"></i> 유동인구 많은 곳
+        </div>
+        <div class="hero-chip" onclick="setQ('음식점 창업 성공률 높은 동네')">
+          <i class="ti ti-chart-bar"></i> 창업 성공률
+        </div>
+        <div class="hero-chip" onclick="setQ('경쟁이 낮은 업종 추천해줘')">
+          <i class="ti ti-bulb"></i> 경쟁 낮은 업종
+        </div>
+        <div class="hero-chip" onclick="setQ('소상공인 지원금 신청 방법')">
+          <i class="ti ti-file-invoice"></i> 지원금 신청
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 빠른 상권분석 -->
+  <div class="quick-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-chart-dots"></i> 빠른 상권분석
+      </div>
+      <a href="analysis.html" class="sec-more">전체보기</a>
+    </div>
+    <div class="quick-grid">
+      <a href="analysis.html?tab=map" class="quick-item">
+        <div class="quick-icon">🗺️</div>
+        <div class="quick-name">상권지도</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=weather" class="quick-item">
+        <div class="quick-icon">🌤️</div>
+        <div class="quick-name">창업기상도</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=theme" class="quick-item">
+        <div class="quick-icon">📊</div>
+        <div class="quick-name">테마상권</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=store" class="quick-item">
+        <div class="quick-icon">🏪</div>
+        <div class="quick-name">업소현황</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=hotplace" class="quick-item">
+        <div class="quick-icon">🔥</div>
+        <div class="quick-name">핫플레이스</div>
+        <span class="q-live">LIVE</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ③ 통계 카드 -->
+  <div class="stat-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-map-pin"></i>
+        <span id="stat-region-label">우리동네 현황</span>
+      </div>
+      <span class="sec-more" onclick="changeRegion()">지역 변경</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card blue">
+        <div class="stat-lbl">
+          <i class="ti ti-users" style="color:var(--blue)"></i> 일 평균 유동인구
+        </div>
+        <div class="stat-val" id="sv-pop">31.6만명</div>
+        <div class="stat-ch up" id="sc-pop">▲ +17.7% 전월 대비</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-lbl">
+          <i class="ti ti-chart-bar" style="color:var(--gold)"></i> 월 평균 매출
+        </div>
+        <div class="stat-val" id="sv-rev">1,316만원</div>
+        <div class="stat-ch dn" id="sc-rev">▼ -2.2% 전년 대비</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-lbl">
+          <i class="ti ti-store" style="color:var(--red)"></i> 동종 업소수
+        </div>
+        <div class="stat-val" id="sv-store">175개</div>
+        <div class="stat-ch dn" id="sc-store">▼ -17.8% 전년 대비</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-lbl">
+          <i class="ti ti-heart-rate" style="color:var(--green)"></i> 창업 생존율
+        </div>
+        <div class="stat-val" id="sv-surv">68%</div>
+        <div class="stat-ch up" id="sc-surv">▲ +3% 전년 대비</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 인기상권 + AI 채팅 -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">
+        <i class="ti ti-trending-up"></i> 인기 검색 상권
+        <span class="card-more">더보기</span>
+      </div>
+      <div id="popular-areas-list">
+        <div class="rank-row"><span class="rank-n">1</span><span class="rank-name">동탄 센트럴파크</span><span class="rank-tag up">급상승</span></div>
+        <div class="rank-row"><span class="rank-n">2</span><span class="rank-name">수원 행궁동</span><span class="rank-tag hot">인기</span></div>
+        <div class="rank-row"><span class="rank-n">3</span><span class="rank-name">화성 봉담읍</span><span class="rank-tag new">신규</span></div>
+        <div class="rank-row"><span class="rank-n">4</span><span class="rank-name">수원 인계동</span></div>
+        <div class="rank-row"><span class="rank-n">5</span><span class="rank-name">오산 세마동</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <i class="ti ti-robot"></i> AI 검색 미리보기
+      </div>
+      <div class="chat-msgs" id="ai-messages">
+        <div class="chat-b ai">안녕하세요 대장님! 상권·창업에 대해 궁금한 것 물어보세요.</div>
+        <div class="chat-b user">유동인구 많은 곳 찾아줘</div>
+        <div class="chat-b ai">업종이 어떻게 되세요? 음식점, 카페, 소매 중 선택해 주시면 맞춤 분석 드릴게요!</div>
+      </div>
+      <div class="chat-inp">
+        <input type="text" placeholder="메시지 입력..." id="ai-input-preview"
+          onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){setQ(v);this.value='';doSearch();}}">
+        <button type="button" class="chat-send" id="ai-send-preview" onclick="doSearch()">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 이벤트·이슈 -->
+  <div class="evt-wrap" id="event-section">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-speakerphone"></i> 이번 주 이벤트·이슈
+        <span class="event-count-badge" style="background:#E8F8F0;color:var(--green);font-size:11px;
+          padding:2px 8px;border-radius:8px;font-weight:700;margin-left:4px;">4</span>
+      </div>
+      <a href="events.html" class="sec-more">전체보기</a>
+    </div>
+    <div class="evt-grid" id="event-grid">
+      <div class="evt-card">
+        <div class="evt-top" style="background:#FFF8E7">
+          <span class="evt-chip" style="background:var(--gold)">할인이벤트</span>
+          <div class="evt-dday" style="color:var(--red)">D-3</div>
+          <div class="evt-name">오픈 1주년 기념 전 메뉴 20% 할인</div>
+        </div>
+        <div class="evt-bot">동탄 맛있는 김밥집 · ~06.04</div>
+      </div>
+      <div class="evt-card">
+        <div class="evt-top" style="background:#E8F8F0">
+          <span class="evt-chip" style="background:var(--green)">공동구매</span>
+          <div class="evt-dday" style="color:var(--green)">모집중</div>
+          <div class="evt-name">식자재 공동구매 대장님 모집</div>
+        </div>
+        <div class="evt-bot">동탄 대장님 모임 · ~06.08</div>
+      </div>
+      <div class="evt-card">
+        <div class="evt-top" style="background:#FFF1F1">
+          <span class="evt-chip" style="background:var(--red)">이슈</span>
+          <div class="evt-dday" style="color:var(--red)">진행중</div>
+          <div class="evt-name">도로공사로 인한 접근성 차단 문제</div>
+        </div>
+        <div class="evt-bot">동탄 센트럴 상가 · 진행중</div>
+      </div>
+      <div class="evt-card">
+        <div class="evt-top" style="background:#EBF4FF">
+          <span class="evt-chip" style="background:var(--blue)">모임·행사</span>
+          <div class="evt-dday" style="color:var(--blue)">D-8</div>
+          <div class="evt-name">동탄 소상공인 네트워킹 모임</div>
+        </div>
+        <div class="evt-bot">동탄2 커뮤니티센터 · 06.10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 커뮤니티 피드 -->
+  <div class="feed-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-messages"></i> 대장님들의 이야기
+      </div>
+      <a href="index.html" class="sec-more">전체보기</a>
+    </div>
+
+    <!-- 글쓰기 바 -->
+    <div class="write-bar">
+      <div class="write-av" id="wr-av">?</div>
+      <div class="write-ph" id="open-write" style="cursor:pointer">대장님들과 이야기를 나눠보세요...</div>
+      <div class="write-acts">
+        <span class="write-act" id="feed-photo-btn" style="cursor:pointer"><i class="ti ti-photo"></i> 사진</span>
+        <span class="write-act"><i class="ti ti-map-pin"></i> 위치</span>
+      </div>
+      <button type="button" class="btn-post" id="open-write-btn">게시하기</button>
+    </div>
+
+    <!-- 피드 탭 -->
+    <div class="feed-tabs">
+      <button type="button" class="feed-tab" id="tab-all">전체글</button><button type="button" class="feed-tab act" id="tab-dong">우리동네</button>
+    </div>
+
+    <!-- 동네 범위 (모바일) -->
+    <div class="m-range-wrap" id="rbar">
+      <div class="seg-control" id="seg-control">
+        <div class="seg-slider pos-0" id="seg-slider"></div>
+        <button type="button" class="seg-btn active" data-idx="0" data-r="우리동네" data-desc="내가 설정한 동네의 게시글만 표시됩니다.">
+          <i class="ti ti-home"></i>
+          <span class="seg-btn-label">우리동네</span>
+        </button>
+        <button type="button" class="seg-btn" data-idx="1" data-r="인근동네" data-desc="우리동네 + 주변 인근 동네 게시글이 함께 표시됩니다.">
+          <i class="ti ti-map-2"></i>
+          <span class="seg-btn-label">인근 동네</span>
+        </button>
+        <button type="button" class="seg-btn" data-idx="2" data-r="전체지역" data-desc="전국 모든 소상공인 대장님들의 게시글이 표시됩니다.">
+          <i class="ti ti-world"></i>
+          <span class="seg-btn-label">전체 지역</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 게시글 목록 -->
+    <div class="feed-post-shell"><div class="cat-tabs feed-cats"><button type="button" class="cat-tab ct act" data-cat="all">전체</button><button type="button" class="cat-tab ct" data-cat="qna">질문·고민</button><button type="button" class="cat-tab ct" data-cat="info">정보공유</button><button type="button" class="cat-tab ct" data-cat="startup">창업준비</button><button type="button" class="cat-tab ct" data-cat="issue">이슈</button><button type="button" class="cat-tab ct" data-cat="event">이벤트</button></div><div id="post-list"></div></div>
+
+    <!-- 모바일 전용 위젯 (사이드바 대체) -->
+    <div class="m-widgets">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-flame"></i> 지금 뜨는 글</div>
+        <div id="hot-posts-list">
+          <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-users"></i> 이웃 대장님</div>
+        <div id="neighbor-list">
+          <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</div>
+
+<!-- 모바일 하단 탭바 (인스타그램형 플로팅 캡슐) -->
+<nav class="mobile-tabs" aria-label="하단 메뉴">
+  <div class="mobile-tabs-pill">
+    <a href="index.html" class="mb-tab act" aria-label="홈">
+      <i class="ti ti-home"></i>
+      <span class="mb-tab-label">홈</span>
+    </a>
+    <a href="analysis.html" class="mb-tab" aria-label="상권분석">
+      <i class="ti ti-map"></i>
+      <span class="mb-tab-label">상권분석</span>
+    </a>
+    <button type="button" class="mb-tab mb-fab" id="write-btn-m" aria-label="글쓰기">
+      <i class="ti ti-plus"></i>
+    </button>
+    <a href="index.html#hero" class="mb-tab" aria-label="AI검색" onclick="setTimeout(function(){focusHeroSearch()},80)">
+      <i class="ti ti-robot"></i>
+      <span class="mb-tab-label">AI검색</span>
+    </a>
+    <a href="profile.html" class="mb-tab" aria-label="내정보">
+      <i class="ti ti-user"></i>
+      <span class="mb-tab-label">내정보</span>
+    </a>
+  </div>
+</nav>
+
+<!-- 글쓰기 모달 -->
+<div class="modal-bg" id="write-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">게시글 작성</span>
+      <button class="modal-close" id="close-modal"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="write-cats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+      <button type="button" class="cat-select-btn" data-cat="info">정보공유</button>
+      <button type="button" class="cat-select-btn act" data-cat="qna">질문·고민</button>
+      <button type="button" class="cat-select-btn" data-cat="startup">창업준비</button>
+      <button type="button" class="cat-select-btn" data-cat="issue">이슈</button>
+      <button type="button" class="cat-select-btn" data-cat="event">이벤트</button>
+    </div>
+    <input id="post-title" type="text" placeholder="제목 (선택)" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:8px;outline:none;font-family:inherit;">
+    <textarea id="post-content" placeholder="대장님들과 이야기를 나눠보세요..."></textarea>
+    <div id="write-auto-tags" class="write-auto-tags"></div>
+    <input type="file" id="image-file-input" accept="image/*" multiple style="display:none;">
+    <div id="image-preview-wrap" style="display:none;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
+    <div id="event-date-wrap" style="display:none;margin-top:8px;">
+      <label style="font-size:12px;color:var(--text3);">이벤트 종료일</label>
+      <input id="event-end-date" type="date" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;margin-top:4px;">
+    </div>
+    <div class="modal-acts">
+      <button type="button" class="mab" id="btn-photo-upload"><i class="ti ti-photo"></i> 사진 <span id="image-count" style="color:#F5A623;"></span></button>
+      <button type="button" class="mab" id="btn-location-tag"><i class="ti ti-map-pin"></i> 위치</button>
+      <button type="button" class="mab" id="btn-upjong-tag"><i class="ti ti-tag"></i> 업종태그</button>
+      <button class="mab"><i class="ti ti-speakerphone"></i> 이벤트</button>
+      <button class="modal-submit" id="submit-post">게시하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function openWriteModalSafe() {
+    document.getElementById('write-modal')?.classList.add('open');
+  }
+  function bindWriteFallback() {
+    document.getElementById('open-write')?.addEventListener('click', openWriteModalSafe);
+    document.getElementById('open-write-btn')?.addEventListener('click', openWriteModalSafe);
+    document.getElementById('feed-photo-btn')?.addEventListener('click', function () {
+      openWriteModalSafe();
+      setTimeout(function () {
+        document.getElementById('image-file-input')?.click();
+      }, 120);
+    });
+    document.getElementById('close-modal')?.addEventListener('click', function () {
+      document.getElementById('write-modal')?.classList.remove('open');
+    });
+    document.getElementById('write-modal')?.addEventListener('click', function (e) {
+      if (e.target.id === 'write-modal') e.target.classList.remove('open');
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindWriteFallback);
+  else bindWriteFallback();
+})();
+</script>
+
+<!-- 내 게시글 / 저장한 글 -->
+<div class="modal-bg" id="my-activity-overlay">
+  <div class="activity-modal-panel" style="background:#fff;width:100%;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="width:36px;height:4px;background:#E8E4DC;border-radius:4px;margin:16px auto 0;"></div>
+    <div style="padding:16px 20px;border-bottom:1px solid #E8E4DC;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:16px;font-weight:700;">내 활동</div>
+      <button type="button" id="close-activity-overlay" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
+    </div>
+    <div style="display:flex;border-bottom:1px solid #E8E4DC;">
+      <button type="button" class="activity-tab act" data-tab="my-posts" style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;border-bottom:2px solid #F5A623;color:#C17F24;">내 게시글</button>
+      <button type="button" class="activity-tab" data-tab="saved-posts" style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:14px;color:#999;border-bottom:2px solid transparent;">저장한 글</button>
+    </div>
+    <div id="activity-list" style="flex:1;overflow-y:auto;padding:12px 16px;"></div>
+  </div>
+</div>
+
+<!-- 상권분석 Mock -->
+<div class="modal-bg" id="analysis-overlay">
+  <div class="analysis-modal-panel" style="background:#fff;padding:20px;margin:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:17px;font-weight:700;"><i class="ti ti-map"></i> 상권분석</div>
+      <button type="button" id="close-analysis-overlay" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="analysis-wizard">
+      <div id="analysis-wizard-body"></div>
+    </div>
+    <div id="analysis-result" style="display:none;">
+      <div style="width:100%;height:360px;border-radius:14px;overflow:hidden;border:1px solid #E8E4DC;margin-bottom:16px;position:relative;">
+        <iframe id="analysis-map-iframe" style="width:100%;height:100%;border:none;display:none;" title="소진공 상권지도" loading="lazy" allow="geolocation"></iframe>
+        <div id="analysis-map-loading" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F7F3EB;color:#999;font-size:14px;">지도를 불러오는 중...</div>
+      </div>
+      <div id="theme-analysis-wrap"></div>
+      <div style="background:#FFF8E7;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid #FAC775;">
+        <div style="font-size:12px;color:#8B5A10;margin-bottom:4px;">분석 조건</div>
+        <div id="analysis-condition" style="font-size:14px;font-weight:700;color:#C17F24;"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div style="background:#EBF4FF;border-radius:12px;padding:14px;border:1px solid #C5DFFF;">
+          <div style="font-size:11px;color:#378ADD;margin-bottom:4px;"><i class="ti ti-users"></i> 일 평균 유동인구</div>
+          <div id="stat-population" style="font-size:22px;font-weight:700;"></div>
+          <div id="stat-population-change" style="font-size:11px;margin-top:3px;"></div>
+        </div>
+        <div style="background:#FFF8E7;border-radius:12px;padding:14px;border:1px solid #FAC775;">
+          <div style="font-size:11px;color:#C17F24;margin-bottom:4px;"><i class="ti ti-chart-bar"></i> 월 평균 매출</div>
+          <div id="stat-revenue" style="font-size:22px;font-weight:700;"></div>
+          <div id="stat-revenue-change" style="font-size:11px;margin-top:3px;"></div>
+        </div>
+        <div style="background:#FFF1F1;border-radius:12px;padding:14px;border:1px solid #FFD0D0;grid-column:1/-1;">
+          <div style="font-size:11px;color:#E24B4A;margin-bottom:4px;"><i class="ti ti-store"></i> 동종 업소수</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div id="stat-stores" style="font-size:22px;font-weight:700;"></div>
+            <div id="stat-stores-change" style="font-size:11px;"></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid #E8E4DC;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">⏰ 시간대별 유동인구</div>
+        <div id="hourly-chart" style="display:flex;gap:6px;align-items:flex-end;height:80px;"></div>
+        <div id="peak-info" style="font-size:12px;color:#555;margin-top:10px;padding:8px 12px;background:#FFF8E7;border-radius:8px;"></div>
+      </div>
+      <div style="background:linear-gradient(135deg,#F5A623,#E8920E);border-radius:12px;padding:14px;">
+        <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;"><i class="ti ti-robot"></i> 골목대장 AI 분석 <span id="analysis-mode-badge" style="background:rgba(255,255,255,.25);padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;">...</span></div>
+        <div id="ai-comment" style="font-size:13px;color:#fff;line-height:1.7;"></div>
+      </div>
+      <button type="button" id="btn-reset-analysis" style="width:100%;margin-top:12px;background:#fff;border:1px solid #E8E4DC;border-radius:12px;padding:12px;font-size:14px;color:#555;cursor:pointer;"><i class="ti ti-search"></i> 다시 검색</button>
+    </div>
+  </div>
+</div>
+
+<!-- 알림 -->
+<div class="modal-bg" id="notification-overlay">
+  <div class="notification-modal-panel">
+    <div style="padding:16px 20px;border-bottom:1px solid #E8E4DC;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div style="font-size:16px;font-weight:700;"><i class="ti ti-bell"></i> 알림</div>
+      <button type="button" id="close-notification-overlay" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="notification-list" style="flex:1;overflow-y:auto;padding:12px 20px;"></div>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// AI 채팅 미리보기
+const aiMsgs = document.getElementById('ai-messages');
+const aiResponses = ['더 자세히 알려주세요!', '소진공 데이터 기준으로 분석하고 있어요.', '해당 업종의 상권 분석을 시작할게요.', '잠시만요, 데이터를 불러오고 있어요...', '좋은 질문이에요! 관련 정보를 찾아볼게요.'];
+function addAiMsg(text, isUser) {
+  if (!aiMsgs) return;
+  const div = document.createElement('div');
+  div.className = isUser ? 'chat-b user' : 'chat-b ai';
+  div.textContent = text;
+  aiMsgs.appendChild(div);
+  aiMsgs.scrollTop = aiMsgs.scrollHeight;
+}
+window.sendAI = function () {
+  const val = document.getElementById('ai-input')?.value?.trim();
+  if (!val) return;
+  addAiMsg(val, true);
+  document.getElementById('ai-input').value = '';
+  setTimeout(() => addAiMsg(aiResponses[Math.floor(Math.random() * aiResponses.length)], false), 700);
+};
+document.getElementById('ai-send-preview')?.addEventListener('click', () => window.doSearch?.());
+document.getElementById('write-btn-m')?.addEventListener('click', () => document.getElementById('open-write')?.click());
+</script>
+<script type="module" src="js/profile_ui.js?v=20260649"></script>
+<script type="module" src="js/auth.js?v=20260649"></script>
+<script type="module" src="js/community_ui.js?v=20260649"></script>
+<script type="module" src="js/analysis.js?v=20260649"></script>
+<script type="module" src="js/notifications_ui.js?v=20260649"></script>
+<script type="module" src="js/fcm.js?v=20260649"></script>
+<script type="module">
+import { getApiKey } from './js/api-config.js';
+async function loadHeroMap() {
+  const iframe = document.getElementById('hero-map-iframe');
+  if (!iframe) return;
+  const certKey = await getApiKey('SOJANGGONG_STARTUP_KEY');
+  if (certKey && !certKey.startsWith('YOUR_')) {
+    iframe.src = `https://bigdata.sbiz.or.kr/#/openApi/startupPublic?certKey=${encodeURIComponent(certKey)}`;
+  }
+}
+loadHeroMap();
+window.setQ = function (q) {
+  const inp = document.getElementById('ai-input');
+  if (inp) { inp.value = q; inp.focus(); }
+};
+window.doSearch = function () {
+  const v = document.getElementById('ai-input')?.value?.trim();
+  if (v && window.sendAI) window.sendAI();
+  else if (v) document.querySelector('[data-open-analysis]')?.click();
+};
+window.focusHeroSearch = function () {
+  document.getElementById('ai-input')?.focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+window.startVoice = function () { showToast('음성검색 준비 중입니다'); };
+window.changeRegion = function () { showToast('지역 변경은 프로필 설정에서 가능합니다'); };
+</script>
+</body>
+</html>
