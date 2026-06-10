@@ -20,8 +20,8 @@ body.m-shell .layout {
   grid-template-columns: 1fr !important;
   grid-template-areas: 'main' !important;
   padding-top: 0 !important;
-  padding-bottom: var(--bn-h);
-  min-height: calc(100dvh - var(--bn-h));
+  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px)) !important;
+  min-height: calc(100dvh - var(--bn-h) - env(safe-area-inset-bottom, 0px));
 }
 
 body.m-shell .main {
@@ -311,8 +311,4 @@ body.m-shell .m-range-wrap .seg-btn.active .seg-btn-label {
 
 body.m-shell .toast {
   bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px) + 12px);
-}
-
-body.m-shell .layout {
-  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px)) !important;
 }
