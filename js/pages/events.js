@@ -1,5 +1,5 @@
-﻿import { getEventsByType } from '../community.js?v=20260664';
-import { openPostDetail, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js';
+﻿import { getEventsByType } from '../community.js?v=20260665';
+import { openPostDetail, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js?v=20260665';
 import { initPageShell, bootPage } from '../page_common.js';
 
 let currentEventType = 'all';

@@ -20,7 +20,7 @@ import {
   getFollowingIds,
   getHotPosts,
   getPopularAreas,
-} from './community.js?v=20260624';
+} from './community.js?v=20260665';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
 import { waitForShell } from './shell_boot.js';
@@ -989,6 +989,7 @@ export async function renderPostList(posts, containerId, { reset = true, append 
   if (!container) return;
 
   const useV2 = usesV2Cards(container);
+  const list = Array.isArray(posts) ? posts : [];
 
   if (skeleton && reset) {
     renderCommSkeleton(container);
@@ -996,7 +997,7 @@ export async function renderPostList(posts, containerId, { reset = true, append 
   }
 
   if (reset && !append) {
-    if (!posts?.length) {
+    if (!list.length) {
       container.innerHTML = useV2
         ? renderCommEmptyHtml()
         : `<div style="padding:40px;text-align:center;color:#999;background:#fff;">
@@ -1013,12 +1014,20 @@ export async function renderPostList(posts, containerId, { reset = true, append 
     container.innerHTML = '';
   }
 
-  if (!posts?.length) return;
+  if (!list.length) return;
 
-  const liked = await getLikedPostIds(posts.map((p) => p.id));
-  const saved = await getBookmarkedPostIds(posts.map((p) => p.id));
-  const makeCard = useV2 ? createPostCardV2 : createPostCard;
-  posts.forEach((post) => container.appendChild(makeCard(post, liked, saved, containerId)));
+  try {
+    const liked = await getLikedPostIds(list.map((p) => p.id));
+    const saved = await getBookmarkedPostIds(list.map((p) => p.id));
+    const makeCard = useV2 ? createPostCardV2 : createPostCard;
+    list.forEach((post) => container.appendChild(makeCard(post, liked, saved, containerId)));
+  } catch (e) {
+    console.error('renderPostList', e);
+    if (reset) {
+      container.innerHTML =
+        '<div style="padding:32px;text-align:center;color:#E24B4A;background:#fff;">게시글 표시 중 오류가 발생했습니다.</div>';
+    }
+  }
 }
 
 export function openPostDetail(postId) {

@@ -1,11 +1,11 @@
-﻿import { getAllPosts } from '../community.js?v=20260664';
+﻿import { getAllPosts } from '../community.js?v=20260665';
 import {
   renderPostList,
   renderCommSkeleton,
   loadHotHighlight,
   updateWriteInducer,
   bindCommWriteInducer,
-} from '../community_ui.js';
+} from '../community_ui.js?v=20260665';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
 import { waitForShell } from '../shell_boot.js';
 
@@ -17,17 +17,25 @@ let currentPage = 0;
 let isLoading = false;
 let hasMore = true;
 
+function normalizePosts(result) {
+  if (Array.isArray(result)) return result;
+  if (result && Array.isArray(result.posts)) return result.posts;
+  return [];
+}
+
 async function loadCommunityFeed(reset = true) {
   if (isLoading) return;
   isLoading = true;
 
-  if (reset) {
-    currentPage = 0;
-    hasMore = true;
-    renderCommSkeleton('community-post-list');
-  }
+  const listEl = document.getElementById('community-post-list');
 
   try {
+    if (reset) {
+      currentPage = 0;
+      hasMore = true;
+      renderCommSkeleton('community-post-list');
+    }
+
     const result = await getAllPosts({
       category: currentCategory,
       page: currentPage,
@@ -36,8 +44,8 @@ async function loadCommunityFeed(reset = true) {
       withCount: reset,
     });
 
-    const posts = result.posts ?? result;
-    const totalCount = result.count;
+    const posts = normalizePosts(result);
+    const totalCount = Array.isArray(result) ? null : result?.count;
 
     if (reset && totalCount != null) {
       const totalEl = document.getElementById('post-total-count');
@@ -48,14 +56,14 @@ async function loadCommunityFeed(reset = true) {
     hasMore = posts.length >= 20;
     if (hasMore) currentPage += 1;
   } catch (e) {
-    console.error(e);
-    if (reset) {
-      document.getElementById('community-post-list').innerHTML =
-        '<div style="padding:32px;text-align:center;color:#E24B4A;background:#fff;">게시글을 불러오지 못했습니다.</div>';
+    console.error('loadCommunityFeed', e);
+    if (reset && listEl) {
+      listEl.innerHTML =
+        '<div style="padding:32px;text-align:center;color:#E24B4A;background:#fff;">게시글을 불러오지 못했습니다.<br><span style="font-size:12px;color:#999;margin-top:8px;display:block;">새로고침 후 다시 시도해주세요.</span></div>';
     }
+  } finally {
+    isLoading = false;
   }
-
-  isLoading = false;
 }
 
 function bindCategoryTabs() {
@@ -105,7 +113,7 @@ async function startCommunityPage() {
   loadHotHighlight().catch(() => {});
 
   if (!initialPostId) {
-    loadCommunityFeed(true);
+    await loadCommunityFeed(true);
     bindInfiniteScroll(() => {
       if (hasMore && !isLoading) loadCommunityFeed(false);
     });
@@ -116,4 +124,13 @@ async function startCommunityPage() {
   });
 }
 
-bootPage(startCommunityPage);
+bootPage(() => {
+  startCommunityPage().catch((e) => {
+    console.error('startCommunityPage', e);
+    const listEl = document.getElementById('community-post-list');
+    if (listEl) {
+      listEl.innerHTML =
+        '<div style="padding:32px;text-align:center;color:#E24B4A;background:#fff;">게시판을 초기화하지 못했습니다. 페이지를 새로고침해주세요.</div>';
+    }
+  });
+});

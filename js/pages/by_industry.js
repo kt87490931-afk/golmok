@@ -1,8 +1,8 @@
-﻿import { getPostsByIndustry } from '../community.js?v=20260664';
-import { renderPostList, renderCommSkeleton, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js';
+﻿import { getPostsByIndustry } from '../community.js?v=20260665';
+import { renderPostList, renderCommSkeleton, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js?v=20260665';
 import { initPageShell, bootPage } from '../page_common.js';
 import { loadStoreStatus } from '../store-status.js?v=20260629';
-import { getCurrentUser, getUserProfile } from '../community.js?v=20260664';
+import { getCurrentUser, getUserProfile } from '../community.js?v=20260665';
 
 let selectedIndustryCode = '';
 let userRegionFull = '경기 화성시 동탄2동';

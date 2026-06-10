@@ -76,15 +76,17 @@ export async function getAllPosts({
   if (sort === 'popular') {
     query = query.order('like_count', { ascending: false });
   } else {
-    query = query.order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
+    query = query.order('created_at', { ascending: false });
   }
 
   query = query.range(page * limit, (page + 1) * limit - 1);
 
   const { data, error, count } = await query;
   if (error) throw error;
-  if (withCount) return { posts: data || [], count: count ?? (data?.length ?? 0) };
-  return data || [];
+
+  const posts = data || [];
+  if (withCount) return { posts, count: count ?? posts.length };
+  return posts;
 }
 
 export async function getDongPosts({ regionDong, category = 'all', page = 0, limit = 20 }) {

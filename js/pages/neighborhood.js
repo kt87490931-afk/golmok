@@ -1,5 +1,5 @@
-﻿import { getCurrentUser, getUserProfile, getDongPosts, getSigunguPosts, getAllPosts, getEventPosts } from '../community.js?v=20260664';
-import { renderPostList, renderCommSkeleton, openPostDetail, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js';
+﻿import { getCurrentUser, getUserProfile, getDongPosts, getSigunguPosts, getAllPosts, getEventPosts } from '../community.js?v=20260665';
+import { renderPostList, renderCommSkeleton, openPostDetail, bindCommWriteInducer, updateWriteInducer } from '../community_ui.js?v=20260665';
 import { initPageShell, bootPage } from '../page_common.js';
 
 let rangeType = 'dong';
