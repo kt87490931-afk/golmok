@@ -6,6 +6,13 @@
 -- ② 테마상권 분석      →  SOJANGGONG_HPREPORT_KEY   →  /openApi/hpReport
 -- ③ 상권지도           →  SOJANGGONG_STARTUP_KEY    →  /openApi/startupPublic
 -- ④ 업소현황           →  SOJANGGONG_STORSTTUS_KEY  →  /openApi/storSttus
+-- ⑤ 간단분석           →  SOJANGGONG_SIMPLE_KEY     →  /openApi/simple
+-- ⑥ SNS 분석           →  SOJANGGONG_SNS_KEY        →  /openApi/snsAnaly
+-- ⑦ 배달분석           →  SOJANGGONG_DELIVERY_KEY   →  /openApi/delivery
+-- ⑧ 상세분석           →  SOJANGGONG_DETAIL_KEY     →  /openApi/detail
+-- ⑨ 관광 축제 정보     →  SOJANGGONG_TOUR_KEY       →  /openApi/tour
+-- ⑩ 업력현황           →  SOJANGGONG_STCARSTTUS_KEY  →  /openApi/stcarSttus
+-- ⑪ 점포당 매출 추이   →  SOJANGGONG_SLSIDEX_KEY    →  /openApi/slsIdex
 --
 -- 실행 순서:
 --   1) 이 파일 전체 실행 (테이블 생성)
@@ -51,7 +58,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.get_admin_app_settings() TO authenticated;
 
--- 로그인 사용자: RPC로만 소진공 설정 조회 (테이블 직접 SELECT 불가)
+-- 비로그인 포함: 소상공인365 iframe용 키만 RPC로 조회 (테이블 직접 SELECT 불가)
 CREATE OR REPLACE FUNCTION public.get_sojanggong_settings()
 RETURNS TABLE(key TEXT, value TEXT)
 LANGUAGE sql
@@ -61,11 +68,10 @@ STABLE
 AS $$
   SELECT s.key, s.value
   FROM public.app_settings s
-  WHERE s.key LIKE 'SOJANGGONG_%'
-    AND auth.uid() IS NOT NULL;
+  WHERE s.key LIKE 'SOJANGGONG_%';
 $$;
 
-GRANT EXECUTE ON FUNCTION public.get_sojanggong_settings() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_sojanggong_settings() TO anon, authenticated;
 
 -- 초기 행 (키 값은 Supabase 대시보드에서 REPLACE_* 를 실제 발급 키로 교체 후 실행)
 INSERT INTO public.app_settings (key, value, description, is_secret)
@@ -74,6 +80,13 @@ VALUES
   ('SOJANGGONG_HPREPORT_KEY', 'YOUR_HPREPORT_KEY', '② 테마상권 분석 (hpReport) 인증키', true),
   ('SOJANGGONG_STARTUP_KEY', 'YOUR_STARTUP_KEY', '③ 상권지도 (startupPublic) 인증키', true),
   ('SOJANGGONG_STORSTTUS_KEY', 'YOUR_STORSTTUS_KEY', '④ 업소현황 (storSttus) 인증키', true),
+  ('SOJANGGONG_SIMPLE_KEY', 'YOUR_SIMPLE_KEY', '⑤ 간단분석 (simple) 인증키', true),
+  ('SOJANGGONG_SNS_KEY', 'YOUR_SNS_KEY', '⑥ SNS 분석 (snsAnaly) 인증키', true),
+  ('SOJANGGONG_DELIVERY_KEY', 'YOUR_DELIVERY_KEY', '⑦ 배달분석 (delivery) 인증키', true),
+  ('SOJANGGONG_DETAIL_KEY', 'YOUR_DETAIL_KEY', '⑧ 상세분석 (detail) 인증키', true),
+  ('SOJANGGONG_TOUR_KEY', 'YOUR_TOUR_KEY', '⑨ 관광 축제 정보 (tour) 인증키', true),
+  ('SOJANGGONG_STCARSTTUS_KEY', 'YOUR_STCARSTTUS_KEY', '⑩ 업력현황 (stcarSttus) 인증키', true),
+  ('SOJANGGONG_SLSIDEX_KEY', 'YOUR_SLSIDEX_KEY', '⑪ 점포당 매출액 추이 (slsIdex) 인증키', true),
   ('SOJANGGONG_API_ENABLED', 'true', 'API 전체 ON/OFF (true/false)', false),
   ('SOJANGGONG_API_MODE', 'mock', '데이터 모드: mock 또는 real', false)
 ON CONFLICT (key) DO NOTHING;

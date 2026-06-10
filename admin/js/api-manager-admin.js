@@ -5,6 +5,13 @@ const API_META = {
   SOJANGGONG_HPREPORT_KEY: { label: '② 테마상권 분석', endpoint: 'hpReport' },
   SOJANGGONG_STARTUP_KEY: { label: '③ 상권지도', endpoint: 'startupPublic' },
   SOJANGGONG_STORSTTUS_KEY: { label: '④ 업소현황', endpoint: 'storSttus' },
+  SOJANGGONG_SIMPLE_KEY: { label: '⑤ 간단분석', endpoint: 'simple' },
+  SOJANGGONG_SNS_KEY: { label: '⑥ SNS 분석', endpoint: 'snsAnaly' },
+  SOJANGGONG_DELIVERY_KEY: { label: '⑦ 배달분석', endpoint: 'delivery' },
+  SOJANGGONG_DETAIL_KEY: { label: '⑧ 상세분석', endpoint: 'detail' },
+  SOJANGGONG_TOUR_KEY: { label: '⑨ 관광 축제 정보', endpoint: 'tour' },
+  SOJANGGONG_STCARSTTUS_KEY: { label: '⑩ 업력현황', endpoint: 'stcarSttus' },
+  SOJANGGONG_SLSIDEX_KEY: { label: '⑪ 점포당 매출 추이', endpoint: 'slsIdex' },
   SOJANGGONG_API_ENABLED: { label: 'API 전체 스위치', endpoint: null },
   SOJANGGONG_API_MODE: { label: '데이터 모드', endpoint: null },
 };
@@ -16,6 +23,13 @@ const KEY_ORDER = [
   'SOJANGGONG_WEATHER_KEY',
   'SOJANGGONG_HPREPORT_KEY',
   'SOJANGGONG_STORSTTUS_KEY',
+  'SOJANGGONG_SIMPLE_KEY',
+  'SOJANGGONG_DETAIL_KEY',
+  'SOJANGGONG_SNS_KEY',
+  'SOJANGGONG_DELIVERY_KEY',
+  'SOJANGGONG_TOUR_KEY',
+  'SOJANGGONG_STCARSTTUS_KEY',
+  'SOJANGGONG_SLSIDEX_KEY',
 ];
 
 function isKeyConfigured(value) {

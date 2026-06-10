@@ -22,6 +22,34 @@ UPDATE public.app_settings
 SET value = 'YOUR_STORSTTUS_KEY', updated_at = NOW()
 WHERE key = 'SOJANGGONG_STORSTTUS_KEY'; -- ④ 업소현황
 
+UPDATE public.app_settings
+SET value = 'YOUR_SIMPLE_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_SIMPLE_KEY'; -- ⑤ 간단분석
+
+UPDATE public.app_settings
+SET value = 'YOUR_SNS_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_SNS_KEY'; -- ⑥ SNS 분석
+
+UPDATE public.app_settings
+SET value = 'YOUR_DELIVERY_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_DELIVERY_KEY'; -- ⑦ 배달분석
+
+UPDATE public.app_settings
+SET value = 'YOUR_DETAIL_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_DETAIL_KEY'; -- ⑧ 상세분석
+
+UPDATE public.app_settings
+SET value = 'YOUR_TOUR_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_TOUR_KEY'; -- ⑨ 관광 축제 정보
+
+UPDATE public.app_settings
+SET value = 'YOUR_STCARSTTUS_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_STCARSTTUS_KEY'; -- ⑩ 업력현황
+
+UPDATE public.app_settings
+SET value = 'YOUR_SLSIDEX_KEY', updated_at = NOW()
+WHERE key = 'SOJANGGONG_SLSIDEX_KEY'; -- ⑪ 점포당 매출액 추이
+
 -- 입력 확인 (마지막 6자만 표시)
 SELECT
   key,

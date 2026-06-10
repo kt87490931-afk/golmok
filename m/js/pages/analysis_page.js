@@ -1,11 +1,18 @@
 import { initPageShell, bootPage } from '../page_common.js';
-import { getApiKey } from '../api-config.js?v=20260630';
+import { getApiKey } from '../api-config.js?v=20260643';
 
 const TABS = [
   { id: 'map', label: '상권지도', endpoint: 'startupPublic', keyName: 'SOJANGGONG_STARTUP_KEY' },
   { id: 'weather', label: '창업기상도', endpoint: 'weather', keyName: 'SOJANGGONG_WEATHER_KEY' },
-  { id: 'theme', label: '테마상권 분석', endpoint: 'hpReport', keyName: 'SOJANGGONG_HPREPORT_KEY' },
+  { id: 'theme', label: '테마상권', endpoint: 'hpReport', keyName: 'SOJANGGONG_HPREPORT_KEY' },
   { id: 'store', label: '업소현황', endpoint: 'storSttus', keyName: 'SOJANGGONG_STORSTTUS_KEY' },
+  { id: 'simple', label: '간단분석', endpoint: 'simple', keyName: 'SOJANGGONG_SIMPLE_KEY' },
+  { id: 'detail', label: '상세분석', endpoint: 'detail', keyName: 'SOJANGGONG_DETAIL_KEY' },
+  { id: 'sns', label: 'SNS분석', endpoint: 'snsAnaly', keyName: 'SOJANGGONG_SNS_KEY' },
+  { id: 'delivery', label: '배달분석', endpoint: 'delivery', keyName: 'SOJANGGONG_DELIVERY_KEY' },
+  { id: 'tour', label: '관광축제', endpoint: 'tour', keyName: 'SOJANGGONG_TOUR_KEY' },
+  { id: 'stcar', label: '업력현황', endpoint: 'stcarSttus', keyName: 'SOJANGGONG_STCARSTTUS_KEY' },
+  { id: 'sls', label: '매출추이', endpoint: 'slsIdex', keyName: 'SOJANGGONG_SLSIDEX_KEY' },
 ];
 
 let activeTabId = 'map';

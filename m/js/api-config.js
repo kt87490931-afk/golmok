@@ -10,14 +10,6 @@ export async function getApiSettings(force = false) {
   if (_settingsPromise && !force) return _settingsPromise;
 
   _settingsPromise = (async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      _settings = null;
-      return null;
-    }
-
     const { data, error } = await supabase.rpc('get_sojanggong_settings');
     if (error) {
       console.warn('get_sojanggong_settings', error.message);
