@@ -386,7 +386,7 @@ body.m-shell[data-gm-shell="analysis"] {
   height: 100svh;
   overflow: hidden;
   padding-bottom: 0;
-  --mb-map-reserve: 52px;
+  --mb-map-reserve: 0px;
 }
 
 body.m-shell.gm-shell-analysis .hd,
@@ -402,7 +402,7 @@ body.m-shell[data-gm-shell="analysis"] .layout {
   min-height: 0 !important;
   height: auto !important;
   padding-top: 0 !important;
-  padding-bottom: calc(var(--bn-h) + var(--mb-map-reserve) + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px)) !important;
   overflow: hidden;
 }
 
