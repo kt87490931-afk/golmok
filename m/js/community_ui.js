@@ -349,7 +349,10 @@ export async function loadFeed(reset = true) {
 }
 
 async function loadEventSection() {
-  const grid = document.getElementById('event-grid') || document.querySelector('.ev-scroll-wrap');
+  const grid =
+    document.getElementById('event-grid') ||
+    document.getElementById('evt-grid') ||
+    document.querySelector('.ev-scroll-wrap');
   const badge = document.querySelector('.event-count-badge') || document.querySelector('.ev-cnt-badge');
   if (!grid || currentFeedType === 'all') return;
 
@@ -879,6 +882,11 @@ function bindFeedTabs() {
       tabAll.classList.toggle('act', type === 'all');
       tabDong.classList.toggle('act', type !== 'all');
     }
+    document.querySelectorAll('.feed-tab').forEach((btn) => {
+      const id = btn.id;
+      if (id === 'tab-all') btn.classList.toggle('act', type === 'all');
+      if (id === 'tab-dong') btn.classList.toggle('act', type !== 'all');
+    });
     document.getElementById('nav-all')?.classList.toggle('act', type === 'all');
     document.getElementById('nav-dong')?.classList.toggle('act', type !== 'all');
     if (rbar) rbar.style.display = type === 'all' ? 'none' : 'block';
@@ -927,13 +935,18 @@ function bindFeedTabs() {
 }
 
 function bindCategoryTabs() {
-  document.querySelectorAll('.ct').forEach((ct) => {
+  const bindOne = (ct) => {
     ct.addEventListener('click', () => {
-      document.querySelectorAll('.ct').forEach((c) => c.classList.remove('act'));
+      document.querySelectorAll('.ct, .cat-tab[data-cat]').forEach((c) => c.classList.remove('act'));
       ct.classList.add('act');
       currentCategory = ct.dataset.cat || 'all';
       loadFeed(true);
     });
+  };
+  document.querySelectorAll('.ct').forEach(bindOne);
+  document.querySelectorAll('.cat-tab[data-cat]').forEach((ct) => {
+    if (!ct.classList.contains('ct')) ct.classList.add('ct');
+    bindOne(ct);
   });
 }
 

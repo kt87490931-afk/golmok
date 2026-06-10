@@ -411,11 +411,12 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;back
         <!-- 빠른 메뉴 -->
         <div class="qsec">
           <div class="qs-t">빠른 메뉴</div>
-          <div class="qgrid">
-            <div class="qi nav-analysis" onclick="location.href='analysis.html'"><div class="qicon"><i class="ti ti-map" style="color:var(--ch);"></i></div><span class="qlbl">상권분석</span></div>
+          <div class="qgrid" style="grid-template-columns:repeat(5,1fr);">
+            <div class="qi" onclick="location.href='analysis.html?tab=map'"><div class="qicon"><i class="ti ti-map" style="color:var(--ch);"></i></div><span class="qlbl">상권지도</span></div>
             <div class="qi" onclick="location.href='analysis.html?tab=weather'"><div class="qicon"><i class="ti ti-cloud" style="color:var(--info);"></i></div><span class="qlbl">창업기상도</span></div>
-            <div class="qi" onclick="location.href='analysis.html?tab=hotplace'"><div class="qicon"><i class="ti ti-flame" style="color:var(--dn);"></i></div><span class="qlbl">핫플레이스</span></div>
-            <div class="qi" onclick="location.href='policy.html'"><div class="qicon"><i class="ti ti-file-text" style="color:var(--up);"></i></div><span class="qlbl">정책지원</span></div>
+            <div class="qi" onclick="location.href='analysis.html?tab=theme'"><div class="qicon"><i class="ti ti-chart-dots" style="color:var(--up);"></i></div><span class="qlbl">테마상권</span></div>
+            <div class="qi" onclick="location.href='analysis.html?tab=store'"><div class="qicon"><i class="ti ti-building-store" style="color:var(--dn);"></i></div><span class="qlbl">업소현황</span></div>
+            <div class="qi" onclick="location.href='analysis.html?tab=hotplace'"><div class="qicon"><i class="ti ti-flame" style="color:#E8920E;"></i></div><span class="qlbl">핫플레이스</span></div>
           </div>
         </div>
         <!-- 상권 통계 카드 -->
@@ -713,11 +714,11 @@ aiS.addEventListener('click',sendAI);aiI.addEventListener('keydown',e=>{if(e.key
 document.querySelectorAll('.aichip').forEach(c=>c.addEventListener('click',()=>{aiI.value=c.textContent;sendAI();}));
 document.querySelectorAll('.sr-tag').forEach(t=>t.addEventListener('click',()=>{document.getElementById('srch-inp').value=t.textContent;showToast('"'+t.textContent+'" 검색');}));
 </script>
-<script type="module" src="js/profile_ui.js?v=20260620"></script>
-<script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260632"></script>
-<script type="module" src="js/analysis.js?v=20260629"></script>
-<script type="module" src="js/notifications_ui.js?v=20260613"></script>
-<script type="module" src="js/fcm.js?v=20260613"></script>
+<script type="module" src="js/profile_ui.js?v=20260648"></script>
+<script type="module" src="js/auth.js?v=20260648"></script>
+<script type="module" src="js/community_ui.js?v=20260648"></script>
+<script type="module" src="js/analysis.js?v=20260648"></script>
+<script type="module" src="js/notifications_ui.js?v=20260648"></script>
+<script type="module" src="js/fcm.js?v=20260648"></script>
 </body>
 </html>

@@ -2,718 +2,430 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="js/mobile-route.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="google-site-verification" content="7_bUIeA-EHmgGeP9RFu_B3IodiO7-cQL3pBrrIuqqU4" />
-<title>골목대장 — 소상공인 상권 커뮤니티</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F5A623">
+<script src="js/mobile-route.js"></script>
+<title>골목대장 — 소상공인 상권 플랫폼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --ch:#F5A623;
-  --chd:#C17F24;
-  --chdd:#8B5A10;
-  --chl:#FFF8E7;
-  --chm:#FAEEDA;
-  --chb:#FAC775;
-  --bg:#F7F3EB;
-  --white:#FFFFFF;
-  --border:#E8E4DC;
-  --text1:#1A1A1A;
-  --text2:#555555;
-  --text3:#999999;
-  --up:#1D9E75;
-  --dn:#E24B4A;
-  --info:#378ADD;
-}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;font-size:14px;}
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+<link rel="stylesheet" href="css/main-v3.css?v=20260648">
+<link rel="icon" href="assets/gmlogo.png" type="image/png">
+</head><body>
 
-/* ───── TOPNAV ───── */
-.topnav{height:56px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100;}
-.logo-row{display:flex;align-items:center;gap:8px;min-width:180px;text-decoration:none;}
-.logo-cat{width:36px;height:36px;border-radius:50%;background:var(--chl);border:2px solid var(--ch);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
-.logo-name{font-size:17px;font-weight:700;color:var(--chd);}
-.logo-sub{font-size:10px;color:var(--chd);opacity:.75;margin-top:1px;white-space:nowrap;}
-.logo-cat img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.tnav-links{display:flex;gap:2px;flex:1;justify-content:center;}
-.tnl{padding:6px 16px;border-radius:20px;font-size:14px;cursor:pointer;color:var(--text2);text-decoration:none;transition:background .15s,color .15s;}
-.tnl:hover,.tnl.act{background:var(--chl);color:var(--chd);font-weight:500;}
-.tnav-r{display:flex;align-items:center;gap:10px;margin-left:auto;}
-.sbar{display:flex;align-items:center;gap:8px;background:#F5F1E8;border:1px solid var(--border);border-radius:24px;padding:6px 14px;min-width:220px;}
-.sbar i{color:var(--ch);font-size:15px;}
-.sbar input{border:none;background:transparent;font-size:13px;color:var(--text1);outline:none;width:100%;}
-.sbar input::placeholder{color:var(--text3);}
-.vbtn{display:flex;align-items:center;gap:6px;background:var(--ch);border:none;border-radius:20px;padding:7px 14px;cursor:pointer;color:#fff;font-size:13px;font-weight:500;transition:opacity .15s;}
-.vbtn:hover{opacity:.88;}
-.icobtn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);border:1px solid var(--border);background:var(--white);font-size:16px;position:relative;transition:background .15s;}
-.icobtn:hover{background:var(--chl);color:var(--chd);}
-.nbadge{position:relative;}
-.nbadge.has-unread::after{content:attr(data-count);position:absolute;top:-3px;right:-3px;background:var(--ch);color:#fff;font-size:10px;border-radius:10px;padding:0 4px;font-weight:700;min-width:16px;text-align:center;}
-.pchip{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;transition:background .15s;}
-.pchip:hover{background:var(--chl);}
-.pav{width:26px;height:26px;border-radius:50%;background:var(--chm);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--chdd);}
-.pname{font-size:13px;font-weight:500;color:var(--text1);}
 
-/* ───── LAYOUT ───── */
-.body{display:flex;min-height:calc(100vh - 56px);}
-
-/* ───── SIDEBAR ───── */
-.sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:12px 0;display:flex;flex-direction:column;position:sticky;top:56px;height:calc(100vh - 56px);flex-shrink:0;}
-.nsec{font-size:11px;color:var(--text3);padding:12px 18px 4px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
-.ni{display:flex;align-items:center;gap:9px;padding:8px 18px;cursor:pointer;color:var(--text2);font-size:13px;border-right:3px solid transparent;transition:background .12s,color .12s;}
-.ni i{font-size:16px;flex-shrink:0;}
-.ni:hover{background:var(--chl);color:var(--chdd);}
-.ni.act{background:var(--chl);color:var(--chd);font-weight:500;border-right-color:var(--ch);}
-.sidebar a.ni{text-decoration:none;color:inherit;}
-.page-main-content{min-height:calc(100vh - 56px);}
-.nbdg{margin-left:auto;background:var(--ch);color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;font-weight:700;}
-.sb-bot{margin-top:auto;border-top:1px solid var(--border);padding:12px 18px;}
-.sb-pr{display:flex;align-items:center;gap:9px;}
-.sbav{width:34px;height:34px;border-radius:50%;background:var(--chm);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--chdd);}
-.sbname{font-size:13px;font-weight:500;color:var(--text1);}
-.sbtype{font-size:11px;color:var(--text3);}
-.sb-act-btn{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:7px 10px;border-radius:8px;font-size:12px;color:var(--text2);width:100%;text-align:left;margin-top:4px;}
-.sb-act-btn:hover{background:var(--chl);}
-.sb-act-out{color:var(--dn);}
-.overlay.open,.modal-bg.open{display:flex!important;}
-#my-activity-overlay{align-items:center;justify-content:center;padding:16px;}
-#my-activity-overlay .activity-modal-panel{border-radius:16px!important;max-height:min(80vh,640px);width:100%;max-width:600px;box-shadow:0 12px 40px rgba(0,0,0,.18);}
-#analysis-overlay{align-items:center;justify-content:center;padding:16px;}
-#analysis-overlay .analysis-modal-panel{border-radius:16px!important;max-height:min(90vh,720px);width:100%;max-width:640px;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow-y:auto;}
-#notification-overlay{align-items:center;justify-content:center;padding:16px;}
-#notification-overlay .notification-modal-panel{border-radius:16px!important;max-height:min(80vh,560px);width:100%;max-width:480px;box-shadow:0 12px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;background:#fff;}
-.analysis-opt-btn,.analysis-radius-btn{padding:10px 16px;border:1px solid var(--border);border-radius:10px;background:#fff;cursor:pointer;font-size:13px;}
-.analysis-opt-btn:hover,.analysis-radius-btn:hover{background:var(--chl);border-color:var(--ch);}
-
-/* ───── CENTER ───── */
-.center{flex:1;min-width:0;display:flex;flex-direction:column;}
-.ftabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;position:sticky;top:56px;z-index:90;}
-.ft{padding:14px 20px;font-size:14px;cursor:pointer;color:var(--text2);border-bottom:3px solid transparent;display:flex;align-items:center;gap:6px;transition:color .12s;}
-.ft i{font-size:15px;}
-.ft:hover{color:var(--chd);}
-.ft.act{color:var(--chd);font-weight:500;border-bottom-color:var(--ch);}
-.rbar{background:var(--chl);border-bottom:1px solid var(--chb);padding:8px 24px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.rlabel{font-size:12px;color:var(--chdd);font-weight:700;}
-.rpill{padding:4px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--chb);color:var(--chdd);background:transparent;transition:background .12s,color .12s;}
-.rpill:hover{background:var(--chm);}
-.rpill.act{background:var(--ch);border-color:var(--ch);color:#fff;font-weight:500;}
-.lchip{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--chdd);cursor:pointer;}
-.lchip i{font-size:14px;color:var(--ch);}
-
-.fscroll{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:14px;}
-
-/* ───── SECTION REDESIGN (3 blocks) ───── */
-.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.stat-card{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--white);box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.stat-card-top{padding:14px 16px 10px;position:relative;}
-.stat-card-top::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;opacity:.12;}
-.stat-card.blue .stat-card-top{background:linear-gradient(135deg,#EBF4FF 0%,#D6EAFF 100%);}
-.stat-card.blue .stat-card-top::after{background:#378ADD;}
-.stat-card.gold .stat-card-top{background:linear-gradient(135deg,#FFF8E7 0%,#FAEEDA 100%);}
-.stat-card.gold .stat-card-top::after{background:#F5A623;}
-.stat-card.red .stat-card-top{background:linear-gradient(135deg,#FFF1F1 0%,#FFE0E0 100%);}
-.stat-card.red .stat-card-top::after{background:#E24B4A;}
-.stat-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
-.stat-card.blue .stat-icon-wrap{background:#378ADD;}
-.stat-card.gold .stat-icon-wrap{background:#F5A623;}
-.stat-card.red .stat-icon-wrap{background:#E24B4A;}
-.stat-icon-wrap i{font-size:18px;color:#fff;}
-.stat-label{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:4px;}
-.stat-value{font-size:26px;font-weight:700;color:var(--text1);line-height:1.1;}
-.stat-card-bottom{padding:10px 16px 12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.stat-chg{font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px;}
-.stat-chg i{font-size:13px;}
-.stat-chg.up{color:var(--up);}
-.stat-chg.dn{color:var(--dn);}
-.stat-date{font-size:10px;color:var(--text3);}
-.stat-bar-wrap{padding:0 16px 12px;margin-top:-4px;}
-.stat-bar-bg{height:5px;background:#E8E4DC;border-radius:5px;overflow:hidden;}
-.stat-bar-fill{height:100%;border-radius:5px;}
-.stat-card.blue .stat-bar-fill{background:linear-gradient(90deg,#378ADD,#6BB8FF);}
-.stat-card.gold .stat-bar-fill{background:linear-gradient(90deg,#F5A623,#FAC775);}
-.stat-card.red .stat-bar-fill{background:linear-gradient(90deg,#E24B4A,#FF8080);}
-
-.ai-analysis-card{border-radius:16px;overflow:hidden;border:1px solid var(--chb);box-shadow:0 2px 12px rgba(245,166,35,.15);}
-.ai-analysis-header{background:linear-gradient(135deg,#F5A623 0%,#E8920E 100%);padding:14px 18px;display:flex;align-items:center;gap:12px;}
-.ai-logo-circle{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
-.ai-logo-circle img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.ai-header-text{flex:1;}
-.ai-header-title{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;}
-.ai-header-title i{font-size:16px;}
-.ai-header-sub{font-size:11px;color:rgba(255,255,255,.85);margin-top:2px;}
-.ai-header-badge{background:rgba(255,255,255,.25);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.4);}
-.ai-analysis-body{background:var(--white);padding:16px 18px;}
-.ai-summary-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-.ai-tag{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;}
-.ai-tag.warn{background:#FFF1F1;color:var(--dn);border:1px solid #FFD0D0;}
-.ai-tag.info{background:#EBF4FF;color:var(--info);border:1px solid #C5DFFF;}
-.ai-tag.tip{background:var(--chl);color:var(--chdd);border:1px solid var(--chb);}
-.ai-tag i{font-size:14px;}
-.ai-text-body{font-size:13px;color:var(--text2);line-height:1.7;background:var(--bg);border-radius:10px;padding:12px 14px;border-left:3px solid var(--ch);}
-.ai-analysis-footer{background:#FFFBF2;padding:10px 18px;border-top:1px solid var(--chb);display:flex;align-items:center;justify-content:space-between;}
-.ai-footer-note{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;}
-.ai-footer-note i{font-size:13px;color:var(--chd);}
-.ai-detail-btn{font-size:12px;color:var(--chd);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;border:1px solid var(--chb);padding:4px 12px;border-radius:20px;background:var(--white);}
-.ai-detail-btn:hover{background:var(--chl);}
-
-.event-section{background:var(--white);border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);}
-.event-section-header{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-.event-section-title{font-size:14px;font-weight:700;color:var(--text1);display:flex;align-items:center;gap:7px;}
-.event-title-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#F5A623,#E8920E);display:flex;align-items:center;justify-content:center;}
-.event-title-icon i{font-size:16px;color:#fff;}
-.event-count-badge{background:var(--ch);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;}
-.event-more-btn{font-size:12px;color:var(--chd);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:3px;border:none;background:transparent;}
-.event-more-btn i{font-size:14px;}
-.event-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 18px;}
-.ev-card-new{border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform .15s,box-shadow .15s;background:var(--white);}
-.ev-card-new:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1);}
-.ev-card-top{padding:12px 12px 8px;position:relative;}
-.ev-card-top.discount{background:linear-gradient(135deg,#FFF8E7,#FAEEDA);}
-.ev-card-top.groupbuy{background:linear-gradient(135deg,#E8F8F0,#D0F0E0);}
-.ev-card-top.issue{background:linear-gradient(135deg,#FFF1F1,#FFE0E0);}
-.ev-card-top.meeting{background:linear-gradient(135deg,#EBF4FF,#D6EAFF);}
-.ev-type-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.ev-type-chip{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;}
-.ev-type-chip.discount{background:#F5A623;color:#fff;}
-.ev-type-chip.groupbuy{background:#1D9E75;color:#fff;}
-.ev-type-chip.issue{background:#E24B4A;color:#fff;}
-.ev-type-chip.meeting{background:#378ADD;color:#fff;}
-.ev-type-chip i{font-size:11px;}
-.ev-dday{font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;}
-.ev-dday.urgent{background:#E24B4A;color:#fff;}
-.ev-dday.soon{background:#F5A623;color:#fff;}
-.ev-dday.normal{background:#E8E4DC;color:var(--text2);}
-.ev-dday.ongoing{background:#E24B4A;color:#fff;animation:pulse 1.5s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.7;}}
-.ev-name-new{font-size:13px;font-weight:700;color:var(--text1);line-height:1.4;margin-bottom:4px;}
-.ev-card-bottom{padding:8px 12px 10px;border-top:1px solid rgba(0,0,0,.06);}
-.ev-shop-new{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:3px;margin-bottom:3px;}
-.ev-shop-new i{font-size:12px;color:var(--text3);}
-.ev-date-new{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:3px;}
-.ev-date-new i{font-size:11px;}
-
-/* ───── EVENT SECTION ───── */
-.evsec{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:16px 18px;}
-.evh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.evtitle{font-size:14px;font-weight:500;color:var(--text1);display:flex;align-items:center;gap:6px;}
-.evtitle i{color:var(--ch);font-size:16px;}
-.evmore{font-size:12px;color:var(--chd);cursor:pointer;font-weight:500;}
-.evmore:hover{text-decoration:underline;}
-.evcards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.evc{border:1px solid var(--chb);border-radius:10px;padding:12px;background:var(--chl);cursor:pointer;position:relative;transition:border-color .15s,transform .1s;}
-.evc:hover{border-color:var(--ch);transform:translateY(-1px);}
-.evbdg{position:absolute;top:8px;right:8px;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
-.evtype{font-size:11px;color:var(--chdd);margin-bottom:5px;display:flex;align-items:center;gap:4px;}
-.evtype i{font-size:13px;}
-.evname{font-size:13px;font-weight:500;color:var(--chdd);margin-bottom:3px;line-height:1.4;}
-.evshop{font-size:11px;color:var(--text2);}
-.evdate{font-size:11px;color:var(--text3);margin-top:6px;}
-
-/* ───── STATS ───── */
-.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.sc{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
-.slbl{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-bottom:5px;}
-.slbl i{font-size:13px;color:var(--ch);}
-.sval{font-size:20px;font-weight:700;color:var(--text1);}
-.schg{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:3px;}
-.up{color:var(--up);} .dn{color:var(--dn);}
-
-/* ───── WRITE BOX ───── */
-.wbox{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
-.wrow{display:flex;align-items:center;gap:10px;}
-.wav{width:36px;height:36px;border-radius:50%;background:var(--chm);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--chdd);flex-shrink:0;}
-.winp{flex:1;background:#F5F1E8;border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:13px;color:var(--text3);cursor:pointer;}
-.wacts{display:flex;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);align-items:center;}
-.wab{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;font-size:12px;color:var(--text2);cursor:pointer;border:none;background:transparent;transition:background .12s,color .12s;}
-.wab:hover{background:var(--chl);color:var(--chd);}
-.wab i{font-size:15px;}
-.pbtn{margin-left:auto;background:var(--ch);color:#fff;border:none;border-radius:20px;padding:7px 20px;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s;}
-.pbtn:hover{opacity:.88;}
-
-/* ───── POST LIST ───── */
-.ctabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--white);border-radius:12px 12px 0 0;overflow:hidden;}
-.ct{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:background .12s,color .12s;}
-.ct:hover{color:var(--chd);background:var(--chl);}
-.ct.act{color:var(--chd);font-weight:500;border-bottom-color:var(--ch);background:var(--chl);}
-.plist{display:flex;flex-direction:column;background:var(--white);border-radius:0 0 12px 12px;border:1px solid var(--border);border-top:none;}
-.pc{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;overflow:hidden;min-width:0;}
-.pc:last-child{border-bottom:none;}
-.pc:hover{background:var(--chl);}
-.pctop{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.pcav{width:40px;height:40px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
-.pcav-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;flex-shrink:0;}
-.pcimgs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px;max-width:100%;}
-.pcimgs--single{display:block;}
-.pcimg-wrap{border-radius:8px;overflow:hidden;max-width:400px;}
-.pcimg-wrap--hero{grid-column:1 / -1;max-width:100%;}
-.pcimg{max-width:400px;width:auto;height:auto;border-radius:8px;display:block;object-fit:contain;}
-.pcimgs--duo .pcimg-wrap,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero){max-width:100%;}
-.pcimgs--duo .pcimg,.pcimgs--multi .pcimg-wrap:not(.pcimg-wrap--hero) .pcimg,.pcimgs--multi .pcimg-wrap--hero .pcimg{max-width:100%;max-height:200px;width:100%;height:auto;object-fit:contain;}
-.pcname{font-size:13px;font-weight:500;color:var(--text1);}
-.pcinfo{font-size:11px;color:var(--text3);margin-top:1px;}
-.pcbdg{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:4px;}
-.pcpin{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--chd);}
-.pcpin i{font-size:13px;}
-.pc-link-head{display:block;text-decoration:none;color:inherit;margin-bottom:8px;}
-.pc-link-head:hover .pctit{color:var(--chd);}
-.pc-link-head .pctit{font-size:14px;font-weight:600;color:var(--text1);margin-bottom:4px;line-height:1.45;}
-.pc-preview{font-size:12px;color:var(--text3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.pc-meta-hint{font-size:11px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:4px;}
-.pd-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text2);margin-bottom:14px;padding:0;font-family:inherit;}
-.pd-back-btn:hover{color:var(--chd);}
-.pd-loading,.pd-error{padding:40px 16px;text-align:center;color:var(--text3);font-size:14px;}
-.pd-article{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:20px;}
-.pd-author{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
-.pd-author-meta{flex:1;min-width:0;}
-.pd-author-name{font-size:15px;font-weight:600;}
-.pd-author-info{font-size:12px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.pd-follow-btn{display:flex;align-items:center;gap:4px;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:12px;font-family:inherit;}
-.pd-title{font-size:20px;font-weight:700;line-height:1.45;margin-bottom:12px;}
-.pd-body{font-size:15px;line-height:1.75;color:var(--text2);margin-bottom:16px;white-space:pre-wrap;word-break:break-word;}
-.pd-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;}
-.pd-act-btn{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;font-family:inherit;}
-.pd-comments-head{font-size:15px;font-weight:700;margin-bottom:12px;}
-.pd-comment-bar--inline{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
-.pd-comment-input{flex:1;border:1px solid var(--border);border-radius:20px;padding:10px 14px;font-size:14px;outline:none;font-family:inherit;}
-.pd-comment-submit{background:var(--ch);color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
-.pcbot{display:flex;align-items:center;gap:14px;}
-.pca{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text3);cursor:pointer;transition:color .12s;}
-.pca:hover{color:var(--chd);}
-.pca i{font-size:14px;}
-.pct{margin-left:auto;font-size:11px;color:var(--text3);}
-
-/* ───── RIGHT COL ───── */
-.rcol{width:300px;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0;}
-
-/* ───── AI PANEL ───── */
-.aipanel{background:var(--chl);border-bottom:1px solid var(--chb);flex-shrink:0;}
-.aihead{background:var(--ch);padding:12px 14px;display:flex;align-items:center;gap:8px;}
-.aicat{width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.aicat img{width:100%;height:100%;object-fit:contain;}
-.aitit{font-size:14px;font-weight:700;color:#fff;}
-.aisub{font-size:11px;color:rgba(255,255,255,.85);}
-.aimsgs{padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:120px;}
-.mbot{background:#fff;border-radius:0 10px 10px 10px;padding:8px 10px;font-size:12px;color:var(--chdd);line-height:1.6;border:1px solid var(--chb);align-self:flex-start;max-width:92%;}
-.musr{background:var(--ch);border-radius:10px 0 10px 10px;padding:8px 10px;font-size:12px;color:#fff;line-height:1.6;align-self:flex-end;max-width:82%;}
-.aiinrow{padding:8px 12px 12px;display:flex;gap:6px;align-items:center;border-top:1px solid var(--chb);}
-.aiinp{flex:1;background:#fff;border:1px solid var(--chb);border-radius:20px;padding:7px 12px;font-size:12px;color:var(--text1);outline:none;font-family:inherit;}
-.aiinp:focus{border-color:var(--ch);}
-.aimicb{background:transparent;border:1px solid var(--ch);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .12s;}
-.aimicb:hover{background:var(--chm);}
-.aimicb i{color:var(--chd);font-size:14px;}
-.aisndb{background:var(--ch);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity .12s;}
-.aisndb:hover{opacity:.85;}
-.aisndb i{color:#fff;font-size:14px;}
-
-/* ───── RIGHT SECTIONS ───── */
-.rcs{padding:14px;border-bottom:1px solid var(--border);}
-.rct{font-size:13px;font-weight:500;color:var(--text1);display:flex;align-items:center;gap:6px;margin-bottom:10px;}
-.rct i{font-size:15px;color:var(--ch);}
-.rcm{margin-left:auto;font-size:11px;color:var(--chd);cursor:pointer;font-weight:400;}
-.rcm:hover{text-decoration:underline;}
-.tri{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
-.tri:last-child{border-bottom:none;}
-.trr{font-size:13px;font-weight:700;color:var(--ch);min-width:16px;}
-.trt{font-size:12px;color:var(--text1);flex:1;}
-.trtg{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--chl);color:var(--chdd);font-weight:500;}
-.hoti{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .12s;}
-.hoti:hover{opacity:.75;}
-.hoti:last-child{border-bottom:none;}
-.hotn{font-size:16px;font-weight:700;color:var(--chb);min-width:20px;line-height:1.3;}
-.hott{font-size:12px;color:var(--text1);line-height:1.5;flex:1;}
-.hotc{font-size:11px;color:var(--text3);margin-top:2px;}
-.foli{display:flex;align-items:center;gap:8px;padding:7px 0;}
-.flav{width:36px;height:36px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
-.neighbor-av-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
-.flnm{font-size:12px;font-weight:500;color:var(--text1);}
-.fltp{font-size:11px;color:var(--text3);}
-.flbtn{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid var(--ch);color:var(--chd);cursor:pointer;background:transparent;font-weight:500;transition:background .15s,color .15s,border-color .15s;flex-shrink:0;}
-.flbtn:hover{background:var(--ch);color:#fff;}
-
-/* ───── MODAL OVERLAY (글쓰기) ───── */
-.modal-bg{display:none!important;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px;pointer-events:none;}
-.modal-bg.open{display:flex!important;pointer-events:auto;z-index:210;}
-.modal-bg.open > .modal,.modal-bg.open > .auth-modal-sheet,.modal-bg.open > div{pointer-events:auto;max-height:90vh;overflow-y:auto;}
-.modal{background:var(--white);border-radius:16px;width:560px;padding:24px;position:relative;}
-.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.modal-title{font-size:16px;font-weight:700;color:var(--text1);}
-.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);display:flex;align-items:center;}
-.modal textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;color:var(--text1);font-family:inherit;resize:vertical;min-height:120px;outline:none;}
-.modal textarea:focus{border-color:var(--ch);}
-.modal-acts{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap;}
-.mab{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;color:var(--text2);cursor:pointer;border:1px solid var(--border);background:transparent;transition:background .12s;}
-.mab:hover{background:var(--chl);color:var(--chd);border-color:var(--chb);}
-.mab i{font-size:14px;}
-.modal-submit{margin-left:auto;background:var(--ch);color:#fff;border:none;border-radius:20px;padding:8px 24px;font-size:13px;font-weight:500;cursor:pointer;}
-.login-btns{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
-.lbtn{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;}
-.lbtn:hover{background:var(--chl);}
-.lbtn-kakao{background:#FEE500;border-color:#FEE500;}
-.lbtn-naver{background:#03C75A;border-color:#03C75A;color:#fff;}
-#logged-panel{text-align:center;}
-#logged-panel .lbtn-logout{margin-top:12px;background:var(--chl);color:var(--chdd);}
-.cat-select-btn{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;}
-.cat-select-btn.act{background:var(--ch);border-color:var(--ch);color:#fff;font-weight:500;}
-.write-auto-tags{display:none;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;padding:8px 10px;background:#F5F1E8;border-radius:10px;border:1px solid var(--border);}
-.auth-modal-sheet{max-width:480px;width:100%;max-height:90vh;overflow-y:auto;}
-.auth-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 12px;}
-.auth-modal-brand{display:flex;align-items:center;gap:10px;}
-.auth-modal-sub{font-size:11px;color:var(--text3);}
-.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin:0 -20px 16px;padding:0 20px;}
-.auth-tab{flex:1;padding:12px 0;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);}
-.auth-tab.act{border-bottom-color:var(--ch);color:var(--chd);}
-.auth-modal-body{display:flex;flex-direction:column;gap:10px;}
-.auth-social-col{display:flex;flex-direction:column;gap:10px;margin-bottom:4px;}
-.auth-btn-google,.auth-btn-kakao,.auth-btn-naver{width:100%;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;}
-.auth-btn-google{border:1px solid var(--border);background:#fff;color:var(--text1);}
-.auth-btn-kakao{border:none;background:#FEE500;color:#000;font-weight:700;}
-.auth-btn-naver{border:none;background:#03C75A;color:#fff;font-weight:700;}
-.auth-divider{display:flex;align-items:center;gap:10px;margin:8px 0;color:var(--text3);font-size:12px;}
-.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.auth-input{width:100%;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;outline:none;font-family:inherit;}
-.auth-input:focus{border-color:var(--ch);}
-.auth-btn-primary{width:100%;background:var(--ch);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;}
-.auth-btn-outline{width:100%;background:none;border:1px solid var(--ch);border-radius:12px;padding:12px;color:var(--chd);cursor:pointer;margin-top:8px;}
-.auth-link-btn{background:none;border:none;color:var(--text3);font-size:12px;text-decoration:underline;cursor:pointer;margin-top:4px;}
-.auth-error{background:#FFF1F1;color:var(--dn);padding:10px 12px;border-radius:8px;font-size:13px;}
-.auth-success{background:#E8F8F0;color:var(--up);padding:10px 12px;border-radius:8px;font-size:13px;}
-.auth-agree-box{background:var(--bg);border-radius:10px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:6px;}
-.auth-agree-box label{display:flex;align-items:center;gap:8px;cursor:pointer;}
-.auth-label{font-size:12px;color:var(--text2);font-weight:500;margin-top:4px;}
-.auth-forgot-desc{font-size:13px;color:var(--text2);text-align:center;margin-bottom:8px;}
-.auth-intro{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;}
-.signup-label{font-size:12px;color:#555;font-weight:500;display:block;margin-bottom:4px;}
-.signup-label .req{color:#E24B4A;}
-.signup-hint{font-size:11px;color:#999;font-weight:400;}
-.signup-section-divider{height:1px;background:#F0EDE6;margin:4px 0;}
-.signup-optional-title{font-size:12px;color:#999;font-weight:500;}
-.pw-wrap{position:relative;}
-.pw-wrap .auth-input{padding-right:40px;}
-.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:16px;padding:4px;}
-.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.status-btn{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #E8E4DC;background:#fff;font-size:12px;font-weight:500;color:#555;cursor:pointer;line-height:1.4;}
-.status-btn.act{border:1px solid #F5A623;background:#FFF8E7;color:#C17F24;}
-.status-label{cursor:pointer;display:block;}
-.signup-agree .agree-row{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-bottom:6px;flex-wrap:wrap;}
-.signup-agree .agree-all-row{font-size:13px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #E8E4DC;}
-.signup-agree .agree-row a{margin-left:auto;color:#F5A623;font-size:11px;text-decoration:none;}
-#password-strength{margin-top:4px;}
-#password-match-msg{margin-top:4px;}
-
-/* ───── TOAST ───── */
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text1);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:all .3s;z-index:300;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-@media (max-width:768px){
-.pcav{width:36px;height:36px;flex-shrink:0;}
-.pcav-img{width:100%;height:100%;object-fit:cover;border-radius:50%;flex-shrink:0;}
-.pcimg-wrap{max-width:100%;}
-.pcimg{width:100%;max-width:100%;max-height:300px;height:auto;object-fit:cover;border-radius:8px;}
-.pcimgs--duo .pcimg,.pcimgs--multi .pcimg{max-height:200px;}
-}
-</style>
-<link rel="stylesheet" href="css/responsive.css?v=20260642">
-<link rel="stylesheet" href="css/mobile-shell.css?v=20260642">
-<script src="js/mobile-nav.js?v=20260642" defer></script>
-</head>
-<body>
-
-<!-- TOPNAV -->
-<nav class="topnav">
-  <a class="logo-row" href="index.html">
-    <div class="logo-cat"><img src="assets/gmlogo.png" alt="골목대장 로고" width="36" height="36"></div>
+<!-- ── 헤더 ── -->
+<header class="hd">
+  <a href="index.html" class="hd-logo">
+    <img src="assets/gmlogo.png" alt="골목대장">
     <div>
-      <div class="logo-name">골목대장</div>
-      <div class="logo-sub">우리는 모두 골목대장, 데이터로 보는 상권의 힘</div>
+      <div class="hd-logo-text">골목대장</div>
+      <div class="hd-logo-sub">소상공인 상권 플랫폼</div>
     </div>
   </a>
-  <div class="tnav-links">
-    <a class="tnl act" href="index.html">홈</a>
-    <a class="tnl" href="analysis.html">상권분석</a>
-    <a class="tnl" href="analysis.html?tab=weather">창업기상도</a>
-    <a class="tnl" href="analysis.html?tab=hotplace">핫플레이스</a>
-    <a class="tnl" href="policy.html">정책·지원</a>
-  </div>
-  <div class="tnav-r">
-    <div class="sbar">
+
+  <nav class="hd-nav">
+    <a href="index.html" class="act">홈</a>
+    <a href="analysis.html">상권분석</a>
+    <a href="analysis.html?tab=weather">창업기상도</a>
+    <a href="analysis.html?tab=hotplace">핫플레이스</a>
+    <a href="policy.html">정책·지원</a>
+  </nav>
+
+  <div class="hd-right">
+    <div class="hd-search-btn" onclick="focusHeroSearch()">
       <i class="ti ti-search"></i>
-      <input type="text" placeholder="상권, 업종, 질문 검색...">
+      <span>상권, 업종, 질문 검색...</span>
     </div>
-    <button class="vbtn"><i class="ti ti-microphone"></i> 음성검색</button>
-    <div class="icobtn nbadge" id="open-notifications" title="알림"><i class="ti ti-bell"></i></div>
-    <div class="pchip" id="user-chip" title="로그인 / 내 정보">
-      <div class="pav" id="user-pav">?</div>
-      <span class="pname" id="user-pname">로그인</span>
-      <i class="ti ti-chevron-down" style="font-size:12px;color:#999;"></i>
+    <div class="icobtn nbadge" id="open-notifications" title="알림" style="position:relative"><i class="ti ti-bell"></i></div><button class="btn-voice" onclick="startVoice()">
+      <i class="ti ti-microphone"></i>
+      <span>음성검색</span>
+    </button>
+    <div class="hd-user" id="user-chip">
+      <div class="hd-user-av" id="user-pav">?</div>
+      <span id="user-pname" class="pname">로그인</span>
+      <i class="ti ti-chevron-down" style="font-size:13px;color:var(--gray-5)"></i>
     </div>
   </div>
-</nav>
+</header>
 
-<div class="body">
+<!-- ── 레이아웃 ── -->
+<div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="nsec">메뉴</div>
-    <a class="ni menu-item act" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
-    <a class="ni menu-item nav-analysis" data-page="analysis" href="analysis.html"><i class="ti ti-map"></i> 상권분석</a>
-    <a class="ni menu-item" data-page="weather" href="analysis.html?tab=weather"><i class="ti ti-cloud"></i> 창업기상도</a>
-    <a class="ni menu-item" data-page="hot" href="analysis.html?tab=hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
-    <div class="nsec">커뮤니티</div>
-    <a class="ni menu-item" data-page="community" href="community.html" id="nav-all"><i class="ti ti-world"></i> 전체 게시판</a>
-    <a class="ni menu-item" data-page="neighborhood" href="neighborhood.html" id="nav-dong"><i class="ti ti-map-pin"></i> 우리동네</a>
-    <a class="ni menu-item" data-page="by-industry" href="by-industry.html"><i class="ti ti-tag"></i> 업종별</a>
-    <a class="ni menu-item" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
-    <a class="ni menu-item" data-page="policy" href="policy.html"><i class="ti ti-file-text"></i> 정책·지원</a>
-    <div class="nsec">내 활동</div>
-    <a class="ni menu-item" id="nav-saved-posts" href="index.html"><i class="ti ti-bookmark"></i> 저장한 글</a>
-    <a class="ni menu-item" id="nav-notifications" href="index.html"><i class="ti ti-bell"></i> 알림 <span class="nbdg" id="sidebar-notify-badge" style="display:none;">0</span></a>
-    <a class="ni menu-item" id="nav-my-posts" href="index.html"><i class="ti ti-edit"></i> 내 게시글</a>
-    <div class="sb-bot">
-      <div class="sb-pr" id="sb-profile-link">
-        <a href="profile.html" class="sbav" id="sb-av" style="text-decoration:none;color:inherit;">?</a>
-        <div style="flex:1;min-width:0;">
-          <div class="sbname" id="sb-name">로그인</div>
-          <a href="profile.html" class="sbtype" id="nav-profile-settings" style="font-size:11px;color:#C17F24;font-weight:500;text-decoration:none;display:block;">프로필 설정</a>
-        </div>
-        <a href="profile.html" style="margin-left:auto;font-size:16px;color:#999;cursor:pointer;text-decoration:none;display:flex;" title="프로필 설정"><i class="ti ti-dots"></i></a>
+<!-- 사이드바 -->
+<aside class="sidebar">
+  <div class="sb-sec">
+    <div class="sb-label">메뉴</div>
+    <a href="index.html" class="sb-a act">
+      <i class="ti ti-home"></i> 홈 피드
+    </a>
+    <a href="analysis.html" class="sb-a">
+      <i class="ti ti-map"></i> 상권분석
+    </a>
+    <a href="analysis.html?tab=weather" class="sb-a">
+      <i class="ti ti-cloud"></i> 창업기상도
+    </a>
+    <a href="analysis.html?tab=hotplace" class="sb-a">
+      <i class="ti ti-flame"></i> 핫플레이스
+    </a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-label">커뮤니티</div>
+    <a href="community.html" class="sb-a" id="nav-all">
+      <i class="ti ti-world"></i> 전체 게시판
+    </a>
+    <a href="neighborhood.html" class="sb-a" id="nav-dong">
+      <i class="ti ti-map-pin"></i> 우리동네
+    </a>
+    <a href="by-industry.html" class="sb-a">
+      <i class="ti ti-tag"></i> 업종별
+    </a>
+    <a href="events.html" class="sb-a">
+      <i class="ti ti-speakerphone"></i> 이벤트·행사
+    </a>
+    <a href="policy.html" class="sb-a">
+      <i class="ti ti-file-text"></i> 정책·지원
+    </a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-label">내 활동</div>
+    <a href="profile.html" class="sb-a" id="sb-profile-link"><div class="sb-av" id="sb-av" style="width:28px;height:28px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:4px">?</div>
+      <i class="ti ti-user"></i>
+      <span id="sb-name">로그인</span>
+    </a>
+    <a href="index.html" id="nav-my-posts" class="sb-a">
+      <i class="ti ti-pencil"></i> 내 게시글
+    </a>
+    <a href="index.html" id="nav-saved-posts" class="sb-a">
+      <i class="ti ti-bookmark"></i> 저장한 글
+    </a>
+    <a href="#" id="sb-logout" class="sb-a" style="display:none;color:var(--red)">
+      <i class="ti ti-logout" style="color:var(--red)"></i> 로그아웃
+    </a>
+  </div>
+</aside>
+
+<!-- ── 메인 ── -->
+<main class="main">
+
+  <!-- ① 히어로 — AI 검색 + 지도 배경 -->
+  <section class="hero" id="hero">
+    <div class="hero-map-bg"></div>
+    <iframe class="hero-map-iframe" id="hero-map-iframe"
+      src="about:blank"
+      title="상권지도 배경" allow="geolocation">
+    </iframe>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <i class="ti ti-robot" style="font-size:14px"></i>
+        <span>골목대장 AI 검색</span>
       </div>
-      <div id="sidebar-profile-actions"></div>
+      <h1 class="hero-title">
+        <em>상권·창업</em>, 무엇이든<br>물어보세요
+      </h1>
+      <p class="hero-sub">소상공인을 위한 데이터 기반 상권분석 플랫폼</p>
+      <div class="hero-search">
+        <i class="ti ti-search" style="font-size:17px;color:#CCC;flex-shrink:0"></i>
+        <input type="text" id="ai-input"
+          placeholder="예: 동탄에서 카페 창업하면 어떨까요?"
+          onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="hero-search-go" onclick="doSearch()">분석하기</button>
+      </div>
+      <div class="hero-chips">
+        <div class="hero-chip" onclick="setQ('유동인구 많은 상권 찾아줘')">
+          <i class="ti ti-users"></i> 유동인구 많은 곳
+        </div>
+        <div class="hero-chip" onclick="setQ('음식점 창업 성공률 높은 동네')">
+          <i class="ti ti-chart-bar"></i> 창업 성공률
+        </div>
+        <div class="hero-chip" onclick="setQ('경쟁이 낮은 업종 추천해줘')">
+          <i class="ti ti-bulb"></i> 경쟁 낮은 업종
+        </div>
+        <div class="hero-chip" onclick="setQ('소상공인 지원금 신청 방법')">
+          <i class="ti ti-file-invoice"></i> 지원금 신청
+        </div>
+      </div>
     </div>
-  </aside>
+  </section>
 
-  <!-- CENTER -->
-  <main class="center">
-    <div id="shell-feed-view">
-    <!-- 피드 탭 -->
-    <div class="ftabs">
-      <div class="ft" id="tab-all"><i class="ti ti-world"></i> 전체글</div>
-      <div class="ft act" id="tab-dong"><i class="ti ti-map-pin"></i> 우리동네</div>
+  <!-- ② 빠른 상권분석 -->
+  <div class="quick-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-chart-dots"></i> 빠른 상권분석
+      </div>
+      <a href="analysis.html" class="sec-more">전체보기</a>
     </div>
+    <div class="quick-grid">
+      <a href="analysis.html?tab=map" class="quick-item">
+        <div class="quick-icon">🗺️</div>
+        <div class="quick-name">상권지도</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=weather" class="quick-item">
+        <div class="quick-icon">🌤️</div>
+        <div class="quick-name">창업기상도</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=theme" class="quick-item">
+        <div class="quick-icon">📊</div>
+        <div class="quick-name">테마상권</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=store" class="quick-item">
+        <div class="quick-icon">🏪</div>
+        <div class="quick-name">업소현황</div>
+        <span class="q-live">LIVE</span>
+      </a>
+      <a href="analysis.html?tab=hotplace" class="quick-item">
+        <div class="quick-icon">🔥</div>
+        <div class="quick-name">핫플레이스</div>
+        <span class="q-live">LIVE</span>
+      </a>
+    </div>
+  </div>
 
-    <!-- 동네 범위 바 -->
-    <div class="rbar" id="rbar">
-      <span class="rlabel">동네 범위</span>
-      <div class="rpill act" data-range="우리동네">우리동네</div>
-      <div class="rpill" data-range="인근동네">인근 동네</div>
-      <div class="rpill" data-range="전체지역">전체 지역</div>
-      <div class="lchip">
+  <!-- ③ 통계 카드 -->
+  <div class="stat-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
         <i class="ti ti-map-pin"></i>
-        경기 화성시 동탄2동 기준
-        <i class="ti ti-chevron-down"></i>
+        <span id="stat-region-label">우리동네 현황</span>
+      </div>
+      <span class="sec-more" onclick="changeRegion()">지역 변경</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card blue">
+        <div class="stat-lbl">
+          <i class="ti ti-users" style="color:var(--blue)"></i> 일 평균 유동인구
+        </div>
+        <div class="stat-val" id="sv-pop">31.6만명</div>
+        <div class="stat-ch up" id="sc-pop">▲ +17.7% 전월 대비</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-lbl">
+          <i class="ti ti-chart-bar" style="color:var(--gold)"></i> 월 평균 매출
+        </div>
+        <div class="stat-val" id="sv-rev">1,316만원</div>
+        <div class="stat-ch dn" id="sc-rev">▼ -2.2% 전년 대비</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-lbl">
+          <i class="ti ti-store" style="color:var(--red)"></i> 동종 업소수
+        </div>
+        <div class="stat-val" id="sv-store">175개</div>
+        <div class="stat-ch dn" id="sc-store">▼ -17.8% 전년 대비</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-lbl">
+          <i class="ti ti-heart-rate" style="color:var(--green)"></i> 창업 생존율
+        </div>
+        <div class="stat-val" id="sv-surv">68%</div>
+        <div class="stat-ch up" id="sc-surv">▲ +3% 전년 대비</div>
       </div>
     </div>
+  </div>
 
-    <div class="fscroll">
-
-      <!-- 상권 통계 카드 -->
-      <div class="stats-strip">
-        <div class="stat-card blue">
-          <div class="stat-card-top">
-            <div class="stat-icon-wrap"><i class="ti ti-users"></i></div>
-            <div class="stat-label">일 평균 유동인구</div>
-            <div class="stat-value">31.6만명</div>
-          </div>
-          <div class="stat-bar-wrap"><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:72%;"></div></div></div>
-          <div class="stat-card-bottom">
-            <span class="stat-chg up"><i class="ti ti-trending-up"></i> +17.7% 전월 대비</span>
-            <span class="stat-date">26년 03월 기준</span>
-          </div>
-        </div>
-        <div class="stat-card gold">
-          <div class="stat-card-top">
-            <div class="stat-icon-wrap"><i class="ti ti-chart-bar"></i></div>
-            <div class="stat-label">월 평균 매출</div>
-            <div class="stat-value">1,316만원</div>
-          </div>
-          <div class="stat-bar-wrap"><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:54%;"></div></div></div>
-          <div class="stat-card-bottom">
-            <span class="stat-chg dn"><i class="ti ti-trending-down"></i> -2.2% 전년 대비</span>
-            <span class="stat-date">26년 03월 기준</span>
-          </div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-card-top">
-            <div class="stat-icon-wrap"><i class="ti ti-store"></i></div>
-            <div class="stat-label">동종 업소수 (요리주점)</div>
-            <div class="stat-value">175개</div>
-          </div>
-          <div class="stat-bar-wrap"><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:38%;"></div></div></div>
-          <div class="stat-card-bottom">
-            <span class="stat-chg dn"><i class="ti ti-trending-down"></i> -17.8% 전년 대비</span>
-            <span class="stat-date">26년 03월 기준</span>
-          </div>
-        </div>
+  <!-- ④ 인기상권 + AI 채팅 -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">
+        <i class="ti ti-trending-up"></i> 인기 검색 상권
+        <span class="card-more">더보기</span>
       </div>
-
-      <!-- AI 분석 카드 -->
-      <div class="ai-analysis-card">
-        <div class="ai-analysis-header">
-          <div class="ai-logo-circle"><img src="assets/gmlogo.png" alt="골목대장 로고"></div>
-          <div class="ai-header-text">
-            <div class="ai-header-title"><i class="ti ti-robot"></i> 골목대장 AI 분석</div>
-            <div class="ai-header-sub">동탄 · 음식 &gt; 요리주점 · 26년 03월 기준</div>
-          </div>
-          <div class="ai-header-badge">AI LIVE</div>
-        </div>
-        <div class="ai-analysis-body">
-          <div class="ai-summary-tags">
-            <div class="ai-tag warn"><i class="ti ti-trending-down"></i> 매출 감소 중</div>
-            <div class="ai-tag info"><i class="ti ti-clock"></i> 피크 금요일 18~23시</div>
-            <div class="ai-tag tip"><i class="ti ti-bulb"></i> 진입 타이밍 주목</div>
-          </div>
-          <div class="ai-text-body">이 상권 요리주점 업종은 전년 대비 매출이 감소하고 있어요. 피크타임은 금요일 18~23시예요. 업소수도 17.8% 줄어들어 경쟁이 낮아진 상황 - 지금이 오히려 진입 타이밍일 수 있어요!</div>
-        </div>
-        <div class="ai-analysis-footer">
-          <span class="ai-footer-note"><i class="ti ti-info-circle"></i> 소진공 빅데이터 기반 분석</span>
-          <button type="button" class="ai-detail-btn" data-open-analysis><i class="ti ti-chart-line"></i> 상세 분석 보기</button>
-        </div>
-      </div>
-
-      <!-- 이벤트·이슈 섹션 -->
-      <div class="event-section" id="event-section">
-        <div class="event-section-header">
-          <div class="event-section-title">
-            <div class="event-title-icon"><i class="ti ti-speakerphone"></i></div>
-            이번 주 우리동네 이벤트·이슈
-            <span class="event-count-badge">4</span>
-          </div>
-          <button class="event-more-btn">전체보기 <i class="ti ti-chevron-right"></i></button>
-        </div>
-        <div class="event-grid" id="event-grid">
-          <div class="ev-card-new">
-            <div class="ev-card-top discount">
-              <div class="ev-type-row">
-                <span class="ev-type-chip discount"><i class="ti ti-discount"></i> 할인이벤트</span>
-                <span class="ev-dday soon">D-3</span>
-              </div>
-              <div class="ev-name-new">오픈 1주년 기념<br>전 메뉴 20% 할인</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-store"></i> 동탄 맛있는 김밥집</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> ~06.04(화)</div>
-            </div>
-          </div>
-          <div class="ev-card-new">
-            <div class="ev-card-top groupbuy">
-              <div class="ev-type-row">
-                <span class="ev-type-chip groupbuy"><i class="ti ti-shopping-cart"></i> 공동구매</span>
-                <span class="ev-dday normal">모집중</span>
-              </div>
-              <div class="ev-name-new">식자재 공동구매<br>대장님 모집</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-users"></i> 동탄 대장님 모임</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> ~06.08(토)</div>
-            </div>
-          </div>
-          <div class="ev-card-new">
-            <div class="ev-card-top issue">
-              <div class="ev-type-row">
-                <span class="ev-type-chip issue"><i class="ti ti-alert-triangle"></i> 이슈</span>
-                <span class="ev-dday ongoing">진행중</span>
-              </div>
-              <div class="ev-name-new">도로공사로 인한<br>접근성 차단 문제</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-map-pin"></i> 동탄 센트럴 상가 일대</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> 진행 중</div>
-            </div>
-          </div>
-          <div class="ev-card-new">
-            <div class="ev-card-top meeting">
-              <div class="ev-type-row">
-                <span class="ev-type-chip meeting"><i class="ti ti-users"></i> 모임·행사</span>
-                <span class="ev-dday normal">D-8</span>
-              </div>
-              <div class="ev-name-new">동탄 소상공인<br>네트워킹 모임</div>
-            </div>
-            <div class="ev-card-bottom">
-              <div class="ev-shop-new"><i class="ti ti-building"></i> 동탄2 커뮤니티센터</div>
-              <div class="ev-date-new"><i class="ti ti-calendar"></i> 06.10(월) 오후 7시</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 글쓰기 -->
-      <div class="wbox">
-        <div class="wrow">
-          <div class="wav">김</div>
-          <div class="winp" id="open-write">대장님들과 이야기를 나눠보세요...</div>
-        </div>
-        <div class="wacts">
-          <button type="button" class="wab" data-write-action="photo" id="feed-photo-btn"><i class="ti ti-photo"></i> 사진</button>
-          <button type="button" class="wab" data-write-action="location"><i class="ti ti-map-pin"></i> 위치</button>
-          <button type="button" class="wab" data-write-action="tag"><i class="ti ti-tag"></i> 업종태그</button>
-          <button type="button" class="wab" data-write-action="event"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
-          <button type="button" class="pbtn" id="open-write-btn">게시하기</button>
-        </div>
-      </div>
-
-      <!-- 게시글 탭 + 리스트 -->
-      <div style="border-radius:12px;overflow:hidden;border:1px solid var(--border);">
-        <div class="ctabs">
-          <div class="ct act" data-cat="all">전체</div>
-          <div class="ct" data-cat="qna">질문·고민</div>
-          <div class="ct" data-cat="info">정보공유</div>
-          <div class="ct" data-cat="startup">창업준비</div>
-          <div class="ct" data-cat="issue">이슈</div>
-          <div class="ct" data-cat="event">이벤트</div>
-        </div>
-        <div class="plist" id="post-list"></div>
-      </div>
-    </div>
-    </div>
-    <div id="shell-post-detail" style="display:none;padding:0 16px 24px;"></div>
-  </main>
-
-  <!-- RIGHT COL -->
-  <aside class="rcol">
-    <div class="aipanel">
-      <div class="aihead">
-        <div class="aicat"><img src="assets/gmlogo.png" alt="골목대장 로고" width="22" height="22"></div>
-        <div>
-          <div class="aitit">골목대장 AI 검색</div>
-          <div class="aisub">상권·창업 무엇이든 물어보세요</div>
-        </div>
-      </div>
-      <div class="aimsgs" id="ai-messages">
-        <div class="mbot">안녕하세요 대장님! 동탄 상권이나 창업에 대해 궁금한 것 편하게 물어보세요.</div>
-        <div class="musr">유동인구 많은 곳 찾아줘</div>
-        <div class="mbot">업종이 어떻게 되세요? 음식점, 카페, 소매 중 선택해 주시면 맞춤 분석 드릴게요!</div>
-      </div>
-      <div class="aiinrow">
-        <div class="aimicb"><i class="ti ti-microphone"></i></div>
-        <input class="aiinp" id="ai-input" placeholder="메시지 입력..." type="text">
-        <button class="aisndb" id="ai-send"><i class="ti ti-send"></i></button>
-      </div>
-    </div>
-
-    <div class="rcs">
-      <div class="rct"><i class="ti ti-trending-up"></i> 인기 검색 상권 <span class="rcm">더보기</span></div>
       <div id="popular-areas-list">
-        <div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>
+        <div class="rank-row"><span class="rank-n">1</span><span class="rank-name">동탄 센트럴파크</span><span class="rank-tag up">급상승</span></div>
+        <div class="rank-row"><span class="rank-n">2</span><span class="rank-name">수원 행궁동</span><span class="rank-tag hot">인기</span></div>
+        <div class="rank-row"><span class="rank-n">3</span><span class="rank-name">화성 봉담읍</span><span class="rank-tag new">신규</span></div>
+        <div class="rank-row"><span class="rank-n">4</span><span class="rank-name">수원 인계동</span></div>
+        <div class="rank-row"><span class="rank-n">5</span><span class="rank-name">오산 세마동</span></div>
       </div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <i class="ti ti-robot"></i> AI 검색 미리보기
+      </div>
+      <div class="chat-msgs" id="ai-messages">
+        <div class="chat-b ai">안녕하세요 대장님! 상권·창업에 대해 궁금한 것 물어보세요.</div>
+        <div class="chat-b user">유동인구 많은 곳 찾아줘</div>
+        <div class="chat-b ai">업종이 어떻게 되세요? 음식점, 카페, 소매 중 선택해 주시면 맞춤 분석 드릴게요!</div>
+      </div>
+      <div class="chat-inp">
+        <input type="text" placeholder="메시지 입력..." id="ai-input-preview"
+          onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){setQ(v);this.value='';doSearch();}}">
+        <button type="button" class="chat-send" id="ai-send-preview" onclick="doSearch()">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 이벤트·이슈 -->
+  <div class="evt-wrap" id="event-section">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-speakerphone"></i> 이번 주 이벤트·이슈
+        <span class="event-count-badge" style="background:#E8F8F0;color:var(--green);font-size:11px;
+          padding:2px 8px;border-radius:8px;font-weight:700;margin-left:4px;">4</span>
+      </div>
+      <a href="events.html" class="sec-more">전체보기</a>
+    </div>
+    <div class="evt-grid" id="event-grid">
+      <div class="evt-card">
+        <div class="evt-top" style="background:#FFF8E7">
+          <span class="evt-chip" style="background:var(--gold)">할인이벤트</span>
+          <div class="evt-dday" style="color:var(--red)">D-3</div>
+          <div class="evt-name">오픈 1주년 기념 전 메뉴 20% 할인</div>
+        </div>
+        <div class="evt-bot">동탄 맛있는 김밥집 · ~06.04</div>
+      </div>
+      <div class="evt-card">
+        <div class="evt-top" style="background:#E8F8F0">
+          <span class="evt-chip" style="background:var(--green)">공동구매</span>
+          <div class="evt-dday" style="color:var(--green)">모집중</div>
+          <div class="evt-name">식자재 공동구매 대장님 모집</div>
+        </div>
+        <div class="evt-bot">동탄 대장님 모임 · ~06.08</div>
+      </div>
+      <div class="evt-card">
+        <div class="evt-top" style="background:#FFF1F1">
+          <span class="evt-chip" style="background:var(--red)">이슈</span>
+          <div class="evt-dday" style="color:var(--red)">진행중</div>
+          <div class="evt-name">도로공사로 인한 접근성 차단 문제</div>
+        </div>
+        <div class="evt-bot">동탄 센트럴 상가 · 진행중</div>
+      </div>
+      <div class="evt-card">
+        <div class="evt-top" style="background:#EBF4FF">
+          <span class="evt-chip" style="background:var(--blue)">모임·행사</span>
+          <div class="evt-dday" style="color:var(--blue)">D-8</div>
+          <div class="evt-name">동탄 소상공인 네트워킹 모임</div>
+        </div>
+        <div class="evt-bot">동탄2 커뮤니티센터 · 06.10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 커뮤니티 피드 -->
+  <div class="feed-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-messages"></i> 대장님들의 이야기
+      </div>
+      <a href="community.html" class="sec-more">전체보기</a>
     </div>
 
-    <div class="rcs">
-      <div class="rct"><i class="ti ti-flame"></i> 지금 뜨는 글 <a href="community.html" style="margin-left:auto;font-size:11px;color:#C17F24;text-decoration:none;font-weight:400;">전체보기</a></div>
-      <div id="hot-posts-list">
-        <div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>
+    <!-- 글쓰기 바 -->
+    <div class="write-bar">
+      <div class="write-av" id="wr-av">?</div>
+      <div class="write-ph" id="open-write" style="cursor:pointer">대장님들과 이야기를 나눠보세요...</div>
+      <div class="write-acts">
+        <span class="write-act" id="feed-photo-btn" style="cursor:pointer"><i class="ti ti-photo"></i> 사진</span>
+        <span class="write-act"><i class="ti ti-map-pin"></i> 위치</span>
       </div>
+      <button type="button" class="btn-post" id="open-write-btn">게시하기</button>
     </div>
 
-    <div class="rcs">
-      <div class="rct"><i class="ti ti-user-plus"></i> 이웃 대장님 <a href="neighborhood.html" class="rcm" style="text-decoration:none;">더보기</a></div>
-      <div id="neighbor-list" data-neighbor-widget>
-        <div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">불러오는 중...</div>
-      </div>
+    <!-- 피드 탭 -->
+    <div class="feed-tabs">
+      <button type="button" class="feed-tab" id="tab-all">전체글</button><button type="button" class="feed-tab act" id="tab-dong">우리동네</button>
     </div>
-  </aside>
+
+    <!-- 게시글 목록 -->
+    <div class="feed-post-shell"><div class="cat-tabs feed-cats"><button type="button" class="cat-tab ct act" data-cat="all">전체</button><button type="button" class="cat-tab ct" data-cat="qna">질문·고민</button><button type="button" class="cat-tab ct" data-cat="info">정보공유</button><button type="button" class="cat-tab ct" data-cat="startup">창업준비</button><button type="button" class="cat-tab ct" data-cat="issue">이슈</button><button type="button" class="cat-tab ct" data-cat="event">이벤트</button></div><div id="post-list"></div></div>
+  </div>
+</main>
+
+<!-- ── 우측 위젯 ── -->
+<aside class="aside">
+
+  <!-- AI 위젯 -->
+  <div class="ai-widget">
+    <div class="ai-widget-hd">
+      <i class="ti ti-robot" style="color:var(--gold);font-size:16px"></i>
+      <span>골목대장 AI 검색</span>
+    </div>
+    <div class="ai-widget-sub">상권·창업 무엇이든 물어보세요</div>
+    <div class="ai-chips">
+      <span class="ai-chip" onclick="setQ('유동인구 많은 곳')">유동인구 많은 곳</span>
+      <span class="ai-chip" onclick="setQ('창업 성공률')">창업 성공률</span>
+      <span class="ai-chip" onclick="setQ('지원금 신청')">지원금 신청</span>
+    </div>
+    <div class="ai-inp-row">
+      <input type="text" placeholder="메시지 입력..." id="ai-widget-input"
+        onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){setQ(v);this.value='';doSearch();}}">
+      <button type="button" class="ai-send" id="ai-widget-send"
+        onclick="const v=document.getElementById('ai-widget-input')?.value?.trim();if(v){setQ(v);document.getElementById('ai-widget-input').value='';doSearch();}">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 인기 검색 상권 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-trending-up"></i> 인기 검색 상권
+      <span class="widget-more">더보기</span>
+    </div>
+    <div id="popular-areas-list-aside">
+      <div class="rank-row"><span class="rank-n">1</span><span class="rank-name">동탄 센트럴파크</span><span class="rank-tag up">급상승</span></div>
+      <div class="rank-row"><span class="rank-n">2</span><span class="rank-name">수원 행궁동</span><span class="rank-tag hot">인기</span></div>
+      <div class="rank-row"><span class="rank-n">3</span><span class="rank-name">화성 봉담읍</span><span class="rank-tag new">신규</span></div>
+      <div class="rank-row"><span class="rank-n">4</span><span class="rank-name">수원 인계동</span></div>
+      <div class="rank-row"><span class="rank-n">5</span><span class="rank-name">오산 세마동</span></div>
+    </div>
+  </div>
+
+  <!-- 지금 뜨는 글 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-flame"></i> 지금 뜨는 글
+      <a href="community.html" class="widget-more">전체보기</a>
+    </div>
+    <div id="hot-posts-list">
+      <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- 이웃 대장님 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-users"></i> 이웃 대장님
+      <span class="widget-more">더보기</span>
+    </div>
+    <div id="neighbor-list">
+      <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+    </div>
+  </div>
+
+</aside>
 </div>
 
-<!-- 로그인 모달: js/auth_modals.js 가 #login-overlay 주입 -->
+<!-- 모바일 하단 탭바 -->
+<nav class="mobile-tabs">
+  <a href="index.html" class="mb-tab act">
+    <i class="ti ti-home"></i>
+    <span>홈</span>
+  </a>
+  <a href="analysis.html" class="mb-tab">
+    <i class="ti ti-map"></i>
+    <span>상권분석</span>
+  </a>
+  <button type="button" class="mb-tab mb-fab" id="write-btn-m">
+    <i class="ti ti-plus"></i>
+  </button>
+  <a href="index.html#hero" class="mb-tab" onclick="setTimeout(function(){focusHeroSearch()},80)">
+    <i class="ti ti-robot"></i>
+    <span>AI검색</span>
+  </a>
+  <a href="profile.html" class="mb-tab">
+    <i class="ti ti-user"></i>
+    <span>내정보</span>
+  </a>
+</nav>
 
 <!-- 글쓰기 모달 -->
 <div class="modal-bg" id="write-modal">
@@ -864,43 +576,59 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// 글쓰기·피드·필터: community_ui.js
-
-// AI 채팅
-const aiInput=document.getElementById('ai-input');
-const aiSend=document.getElementById('ai-send');
-const aiMsgs=document.getElementById('ai-messages');
-const responses=['더 자세히 알려주세요!','소진공 데이터 기준으로 분석하고 있어요.','해당 업종의 상권 분석을 시작할게요.','잠시만요, 데이터를 불러오고 있어요...','좋은 질문이에요! 관련 정보를 찾아볼게요.'];
-function addMsg(text,isUser){
-  const div=document.createElement('div');
-  div.className=isUser?'musr':'mbot';
-  div.textContent=text;
+// AI 채팅 미리보기
+const aiMsgs = document.getElementById('ai-messages');
+const aiResponses = ['더 자세히 알려주세요!', '소진공 데이터 기준으로 분석하고 있어요.', '해당 업종의 상권 분석을 시작할게요.', '잠시만요, 데이터를 불러오고 있어요...', '좋은 질문이에요! 관련 정보를 찾아볼게요.'];
+function addAiMsg(text, isUser) {
+  if (!aiMsgs) return;
+  const div = document.createElement('div');
+  div.className = isUser ? 'chat-b user' : 'chat-b ai';
+  div.textContent = text;
   aiMsgs.appendChild(div);
-  aiMsgs.scrollTop=aiMsgs.scrollHeight;
+  aiMsgs.scrollTop = aiMsgs.scrollHeight;
 }
-function sendAI(){
-  const val=aiInput.value.trim();
-  if(!val)return;
-  addMsg(val,true);
-  aiInput.value='';
-  setTimeout(()=>addMsg(responses[Math.floor(Math.random()*responses.length)],false),700);
-}
-aiSend.addEventListener('click',sendAI);
-aiInput.addEventListener('keydown',(e)=>{if(e.key==='Enter')sendAI();});
-
-// 사이드바 네비 활성화
-document.querySelectorAll('.ni').forEach(ni=>{
-  ni.addEventListener('click',()=>{
-    document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
-    ni.classList.add('act');
-  });
-});
+window.sendAI = function () {
+  const val = document.getElementById('ai-input')?.value?.trim();
+  if (!val) return;
+  addAiMsg(val, true);
+  document.getElementById('ai-input').value = '';
+  setTimeout(() => addAiMsg(aiResponses[Math.floor(Math.random() * aiResponses.length)], false), 700);
+};
+document.getElementById('ai-send-preview')?.addEventListener('click', () => window.doSearch?.());
+document.getElementById('write-btn-m')?.addEventListener('click', () => document.getElementById('open-write')?.click());
 </script>
-<script type="module" src="js/profile_ui.js?v=20260615"></script>
-<script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/community_ui.js?v=20260633"></script>
-<script type="module" src="js/analysis.js?v=20260629"></script>
-<script type="module" src="js/notifications_ui.js?v=20260615"></script>
-<script type="module" src="js/fcm.js?v=20260615"></script>
+<script type="module" src="js/profile_ui.js?v=20260648"></script>
+<script type="module" src="js/auth.js?v=20260648"></script>
+<script type="module" src="js/community_ui.js?v=20260648"></script>
+<script type="module" src="js/analysis.js?v=20260648"></script>
+<script type="module" src="js/notifications_ui.js?v=20260648"></script>
+<script type="module" src="js/fcm.js?v=20260648"></script>
+<script type="module">
+import { getApiKey } from './js/api-config.js';
+async function loadHeroMap() {
+  const iframe = document.getElementById('hero-map-iframe');
+  if (!iframe) return;
+  const certKey = await getApiKey('SOJANGGONG_STARTUP_KEY');
+  if (certKey && !certKey.startsWith('YOUR_')) {
+    iframe.src = `https://bigdata.sbiz.or.kr/#/openApi/startupPublic?certKey=${encodeURIComponent(certKey)}`;
+  }
+}
+loadHeroMap();
+window.setQ = function (q) {
+  const inp = document.getElementById('ai-input');
+  if (inp) { inp.value = q; inp.focus(); }
+};
+window.doSearch = function () {
+  const v = document.getElementById('ai-input')?.value?.trim();
+  if (v && window.sendAI) window.sendAI();
+  else if (v) document.querySelector('[data-open-analysis]')?.click();
+};
+window.focusHeroSearch = function () {
+  document.getElementById('ai-input')?.focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+window.startVoice = function () { showToast('음성검색 준비 중입니다'); };
+window.changeRegion = function () { showToast('지역 변경은 프로필 설정에서 가능합니다'); };
+</script>
 </body>
 </html>

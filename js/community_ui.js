@@ -349,7 +349,10 @@ export async function loadFeed(reset = true) {
 }
 
 async function loadEventSection() {
-  const grid = document.getElementById('event-grid') || document.querySelector('.ev-scroll-wrap');
+  const grid =
+    document.getElementById('event-grid') ||
+    document.getElementById('evt-grid') ||
+    document.querySelector('.ev-scroll-wrap');
   const badge = document.querySelector('.event-count-badge') || document.querySelector('.ev-cnt-badge');
   if (!grid || currentFeedType === 'all') return;
 
@@ -386,6 +389,16 @@ async function loadEventSection() {
               <div class="ev-date-m"><i class="ti ti-calendar"></i> ${date}</div>
             </div>
           </div>`;
+        }
+        const isV3Evt = grid.classList.contains('evt-grid') || !!grid.closest('.evt-wrap');
+        if (isV3Evt) {
+          return `<div class="evt-card" data-post-id="${ev.id}" style="cursor:pointer;">
+          <div class="evt-top" style="background:#FFF8E7">
+            <span class="evt-chip" style="background:var(--gold)">이벤트</span>
+            <div class="evt-name">${title}</div>
+          </div>
+          <div class="evt-bot">${shop} · ${date}</div>
+        </div>`;
         }
         return `<div class="ev-card-new" data-post-id="${ev.id}" style="cursor:pointer;">
           <div class="ev-card-top discount">
@@ -1019,6 +1032,11 @@ function bindFeedTabs() {
       tabAll.classList.toggle('act', type === 'all');
       tabDong.classList.toggle('act', type !== 'all');
     }
+    document.querySelectorAll('.feed-tab').forEach((btn) => {
+      const id = btn.id;
+      if (id === 'tab-all') btn.classList.toggle('act', type === 'all');
+      if (id === 'tab-dong') btn.classList.toggle('act', type !== 'all');
+    });
     document.getElementById('nav-all')?.classList.toggle('act', type === 'all');
     document.getElementById('nav-dong')?.classList.toggle('act', type !== 'all');
     if (rbar) rbar.style.display = type === 'all' ? 'none' : 'block';
@@ -1067,13 +1085,18 @@ function bindFeedTabs() {
 }
 
 function bindCategoryTabs() {
-  document.querySelectorAll('.ct').forEach((ct) => {
+  const bindOne = (ct) => {
     ct.addEventListener('click', () => {
-      document.querySelectorAll('.ct').forEach((c) => c.classList.remove('act'));
+      document.querySelectorAll('.ct, .cat-tab[data-cat]').forEach((c) => c.classList.remove('act'));
       ct.classList.add('act');
       currentCategory = ct.dataset.cat || 'all';
       loadFeed(true);
     });
+  };
+  document.querySelectorAll('.ct').forEach(bindOne);
+  document.querySelectorAll('.cat-tab[data-cat]').forEach((ct) => {
+    if (!ct.classList.contains('ct')) ct.classList.add('ct');
+    bindOne(ct);
   });
 }
 
@@ -1093,6 +1116,7 @@ function bindWriteModal() {
   document.getElementById('open-write')?.addEventListener('click', openWriteOverlay);
   document.getElementById('open-write-btn')?.addEventListener('click', openWriteOverlay);
   document.getElementById('write-btn')?.addEventListener('click', openWriteOverlay);
+  document.getElementById('write-btn-m')?.addEventListener('click', openWriteOverlay);
   document.getElementById('feed-photo-btn')?.addEventListener('click', openWriteWithPhoto);
 
   document.querySelectorAll('.wbox .wab[data-write-action]').forEach((btn) => {
@@ -1265,48 +1289,89 @@ export async function loadHotPosts() {
   }
 }
 
-export async function loadPopularAreas() {
-  const list = document.getElementById('popular-areas-list');
-  if (!list) return;
+function popularAreaTagClass(badge) {
+  if (badge === '급상승') return 'up';
+  if (badge === '인기') return 'hot';
+  if (badge === '신규') return 'new';
+  return '';
+}
 
-  list.innerHTML = '<div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>';
+function popularAreaBadgeStyle(badge) {
+  if (badge === '급상승') return 'background:#FFF1F1;color:#E24B4A;';
+  if (badge === '인기') return 'background:#FFF8E7;color:#C17F24;';
+  if (badge === '신규') return 'background:#E8F8F0;color:#1D9E75;';
+  return 'background:#F5F1E8;color:#555;';
+}
 
-  try {
-    const areas = await getPopularAreas(5);
-    if (!areas.length) {
-      list.innerHTML =
-        '<div style="padding:10px 0;color:#999;font-size:12px;">등록된 인기 상권이 없습니다</div>';
-      return;
-    }
-
-    const badgeStyle = (badge) => {
-      if (badge === '급상승') return 'background:#FFF1F1;color:#E24B4A;';
-      if (badge === '인기') return 'background:#FFF8E7;color:#C17F24;';
-      if (badge === '신규') return 'background:#E8F8F0;color:#1D9E75;';
-      return 'background:#F5F1E8;color:#555;';
-    };
-
-    list.innerHTML = areas
-      .map(
-        (area, idx) => `<div class="tri popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
+function renderPopularAreasHtml(areas, listEl) {
+  const useV3 = !!listEl.closest('.two-col, .widget, .card') && !listEl.closest('.wcard');
+  if (useV3) {
+    return areas
+      .map((area, idx) => {
+        const tagCls = popularAreaTagClass(area.badge);
+        return `<div class="rank-row popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
+          <span class="rank-n">${idx + 1}</span>
+          <span class="rank-name">${escapeHtml(area.name)}</span>
+          ${area.badge ? `<span class="rank-tag ${tagCls}">${escapeHtml(area.badge)}</span>` : ''}
+        </div>`;
+      })
+      .join('');
+  }
+  return areas
+    .map(
+      (area, idx) => `<div class="tri popular-area-item" data-area-name="${escapeHtml(area.name)}" role="button" tabindex="0">
           <span class="trr">${idx + 1}</span>
           <span class="trt">${escapeHtml(area.name)}</span>
           ${
             area.badge
-              ? `<span class="trtg" style="${badgeStyle(area.badge)}">${escapeHtml(area.badge)}</span>`
+              ? `<span class="trtg" style="${popularAreaBadgeStyle(area.badge)}">${escapeHtml(area.badge)}</span>`
               : ''
           }
         </div>`
-      )
-      .join('');
+    )
+    .join('');
+}
 
-    list.querySelectorAll('.popular-area-item').forEach((el) => {
-      el.addEventListener('click', () => searchArea(el.dataset.areaName));
+function bindPopularAreaClicks(list) {
+  list.querySelectorAll('.popular-area-item').forEach((el) => {
+    el.addEventListener('click', () => searchArea(el.dataset.areaName));
+  });
+}
+
+export async function loadPopularAreas() {
+  const lists = [
+    document.getElementById('popular-areas-list'),
+    document.getElementById('popular-areas-list-aside'),
+  ].filter(Boolean);
+  if (!lists.length) return;
+
+  const loadingHtml = '<div style="padding:10px 0;color:#999;font-size:12px;">불러오는 중...</div>';
+  lists.forEach((list) => {
+    list.innerHTML = loadingHtml;
+  });
+
+  try {
+    const areas = await getPopularAreas(5);
+    if (!areas.length) {
+      const emptyHtml =
+        '<div style="padding:10px 0;color:#999;font-size:12px;">등록된 인기 상권이 없습니다</div>';
+      lists.forEach((list) => {
+        list.innerHTML = emptyHtml;
+      });
+      return;
+    }
+
+    lists.forEach((list) => {
+      list.innerHTML = renderPopularAreasHtml(areas, list);
+      bindPopularAreaClicks(list);
     });
   } catch (err) {
     console.error('loadPopularAreas', err);
-    list.innerHTML =
+    const errHtml =
       '<div style="padding:10px 0;color:#999;font-size:12px;">데이터를 불러올 수 없습니다</div>';
+    lists.forEach((list) => {
+      list.innerHTML = errHtml;
+    });
   }
 }
 
