@@ -16,6 +16,12 @@
   top: 56px;
 }
 
+@media (max-width: 768px) {
+  .page-main-content:has(.sbiz-analysis-wrap) .analysis-tab-bar {
+    top: 48px;
+  }
+}
+
 .tab-group {
   position: relative;
 }
@@ -189,8 +195,8 @@
 }
 
 .page-main-content:has(.sbiz-analysis-wrap),
-body[data-gm-shell="analysis"] .gm-page-inner:has(.sbiz-analysis-wrap),
-body.gm-shell-analysis .gm-page-inner:has(.sbiz-analysis-wrap) {
+body[data-gm-shell="analysis"]:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap),
+body.gm-shell-analysis:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap) {
   padding: 0 !important;
   height: calc(100dvh - var(--hd-h, 68px));
   overflow: hidden;
@@ -228,7 +234,7 @@ body.gm-shell-analysis .gm-page-inner:has(.sbiz-analysis-wrap) {
   .analysis-tab-bar {
     overflow-x: auto;
     padding: 0;
-    top: 48px;
+    top: 0;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;

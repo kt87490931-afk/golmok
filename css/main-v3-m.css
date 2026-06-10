@@ -358,3 +358,87 @@ body.m-shell .m-range-wrap .seg-btn.active .seg-btn-label {
 body.m-shell .toast {
   bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px) + 12px);
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   /m/ 상권분석 — 지도 iframe 전체 높이
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body.m-shell.gm-shell-analysis,
+body.m-shell[data-gm-shell="analysis"] {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100svh;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+body.m-shell.gm-shell-analysis .hd,
+body.m-shell[data-gm-shell="analysis"] .hd {
+  flex-shrink: 0;
+}
+
+body.m-shell.gm-shell-analysis .layout,
+body.m-shell[data-gm-shell="analysis"] .layout {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0 !important;
+  height: auto !important;
+  padding-top: 0 !important;
+  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px)) !important;
+  overflow: hidden;
+}
+
+body.m-shell.gm-shell-analysis .main,
+body.m-shell[data-gm-shell="analysis"] .main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
+
+body.m-shell.gm-shell-analysis .gm-page-inner,
+body.m-shell[data-gm-shell="analysis"] .gm-page-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden;
+  padding: 0;
+}
+
+body.m-shell.gm-shell-analysis .sbiz-analysis-wrap,
+body.m-shell[data-gm-shell="analysis"] .sbiz-analysis-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: auto;
+}
+
+body.m-shell.gm-shell-analysis .sbiz-iframe-shell,
+body.m-shell[data-gm-shell="analysis"] .sbiz-iframe-shell {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+body.m-shell.gm-shell-analysis #analysis-iframe,
+body.m-shell[data-gm-shell="analysis"] #analysis-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+body.m-shell.gm-shell-analysis .analysis-iframe-loading,
+body.m-shell[data-gm-shell="analysis"] .analysis-iframe-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
