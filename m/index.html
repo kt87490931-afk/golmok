@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../css/main-v3.css?v=20260655">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260662">
 <link rel="stylesheet" href="../css/shell-pages.css?v=20260655">
 <link rel="stylesheet" href="../css/main-v3-m.css?v=20260661">
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
@@ -321,17 +321,8 @@ document.getElementById('write-btn-m')?.addEventListener('click', () => document
 <script type="module" src="js/analysis.js?v=20260655"></script>
 <script type="module" src="js/notifications_ui.js?v=20260655"></script>
 <script type="module" src="js/fcm.js?v=20260655"></script>
+<script type="module" src="../js/hero_map.js?v=20260662"></script>
 <script type="module">
-import { getApiKey } from './js/api-config.js';
-async function loadHeroMap() {
-  const iframe = document.getElementById('hero-map-iframe');
-  if (!iframe) return;
-  const certKey = await getApiKey('SOJANGGONG_STARTUP_KEY');
-  if (certKey && !certKey.startsWith('YOUR_')) {
-    iframe.src = `https://bigdata.sbiz.or.kr/#/openApi/startupPublic?certKey=${encodeURIComponent(certKey)}`;
-  }
-}
-loadHeroMap();
 window.setQ = function (q) {
   const inp = document.getElementById('ai-input');
   if (inp) { inp.value = q; inp.focus(); }
