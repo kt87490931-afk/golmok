@@ -397,7 +397,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </style>
 <link rel="stylesheet" href="css/responsive.css?v=20260642">
 <link rel="stylesheet" href="css/mobile-shell.css?v=20260642">
-<link rel="stylesheet" href="css/analysis-tabs.css?v=20260644">
+<link rel="stylesheet" href="css/analysis-tabs.css?v=20260645">
 <script src="js/mobile-nav.js?v=20260642" defer></script>
 </head>
 <body>
@@ -478,8 +478,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
               <i class="ti ti-chevron-down group-arrow"></i>
             </button>
             <div class="tab-group-menu open" id="menu-status">
-              <button type="button" class="tab-sub-btn active" data-tab="map"><i class="ti ti-map-2"></i> 상권지도</button>
-              <button type="button" class="tab-sub-btn" data-tab="weather"><i class="ti ti-cloud"></i> 창업기상도</button>
+              <button type="button" class="tab-sub-btn active" data-tab="map"><i class="ti ti-map-2"></i> 상권지도 <span class="tab-badge live">LIVE</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="weather"><i class="ti ti-cloud"></i> 창업기상도 <span class="tab-badge live">LIVE</span></button>
             </div>
           </div>
           <div class="tab-group-divider"></div>
@@ -490,8 +490,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
               <i class="ti ti-chevron-down group-arrow"></i>
             </button>
             <div class="tab-group-menu" id="menu-analysis">
-              <button type="button" class="tab-sub-btn" data-tab="simple"><i class="ti ti-bolt"></i> 간단분석</button>
-              <button type="button" class="tab-sub-btn" data-tab="detail"><i class="ti ti-search"></i> 상세분석</button>
+              <button type="button" class="tab-sub-btn" data-tab="store"><i class="ti ti-store"></i> 업소현황 <span class="tab-badge live">LIVE</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="simple"><i class="ti ti-bolt"></i> 간단분석 <span class="tab-badge coming">준비중</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="detail"><i class="ti ti-search"></i> 상세분석 <span class="tab-badge coming">준비중</span></button>
             </div>
           </div>
           <div class="tab-group-divider"></div>
@@ -502,13 +503,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
               <i class="ti ti-chevron-down group-arrow"></i>
             </button>
             <div class="tab-group-menu" id="menu-theme">
-              <button type="button" class="tab-sub-btn" data-tab="theme"><i class="ti ti-building-store"></i> 테마상권</button>
-              <button type="button" class="tab-sub-btn" data-tab="store"><i class="ti ti-store"></i> 업소현황</button>
-              <button type="button" class="tab-sub-btn" data-tab="sns"><i class="ti ti-brand-instagram"></i> SNS분석</button>
-              <button type="button" class="tab-sub-btn" data-tab="delivery"><i class="ti ti-bike"></i> 배달분석</button>
-              <button type="button" class="tab-sub-btn" data-tab="festival"><i class="ti ti-confetti"></i> 관광축제</button>
-              <button type="button" class="tab-sub-btn" data-tab="history"><i class="ti ti-calendar"></i> 업력현황</button>
-              <button type="button" class="tab-sub-btn" data-tab="sales"><i class="ti ti-trending-up"></i> 매출추이</button>
+              <button type="button" class="tab-sub-btn" data-tab="theme"><i class="ti ti-building-store"></i> 테마상권 <span class="tab-badge live">LIVE</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="sns"><i class="ti ti-brand-instagram"></i> SNS분석 <span class="tab-badge coming">준비중</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="delivery"><i class="ti ti-bike"></i> 배달분석 <span class="tab-badge coming">준비중</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="festival"><i class="ti ti-confetti"></i> 관광축제 <span class="tab-badge coming">준비중</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="history"><i class="ti ti-calendar"></i> 업력현황 <span class="tab-badge coming">준비중</span></button>
+              <button type="button" class="tab-sub-btn" data-tab="sales"><i class="ti ti-trending-up"></i> 매출추이 <span class="tab-badge coming">준비중</span></button>
             </div>
           </div>
           <div class="current-tab-label">
@@ -757,6 +757,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/analysis_page.js?v=20260644"></script>
+<script type="module" src="js/pages/analysis_page.js?v=20260645"></script>
 </body>
 </html>

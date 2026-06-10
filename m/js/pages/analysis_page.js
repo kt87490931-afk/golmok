@@ -1,75 +1,88 @@
 import { initPageShell, bootPage } from '../page_common.js';
 import { getApiKey } from '../api-config.js?v=20260644';
 
-/** tab id → API 설정 (지시서 TAB_CONFIG + 기존 endpoint/key) */
+/** tab id → API 설정 (live=true: Supabase 실키 4종만 오픈) */
 const TAB_ENTRIES = {
   map: {
     group: 'status',
     label: '상권지도',
     endpoint: 'startupPublic',
     keyName: 'SOJANGGONG_STARTUP_KEY',
+    live: true,
   },
   weather: {
     group: 'status',
     label: '창업기상도',
     endpoint: 'weather',
     keyName: 'SOJANGGONG_WEATHER_KEY',
+    live: true,
+  },
+  store: {
+    group: 'analysis',
+    label: '업소현황',
+    endpoint: 'storSttus',
+    keyName: 'SOJANGGONG_STORSTTUS_KEY',
+    live: true,
   },
   simple: {
     group: 'analysis',
     label: '간단분석',
     endpoint: 'simple',
     keyName: 'SOJANGGONG_SIMPLE_KEY',
+    live: false,
   },
   detail: {
     group: 'analysis',
     label: '상세분석',
     endpoint: 'detail',
     keyName: 'SOJANGGONG_DETAIL_KEY',
+    live: false,
   },
   theme: {
     group: 'theme',
     label: '테마상권',
     endpoint: 'hpReport',
     keyName: 'SOJANGGONG_HPREPORT_KEY',
-  },
-  store: {
-    group: 'theme',
-    label: '업소현황',
-    endpoint: 'storSttus',
-    keyName: 'SOJANGGONG_STORSTTUS_KEY',
+    live: true,
   },
   sns: {
     group: 'theme',
     label: 'SNS분석',
     endpoint: 'snsAnaly',
     keyName: 'SOJANGGONG_SNS_KEY',
+    live: false,
   },
   delivery: {
     group: 'theme',
     label: '배달분석',
     endpoint: 'delivery',
     keyName: 'SOJANGGONG_DELIVERY_KEY',
+    live: false,
   },
   festival: {
     group: 'theme',
     label: '관광축제',
     endpoint: 'tour',
     keyName: 'SOJANGGONG_TOUR_KEY',
+    live: false,
   },
   history: {
     group: 'theme',
     label: '업력현황',
     endpoint: 'stcarSttus',
     keyName: 'SOJANGGONG_STCARSTTUS_KEY',
+    live: false,
   },
   sales: {
     group: 'theme',
     label: '매출추이',
     endpoint: 'slsIdex',
     keyName: 'SOJANGGONG_SLSIDEX_KEY',
+    live: false,
   },
 };
+
+const COMING_SOON_MSG = '추가 API 승인 후 오픈 예정입니다';
 
 /** 이전 URL 파라미터 호환 */
 const TAB_ALIASES = {
@@ -116,28 +129,36 @@ async function switchTab(tabKey, btnEl) {
   const loading = document.getElementById('analysis-iframe-loading');
   if (!iframe || !loading) return;
 
-  loading.style.display = 'flex';
-  loading.textContent = `${entry.label} 불러오는 중...`;
-
-  const src = await buildTabUrl(entry);
-  if (!src) {
-    loading.innerHTML =
-      '<span style="color:#E24B4A;">API 키가 설정되지 않았습니다.<br><span style="font-size:12px;color:#999;">어드민 API 관리에서 확인하세요.</span></span>';
-    iframe.removeAttribute('src');
-    return;
-  }
-
-  iframe.onload = () => {
-    loading.style.display = 'none';
-  };
-  iframe.onerror = () => {
-    loading.textContent = '화면을 불러오지 못했습니다.';
-  };
-  iframe.src = src;
-
   currentTab = id;
   currentGroup = entry.group;
   openGroup(entry.group);
+
+  if (!entry.live) {
+    iframe.style.display = 'none';
+    iframe.removeAttribute('src');
+    loading.style.display = 'flex';
+    loading.innerHTML = `<div class="coming-soon-panel"><i class="ti ti-clock-pause"></i><p>${COMING_SOON_MSG}</p></div>`;
+  } else {
+    iframe.style.display = 'block';
+    loading.style.display = 'flex';
+    loading.textContent = `${entry.label} 불러오는 중...`;
+
+    const src = await buildTabUrl(entry);
+    if (!src) {
+      loading.innerHTML =
+        '<span style="color:#E24B4A;">API 키가 설정되지 않았습니다.<br><span style="font-size:12px;color:#999;">어드민 API 관리에서 확인하세요.</span></span>';
+      iframe.removeAttribute('src');
+      iframe.style.display = 'none';
+    } else {
+      iframe.onload = () => {
+        loading.style.display = 'none';
+      };
+      iframe.onerror = () => {
+        loading.textContent = '화면을 불러오지 못했습니다.';
+      };
+      iframe.src = src;
+    }
+  }
 
   const url = new URL(window.location.href);
   if (id === 'map') url.searchParams.delete('tab');
