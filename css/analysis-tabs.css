@@ -1,0 +1,239 @@
+/* 골목대장 — analysis.html 3그룹 탭 (상권현황·상권분석·테마분석) */
+.analysis-tab-bar {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border-bottom: 1px solid #e8e4dc;
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.tab-group {
+  position: relative;
+}
+
+.tab-group-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.tab-group-btn:hover {
+  color: #c17f24;
+  background: #fff8e7;
+}
+
+.tab-group-btn.active {
+  color: #c17f24;
+  border-bottom-color: #f5a623;
+  font-weight: 600;
+}
+
+.tab-group-btn i:first-child {
+  font-size: 16px;
+  color: #f5a623;
+}
+
+.group-arrow {
+  font-size: 13px;
+  transition: transform 0.2s;
+}
+
+.tab-group-btn.active .group-arrow {
+  transform: rotate(180deg);
+}
+
+.tab-group-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  z-index: 200;
+  padding: 6px 0;
+}
+
+.tab-group-menu.open {
+  display: block;
+}
+
+.tab-sub-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #444;
+  text-align: left;
+  transition: background 0.12s, color 0.12s;
+  font-family: inherit;
+}
+
+.tab-sub-btn:hover {
+  background: #fff8e7;
+  color: #c17f24;
+}
+
+.tab-sub-btn.active {
+  background: #fff8e7;
+  color: #c17f24;
+  font-weight: 600;
+}
+
+.tab-sub-btn i {
+  font-size: 15px;
+  color: #f5a623;
+  flex-shrink: 0;
+}
+
+.tab-group-divider {
+  width: 1px;
+  background: #e8e4dc;
+  margin: 8px 0;
+  flex-shrink: 0;
+}
+
+.current-tab-label {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 12px;
+  color: #999;
+}
+
+#current-tab-text {
+  background: #fff8e7;
+  color: #c17f24;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sbiz-analysis-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+}
+
+.page-main-content:has(.sbiz-analysis-wrap) {
+  padding: 0 !important;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+.sbiz-iframe-shell {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #f7f3eb;
+}
+
+#analysis-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.analysis-iframe-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f3eb;
+  color: #999;
+  font-size: 14px;
+  z-index: 1;
+  padding: 16px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .analysis-tab-bar {
+    overflow-x: auto;
+    padding: 0;
+    top: 48px;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .analysis-tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-group-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .tab-group-menu {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 16px 16px 0 0;
+    border: none;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    padding: 8px 0 20px;
+    min-width: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .tab-group-menu::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: #e8e4dc;
+    border-radius: 4px;
+    margin: 8px auto 12px;
+  }
+
+  .tab-sub-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .current-tab-label {
+    display: none;
+  }
+
+  .app.mobile-analysis .sbiz-analysis-wrap {
+    height: calc(100dvh - 48px);
+  }
+
+  #analysis-iframe {
+    height: 100% !important;
+  }
+}

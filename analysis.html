@@ -397,6 +397,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </style>
 <link rel="stylesheet" href="css/responsive.css?v=20260642">
 <link rel="stylesheet" href="css/mobile-shell.css?v=20260642">
+<link rel="stylesheet" href="css/analysis-tabs.css?v=20260644">
 <script src="js/mobile-nav.js?v=20260642" defer></script>
 </head>
 <body>
@@ -469,26 +470,56 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="fscroll page-main-content">
 
       <div class="sbiz-analysis-wrap">
-        <div class="sbiz-analysis-tabs" id="sbiz-tabs" role="tablist"></div>
+        <div class="analysis-tab-bar" role="tablist">
+          <div class="tab-group" id="group-status">
+            <button type="button" class="tab-group-btn active" data-group="status" aria-expanded="true">
+              <i class="ti ti-map"></i>
+              상권현황
+              <i class="ti ti-chevron-down group-arrow"></i>
+            </button>
+            <div class="tab-group-menu open" id="menu-status">
+              <button type="button" class="tab-sub-btn active" data-tab="map"><i class="ti ti-map-2"></i> 상권지도</button>
+              <button type="button" class="tab-sub-btn" data-tab="weather"><i class="ti ti-cloud"></i> 창업기상도</button>
+            </div>
+          </div>
+          <div class="tab-group-divider"></div>
+          <div class="tab-group" id="group-analysis">
+            <button type="button" class="tab-group-btn" data-group="analysis" aria-expanded="false">
+              <i class="ti ti-chart-bar"></i>
+              상권분석
+              <i class="ti ti-chevron-down group-arrow"></i>
+            </button>
+            <div class="tab-group-menu" id="menu-analysis">
+              <button type="button" class="tab-sub-btn" data-tab="simple"><i class="ti ti-bolt"></i> 간단분석</button>
+              <button type="button" class="tab-sub-btn" data-tab="detail"><i class="ti ti-search"></i> 상세분석</button>
+            </div>
+          </div>
+          <div class="tab-group-divider"></div>
+          <div class="tab-group" id="group-theme">
+            <button type="button" class="tab-group-btn" data-group="theme" aria-expanded="false">
+              <i class="ti ti-chart-dots"></i>
+              테마분석
+              <i class="ti ti-chevron-down group-arrow"></i>
+            </button>
+            <div class="tab-group-menu" id="menu-theme">
+              <button type="button" class="tab-sub-btn" data-tab="theme"><i class="ti ti-building-store"></i> 테마상권</button>
+              <button type="button" class="tab-sub-btn" data-tab="store"><i class="ti ti-store"></i> 업소현황</button>
+              <button type="button" class="tab-sub-btn" data-tab="sns"><i class="ti ti-brand-instagram"></i> SNS분석</button>
+              <button type="button" class="tab-sub-btn" data-tab="delivery"><i class="ti ti-bike"></i> 배달분석</button>
+              <button type="button" class="tab-sub-btn" data-tab="festival"><i class="ti ti-confetti"></i> 관광축제</button>
+              <button type="button" class="tab-sub-btn" data-tab="history"><i class="ti ti-calendar"></i> 업력현황</button>
+              <button type="button" class="tab-sub-btn" data-tab="sales"><i class="ti ti-trending-up"></i> 매출추이</button>
+            </div>
+          </div>
+          <div class="current-tab-label">
+            <span id="current-tab-text">상권지도</span>
+          </div>
+        </div>
         <div class="sbiz-iframe-shell">
-          <div id="sbiz-iframe-loading" class="sbiz-iframe-loading">상권지도 불러오는 중...</div>
-          <iframe id="sbiz-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
+          <div id="analysis-iframe-loading" class="analysis-iframe-loading">상권지도 불러오는 중...</div>
+          <iframe id="analysis-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
         </div>
       </div>
-      <style>
-        .page-main-content:has(.sbiz-analysis-wrap){padding:0!important;height:calc(100vh - 56px);overflow:hidden;}
-        .sbiz-analysis-wrap{display:flex;flex-direction:column;height:100%;min-height:0;background:#fff;}
-        .sbiz-analysis-tabs{display:flex;flex-shrink:0;overflow-x:auto;border-bottom:1px solid var(--border);background:#fff;}
-        .sbiz-analysis-tabs::-webkit-scrollbar{display:none;}
-        .sbiz-tab{padding:12px 20px;border:none;background:none;cursor:pointer;font-size:14px;color:var(--text2);border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;}
-        .sbiz-tab.act{color:var(--chd);font-weight:600;border-bottom-color:var(--ch);}
-        .sbiz-iframe-shell{flex:1;min-height:0;position:relative;background:#F7F3EB;}
-        #sbiz-iframe{width:100%;height:100%;border:none;display:block;}
-        .sbiz-iframe-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#F7F3EB;color:#999;font-size:14px;z-index:1;}
-      </style>
-<link rel="stylesheet" href="css/responsive.css?v=20260642">
-<link rel="stylesheet" href="css/mobile-shell.css?v=20260642">
-<script src="js/mobile-nav.js?v=20260642" defer></script>
     </div>
   </main>
 
@@ -726,6 +757,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/analysis_page.js?v=20260643"></script>
+<script type="module" src="js/pages/analysis_page.js?v=20260644"></script>
 </body>
 </html>

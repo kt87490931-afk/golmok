@@ -7,6 +7,7 @@
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
 <title>상권분석 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../css/analysis-tabs.css?v=20260644">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -16,16 +17,9 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg)
 .m-hd{height:48px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;}
 .m-hd a{color:#1A1A1A;text-decoration:none;font-size:20px;display:flex;}
 .m-hd-title{flex:1;text-align:center;font-size:15px;font-weight:700;margin-right:28px;}
-.sbiz-analysis-wrap{display:flex;flex-direction:column;flex:1;min-height:0;}
-.sbiz-analysis-tabs{display:flex;overflow-x:auto;flex-shrink:0;border-bottom:1px solid var(--border);background:#fff;}
-.sbiz-analysis-tabs::-webkit-scrollbar{display:none;}
-.sbiz-tab{padding:11px 16px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--t2);border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;}
-.sbiz-tab.act{color:var(--chd);font-weight:600;border-bottom-color:var(--ch);}
-.sbiz-iframe-shell{flex:1;min-height:0;position:relative;background:var(--bg);}
-#sbiz-iframe{width:100%;height:100%;border:none;display:block;}
-.sbiz-iframe-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--t3);font-size:13px;z-index:1;padding:16px;text-align:center;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(26,26,26,.92);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;opacity:0;pointer-events:none;transition:all .25s;z-index:300;}
 .toast.show{opacity:1;}
+.app.mobile-analysis .analysis-tab-bar{top:0;position:relative;}
 </style>
 </head>
 <body>
@@ -35,10 +29,51 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg)
     <div class="m-hd-title">상권분석</div>
   </header>
   <div class="sbiz-analysis-wrap">
-    <div class="sbiz-analysis-tabs" id="sbiz-tabs" role="tablist"></div>
+    <div class="analysis-tab-bar" role="tablist">
+      <div class="tab-group" id="group-status">
+        <button type="button" class="tab-group-btn active" data-group="status" aria-expanded="true">
+          <i class="ti ti-map"></i>
+          상권현황
+          <i class="ti ti-chevron-down group-arrow"></i>
+        </button>
+        <div class="tab-group-menu open" id="menu-status">
+          <button type="button" class="tab-sub-btn active" data-tab="map"><i class="ti ti-map-2"></i> 상권지도</button>
+          <button type="button" class="tab-sub-btn" data-tab="weather"><i class="ti ti-cloud"></i> 창업기상도</button>
+        </div>
+      </div>
+      <div class="tab-group-divider"></div>
+      <div class="tab-group" id="group-analysis">
+        <button type="button" class="tab-group-btn" data-group="analysis" aria-expanded="false">
+          <i class="ti ti-chart-bar"></i>
+          상권분석
+          <i class="ti ti-chevron-down group-arrow"></i>
+        </button>
+        <div class="tab-group-menu" id="menu-analysis">
+          <button type="button" class="tab-sub-btn" data-tab="simple"><i class="ti ti-bolt"></i> 간단분석</button>
+          <button type="button" class="tab-sub-btn" data-tab="detail"><i class="ti ti-search"></i> 상세분석</button>
+        </div>
+      </div>
+      <div class="tab-group-divider"></div>
+      <div class="tab-group" id="group-theme">
+        <button type="button" class="tab-group-btn" data-group="theme" aria-expanded="false">
+          <i class="ti ti-chart-dots"></i>
+          테마분석
+          <i class="ti ti-chevron-down group-arrow"></i>
+        </button>
+        <div class="tab-group-menu" id="menu-theme">
+          <button type="button" class="tab-sub-btn" data-tab="theme"><i class="ti ti-building-store"></i> 테마상권</button>
+          <button type="button" class="tab-sub-btn" data-tab="store"><i class="ti ti-store"></i> 업소현황</button>
+          <button type="button" class="tab-sub-btn" data-tab="sns"><i class="ti ti-brand-instagram"></i> SNS분석</button>
+          <button type="button" class="tab-sub-btn" data-tab="delivery"><i class="ti ti-bike"></i> 배달분석</button>
+          <button type="button" class="tab-sub-btn" data-tab="festival"><i class="ti ti-confetti"></i> 관광축제</button>
+          <button type="button" class="tab-sub-btn" data-tab="history"><i class="ti ti-calendar"></i> 업력현황</button>
+          <button type="button" class="tab-sub-btn" data-tab="sales"><i class="ti ti-trending-up"></i> 매출추이</button>
+        </div>
+      </div>
+    </div>
     <div class="sbiz-iframe-shell">
-      <div id="sbiz-iframe-loading" class="sbiz-iframe-loading">상권지도 불러오는 중...</div>
-      <iframe id="sbiz-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
+      <div id="analysis-iframe-loading" class="analysis-iframe-loading">상권지도 불러오는 중...</div>
+      <iframe id="analysis-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
     </div>
   </div>
 </div>
@@ -47,6 +82,6 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--bg)
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 </script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/pages/analysis_page.js?v=20260643"></script>
+<script type="module" src="js/pages/analysis_page.js?v=20260644"></script>
 </body>
 </html>
