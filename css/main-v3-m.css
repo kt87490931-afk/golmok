@@ -38,8 +38,8 @@ body.m-shell .hd {
   max-width: 100%;
   width: 100%;
   height: auto;
-  min-height: var(--hd-h);
-  padding: 8px 14px;
+  min-height: 62px;
+  padding: 10px 14px;
   z-index: 100;
 }
 
@@ -49,11 +49,19 @@ body.m-shell .hd-nav {
 
 body.m-shell .hd-logo-sub {
   display: block;
-  font-size: 9px;
-  line-height: 1.3;
-  max-width: 168px;
-  white-space: normal;
+  font-size: 10px;
+  line-height: 1.35;
+  max-width: 180px;
   color: var(--gray-5);
+  margin-top: 2px;
+}
+
+body.m-shell .hd-logo-sub-pc {
+  display: none;
+}
+
+body.m-shell .hd-logo-sub-m {
+  display: block;
 }
 
 body.m-shell .hd-search-btn span {
