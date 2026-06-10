@@ -392,77 +392,81 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/main-v3.css?v=20260654">
-<link rel="stylesheet" href="../css/shell-pages.css?v=20260654">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260656">
+<link rel="stylesheet" href="../css/shell-pages.css?v=20260656">
 <link rel="stylesheet" href="../css/main-v3-m.css?v=20260654">
 </head>
-<body class="m-shell" data-gm-active="events" data-gm-shell="standard">
+<body class="m-shell gm-shell-loaded" data-gm-active="events" data-gm-shell="standard">
 
-<!-- TOPNAV -->
-<nav class="topnav">
-  <a class="logo-row" href="index.html">
-    <div class="logo-cat"><img src="assets/gmlogo.png" alt="골목대장 로고" width="36" height="36"></div>
+<header class="hd">
+  <a href="index.html" class="hd-logo">
+    <img src="assets/gmlogo.png" alt="골목대장">
     <div>
-      <div class="logo-name">골목대장</div>
-      <div class="logo-sub">우리는 모두 골목대장, 데이터로 보는 상권의 힘</div>
+      <div class="hd-logo-text">골목대장</div>
+      <div class="hd-logo-sub">
+        <span class="hd-logo-sub-pc">우리는 모두 골목대장, 데이터로 보는 상권의 힘</span>
+        <span class="hd-logo-sub-m">우리는 모두 골목대장,<br>데이터로 보는 상권의 힘</span>
+      </div>
     </div>
   </a>
-  <div class="tnav-links">
-    <a class="tnl" href="index.html">홈</a>
-    <a class="tnl" href="#" data-open-analysis>상권분석</a>
-    <a class="tnl" href="index.html">창업기상도</a>
-    <a class="tnl" href="index.html">핫플레이스</a>
-    <a class="tnl" href="policy.html">정책·지원</a>
-  </div>
-  <div class="tnav-r">
-    <div class="sbar">
+  <nav class="hd-nav">
+    <a href="index.html" data-gm-nav="home">홈</a>
+    <a href="analysis.html" data-gm-nav="analysis">상권분석</a>
+    <a href="analysis.html?tab=weather" data-gm-nav="weather">창업기상도</a>
+    <a href="analysis.html?tab=hotplace" data-gm-nav="hotplace">핫플레이스</a>
+    <a href="../policy.html" data-gm-nav="policy">정책·지원</a>
+  </nav>
+  <div class="hd-right">
+    <div class="hd-search-btn" onclick="focusHeroSearch()">
       <i class="ti ti-search"></i>
-      <input type="text" placeholder="상권, 업종, 질문 검색...">
+      <span>상권, 업종, 질문 검색...</span>
     </div>
-    <button class="vbtn"><i class="ti ti-microphone"></i> 음성검색</button>
-    <div class="icobtn nbadge" id="open-notifications" title="알림"><i class="ti ti-bell"></i></div>
-    <div class="pchip" id="user-chip" title="로그인 / 내 정보">
-      <div class="pav" id="user-pav">?</div>
-      <span class="pname" id="user-pname">로그인</span>
-      <i class="ti ti-chevron-down" style="font-size:12px;color:#999;"></i>
+    <div class="icobtn nbadge" id="open-notifications" title="알림" style="position:relative"><i class="ti ti-bell"></i></div>
+    <button class="btn-voice" type="button" onclick="startVoice()">
+      <i class="ti ti-microphone"></i>
+      <span>음성검색</span>
+    </button>
+    <div class="hd-user" id="user-chip">
+      <div class="hd-user-av" id="user-pav">?</div>
+      <span id="user-pname" class="pname">로그인</span>
+      <i class="ti ti-chevron-down" style="font-size:13px;color:var(--gray-5)"></i>
     </div>
   </div>
-</nav>
+</header>
 
-<div class="body">
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-sec">
+    <div class="sb-label">메뉴</div>
+    <a href="index.html" class="sb-a" data-gm-nav="home"><i class="ti ti-home"></i> 홈 피드</a>
+    <a href="analysis.html" class="sb-a" data-gm-nav="analysis"><i class="ti ti-map"></i> 상권분석</a>
+    <a href="analysis.html?tab=weather" class="sb-a" data-gm-nav="weather"><i class="ti ti-cloud"></i> 창업기상도</a>
+    <a href="analysis.html?tab=hotplace" class="sb-a" data-gm-nav="hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-label">커뮤니티</div>
+    <a href="../community.html" class="sb-a" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
+    <a href="../neighborhood.html" class="sb-a" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
+    <a href="../by-industry.html" class="sb-a" data-gm-nav="by-industry"><i class="ti ti-tag"></i> 업종별</a>
+    <a href="events.html" class="sb-a" data-gm-nav="events" class="act"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
+    <a href="../policy.html" class="sb-a" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책·지원</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-label">내 활동</div>
+    <a href="profile.html" class="sb-a" id="sb-profile-link" data-gm-nav="profile">
+      <div class="sb-av" id="sb-av" style="width:28px;height:28px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:4px">?</div>
+      <i class="ti ti-user"></i>
+      <span id="sb-name">로그인</span>
+    </a>
+    <a href="index.html" id="nav-my-posts" class="sb-a"><i class="ti ti-pencil"></i> 내 게시글</a>
+    <a href="index.html" id="nav-saved-posts" class="sb-a"><i class="ti ti-bookmark"></i> 저장한 글</a>
+    <a href="#" id="sb-logout" class="sb-a" style="display:none;color:var(--red)"><i class="ti ti-logout" style="color:var(--red)"></i> 로그아웃</a>
+  </div>
+</aside>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="nsec">메뉴</div>
-    <a class="ni menu-item" data-page="home" href="index.html"><i class="ti ti-home"></i> 홈 피드</a>
-    <a class="ni menu-item nav-analysis" data-page="analysis" data-open-analysis href="#"><i class="ti ti-map"></i> 상권분석</a>
-    <a class="ni menu-item" data-page="weather" href="index.html"><i class="ti ti-cloud"></i> 창업기상도</a>
-    <a class="ni menu-item" data-page="hot" href="index.html"><i class="ti ti-flame"></i> 핫플레이스</a>
-    <div class="nsec">커뮤니티</div>
-    <a class="ni menu-item" data-page="community" href="community.html" id="nav-all"><i class="ti ti-world"></i> 전체 게시판</a>
-    <a class="ni menu-item" data-page="neighborhood" href="neighborhood.html" id="nav-dong"><i class="ti ti-map-pin"></i> 우리동네</a>
-    <a class="ni menu-item" data-page="by-industry" href="by-industry.html"><i class="ti ti-tag"></i> 업종별</a>
-    <a class="ni menu-item act" data-page="events" href="events.html"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
-    <a class="ni menu-item" data-page="policy" href="policy.html"><i class="ti ti-file-text"></i> 정책·지원</a>
-    <div class="nsec">내 활동</div>
-    <a class="ni menu-item" id="nav-saved-posts" href="index.html"><i class="ti ti-bookmark"></i> 저장한 글</a>
-    <a class="ni menu-item" id="nav-notifications" href="index.html"><i class="ti ti-bell"></i> 알림 <span class="nbdg" id="sidebar-notify-badge" style="display:none;">0</span></a>
-    <a class="ni menu-item" id="nav-my-posts" href="index.html"><i class="ti ti-edit"></i> 내 게시글</a>
-    <div class="sb-bot">
-      <div class="sb-pr">
-        <div class="sbav" id="sb-av">?</div>
-        <div><div class="sbname" id="sb-name">로그인</div><div class="sbtype">음식 · 동탄</div></div>
-        <i class="ti ti-dots" style="margin-left:auto;font-size:16px;color:#999;cursor:pointer;"></i>
-      </div>
-      <div id="sidebar-profile-actions"></div>
-    </div>
-  </aside>
-
-    <!-- CENTER -->
-  <main class="center">
-    <div class="fscroll page-main-content">
-
-      <div class="main-content">
+<main class="main">
+<div class="gm-page-inner">
+<div class="main-content">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div>
             <h2 style="font-size:20px;font-weight:700;">이벤트·행사</h2>
@@ -484,57 +488,34 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;cursor:pointer;margin-top:12px;">이벤트 등록하기</button>
         </div>
       </div>
-    </div>
-  </main>
-
-  <!-- RIGHT COL -->
-  <aside class="rcol">
-    <div class="aipanel">
-      <div class="aihead">
-        <div class="aicat"><img src="assets/gmlogo.png" alt="골목대장 로고" width="22" height="22"></div>
-        <div>
-          <div class="aitit">골목대장 AI 검색</div>
-          <div class="aisub">상권·창업 무엇이든 물어보세요</div>
-        </div>
-      </div>
-      <div class="aimsgs" id="ai-messages">
-        <div class="mbot">안녕하세요 대장님! 동탄 상권이나 창업에 대해 궁금한 것 편하게 물어보세요.</div>
-        <div class="musr">유동인구 많은 곳 찾아줘</div>
-        <div class="mbot">업종이 어떻게 되세요? 음식점, 카페, 소매 중 선택해 주시면 맞춤 분석 드릴게요!</div>
-      </div>
-      <div class="aiinrow">
-        <div class="aimicb"><i class="ti ti-microphone"></i></div>
-        <input class="aiinp" id="ai-input" placeholder="메시지 입력..." type="text">
-        <button class="aisndb" id="ai-send"><i class="ti ti-send"></i></button>
-      </div>
-    </div>
-
-    <div class="rcs">
-      <div class="rct"><i class="ti ti-trending-up"></i> 인기 검색 상권 <span class="rcm">더보기</span></div>
-      <div class="tri"><span class="trr">1</span><span class="trt">동탄 센트럴파크</span><span class="trtg">급상승</span></div>
-      <div class="tri"><span class="trr">2</span><span class="trt">수원 행궁동</span><span class="trtg">인기</span></div>
-      <div class="tri"><span class="trr">3</span><span class="trt">화성 봉담읍</span><span class="trtg">신규</span></div>
-      <div class="tri"><span class="trr">4</span><span class="trt">수원 인계동</span></div>
-      <div class="tri"><span class="trr">5</span><span class="trt">오산 세마동</span></div>
-    </div>
-
-    <div class="rcs">
-      <div class="rct"><i class="ti ti-flame"></i> 지금 뜨는 글 <span class="rcm">전체보기</span></div>
-      <div class="hoti"><span class="hotn">01</span><div><div class="hott">식자재 공동구매 함께 할 대장님 모집해요</div><div class="hotc">공감 88 · 댓글 34</div></div></div>
-      <div class="hoti"><span class="hotn">02</span><div><div class="hott">소상공인 전기료 지원 신청 기간 연장</div><div class="hotc">공감 71 · 댓글 19</div></div></div>
-      <div class="hoti"><span class="hotn">03</span><div><div class="hott">배달앱 수수료 협상 성공 후기 공유합니다</div><div class="hotc">공감 64 · 댓글 52</div></div></div>
-    </div>
-
-    <div class="rcs">
-      <div class="rct"><i class="ti ti-user-plus"></i> 이웃 대장님 <span class="rcm">더보기</span></div>
-      <div id="neighbor-list">
-        <div style="padding:12px 8px;color:#999;font-size:12px;text-align:center;">불러오는 중...</div>
-      </div>
-    </div>
-  </aside>
+</div>
+</main>
 </div>
 
-<!-- 로그인 모달: js/auth_modals.js 가 #login-overlay 주입 -->
+<nav class="mobile-tabs" aria-label="하단 메뉴">
+  <div class="mobile-tabs-pill">
+    <a href="index.html" class="mb-tab" data-gm-mtab="home" aria-label="홈">
+      <i class="ti ti-home"></i>
+      <span class="mb-tab-label">홈</span>
+    </a>
+    <a href="analysis.html" class="mb-tab" data-gm-mtab="analysis" aria-label="상권분석">
+      <i class="ti ti-map"></i>
+      <span class="mb-tab-label">상권분석</span>
+    </a>
+    <button type="button" class="mb-tab mb-fab" id="write-btn-m" aria-label="글쓰기">
+      <i class="ti ti-plus"></i>
+    </button>
+    <a href="index.html#hero" class="mb-tab" data-gm-mtab="ai" aria-label="AI검색" onclick="setTimeout(function(){focusHeroSearch()},80);return true;">
+      <i class="ti ti-robot"></i>
+      <span class="mb-tab-label">AI검색</span>
+    </a>
+    <a href="profile.html" class="mb-tab" data-gm-mtab="profile" aria-label="내정보">
+      <i class="ti ti-user"></i>
+      <span class="mb-tab-label">내정보</span>
+    </a>
+  </div>
+</nav>
+<script src="../js/shell_globals.js?v=20260656"></script>
 
 <!-- 글쓰기 모달 -->
 <div class="modal-bg" id="write-modal">
@@ -718,6 +699,5 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
 <script type="module" src="js/pages/events.js?v=20260619"></script>
-<script type="module" src="../js/shell_loader.js?v=20260654"></script>
 </body>
 </html>

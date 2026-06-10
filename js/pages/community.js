@@ -1,6 +1,7 @@
 ﻿import { getAllPosts } from '../community.js?v=20260624';
 import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
+import { waitForShell } from '../shell_boot.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const initialPostId = urlParams.get('id') || urlParams.get('post');
@@ -51,17 +52,19 @@ function bindCategoryTabs() {
   });
 }
 
-bootPage(() => {
+async function startCommunityPage() {
+  await waitForShell();
   initPageShell('community');
   activateTabs('.cat-tab', currentCategory);
   bindCategoryTabs();
   if (!initialPostId) {
     loadCommunityFeed(true);
-    bindInfiniteScroll((reset) => {
+    bindInfiniteScroll(() => {
       if (hasMore && !isLoading) loadCommunityFeed(false);
     });
   }
   window.addEventListener('golmok:posts-changed', () => {
     if (!new URLSearchParams(window.location.search).get('id')) loadCommunityFeed(true);
   });
-});
+}
+bootPage(startCommunityPage);
