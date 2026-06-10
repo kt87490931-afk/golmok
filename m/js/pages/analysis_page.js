@@ -20,8 +20,10 @@ const TAB_ENTRIES = {
   hotplace: {
     group: 'status',
     label: '핫플레이스',
-    hashPath: '/hotplace/gis',
-    keyName: 'SOJANGGONG_STARTUP_KEY',
+    /** /hotplace/gis 는 사이트 전체(헤더 포함) — gis/openApi 임베드 전용 URL 사용 */
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'hotPlace', mapOnly: 'Y' },
+    keyName: 'SOJANGGONG_HPREPORT_KEY',
     live: true,
   },
   store: {
@@ -109,7 +111,10 @@ function normalizeTabId(tabKey) {
 async function buildTabUrl(entry) {
   const certKey = await getApiKey(entry.keyName);
   if (!certKey || certKey.startsWith('YOUR_') || certKey.startsWith('REPLACE_')) return '';
-  const qs = new URLSearchParams({ certKey });
+  const qs = new URLSearchParams({ certKey, ...(entry.gisParams || {}) });
+  if (entry.gisEmbed) {
+    return `https://bigdata.sbiz.or.kr/gis/openApi/${entry.gisEmbed}?${qs.toString()}`;
+  }
   if (entry.hashPath) {
     return `https://bigdata.sbiz.or.kr/#${entry.hashPath}?${qs.toString()}`;
   }
