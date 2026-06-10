@@ -58,8 +58,13 @@ body[data-gm-shell="analysis"] .sbiz-iframe-shell {
   min-height: 500px;
 }
 
-body.gm-shell-analysis .analysis-tab-bar {
-  top: var(--hd-h);
+/* PC: layout padding-top이 이미 헤더 높이만큼 밀어줌 → sticky top은 0 */
+body.gm-shell-analysis:not(.m-shell) .analysis-tab-bar,
+body[data-gm-shell="analysis"]:not(.m-shell) .analysis-tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 95;
+  flex-shrink: 0;
 }
 
 body.m-shell.gm-shell-analysis .analysis-tab-bar {
