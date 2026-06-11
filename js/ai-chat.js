@@ -1,6 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260685';
+import { askGemini, getTabExamples } from './gemini.js?v=20260686';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260685';
+import { searchRelatedPosts } from './community.js?v=20260686';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -488,7 +488,8 @@ async function showAIStatusBanner() {
     const map = {};
     (data || []).forEach((r) => { map[r.key] = r.value; });
     const enabled = map.GEMINI_ENABLED === 'true';
-    const limit = map.GEMINI_DAILY_LIMIT || '10';
+    const limit = map.GEMINI_DAILY_LIMIT ?? '0';
+    const limitLabel = !limit || limit === '0' ? '무제한' : `${escHtml(limit)}회`;
     const banner = document.getElementById('ai-status-banner');
     if (!banner) return;
     if (!enabled) {
@@ -496,7 +497,7 @@ async function showAIStatusBanner() {
       banner.innerHTML = '⚠️ AI 기능이 현재 <strong>OFF</strong> 상태입니다. 어드민 → AI 관리에서 ON으로 변경 후 API 키를 등록하세요.';
     } else {
       banner.hidden = false;
-      banner.innerHTML = `ℹ️ 일일 질문 한도 <strong>${escHtml(limit)}회</strong> · 소진공 API 데이터만 답변합니다. (API 키 등록 전에는 답변 불가)`;
+      banner.innerHTML = `ℹ️ 일일 질문 <strong>${limitLabel}</strong> · 소진공 API 데이터 기반 답변 · API 비용 관리를 위해 필요 시 어드민에서 한도를 설정할 수 있습니다.`;
     }
   } catch {
     /* ignore */

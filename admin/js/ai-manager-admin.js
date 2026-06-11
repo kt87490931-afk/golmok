@@ -2,7 +2,7 @@ import { supabase, showAdminToast, escapeHtml } from './admin-auth.js?v=20260681
 
 const GEMINI_FIELDS = [
   { key: 'GEMINI_ENABLED', label: 'AI 기능 ON/OFF', type: 'toggle', desc: '비용 급증 시 즉시 차단 (API 키 없이도 OFF 유지)' },
-  { key: 'GEMINI_DAILY_LIMIT', label: '일일 질문 한도', type: 'number', desc: '사용자·세션당 하루 최대 호출 수', min: 1, max: 100 },
+  { key: 'GEMINI_DAILY_LIMIT', label: '일일 질문 한도', type: 'number', desc: '0=무제한, 1 이상=하루 최대 호출 수', min: 0, max: 1000 },
   { key: 'GEMINI_MAX_TOKENS', label: '최대 출력 토큰', type: 'number', desc: 'Gemini 답변 길이 제한', min: 80, max: 1024 },
   {
     key: 'GEMINI_MODEL',

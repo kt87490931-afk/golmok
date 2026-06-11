@@ -454,19 +454,21 @@ Deno.serve(async (req) => {
       return jsonResponse({ success: false, error: "AI 서비스 준비 중입니다 (API 키 등록 필요)" });
     }
 
-    const dailyLimit = parseInt(cfg.GEMINI_DAILY_LIMIT || "10", 10);
-    const { data: limitOk } = await supabase.rpc("check_ai_daily_limit", {
-      p_user_id: userId,
-      p_session_id: sessionId,
-      p_limit: dailyLimit,
-    });
-
-    if (!limitOk) {
-      return jsonResponse({
-        success: false,
-        limitExceeded: true,
-        error: `오늘 AI 질문 횟수(${dailyLimit}회)를 모두 사용했습니다. 내일 다시 이용해주세요!`,
+    const dailyLimit = parseInt(cfg.GEMINI_DAILY_LIMIT || "0", 10);
+    if (dailyLimit > 0) {
+      const { data: limitOk } = await supabase.rpc("check_ai_daily_limit", {
+        p_user_id: userId,
+        p_session_id: sessionId,
+        p_limit: dailyLimit,
       });
+
+      if (!limitOk) {
+        return jsonResponse({
+          success: false,
+          limitExceeded: true,
+          error: `오늘 AI 질문 횟수(${dailyLimit}회)를 모두 사용했습니다. 내일 다시 이용해주세요!`,
+        });
+      }
     }
 
     if (tab === "policy") {

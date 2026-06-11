@@ -5,7 +5,7 @@ INSERT INTO public.app_settings (key, value, description, is_secret)
 VALUES
   ('GEMINI_API_KEY', 'YOUR_GEMINI_API_KEY', 'Google Gemini API 키', true),
   ('GEMINI_ENABLED', 'false', 'AI 기능 ON/OFF', false),
-  ('GEMINI_DAILY_LIMIT', '10', '사용자·세션당 일일 최대 호출 횟수', false),
+  ('GEMINI_DAILY_LIMIT', '0', '사용자·세션당 일일 최대 호출 횟수 (0=무제한)', false),
   ('GEMINI_MAX_TOKENS', '300', '최대 출력 토큰 수', false),
   ('GEMINI_MODEL', 'gemini-2.5-flash', 'Gemini 모델명', false)
 ON CONFLICT (key) DO NOTHING;
