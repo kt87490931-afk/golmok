@@ -1,6 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260683';
+import { askGemini, getTabExamples } from './gemini.js?v=20260684';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260683';
+import { searchRelatedPosts } from './community.js?v=20260684';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -83,11 +83,9 @@ function getRelatedPostUrl(postId) {
 }
 
 function renderRelatedPosts(posts) {
-  if (!posts?.length) return '';
-  return `
-    <div class="ai-related-posts">
-      <div class="ai-related-title"><i class="ti ti-message-2"></i> 관련 커뮤니티 글</div>
-      <ul class="ai-related-list">
+  const hasPosts = posts?.length > 0;
+  const bodyHtml = hasPosts
+    ? `<ul class="ai-related-list">
         ${posts.map((p) => `
           <li>
             <a href="${getRelatedPostUrl(p.id)}" class="ai-related-item">
@@ -99,7 +97,13 @@ function renderRelatedPosts(posts) {
             </a>
           </li>
         `).join('')}
-      </ul>
+      </ul>`
+    : `<p class="ai-related-empty">관련 커뮤니티 글이 없습니다.</p>`;
+
+  return `
+    <div class="ai-related-posts">
+      <div class="ai-related-title"><i class="ti ti-message-2"></i> 관련 커뮤니티 글</div>
+      ${bodyHtml}
     </div>
   `;
 }

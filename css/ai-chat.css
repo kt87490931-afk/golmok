@@ -380,6 +380,17 @@
   color: #999;
 }
 
+.ai-related-empty {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #999;
+  background: #faf9f7;
+  border: 1px dashed #e8e4dc;
+  border-radius: 10px;
+  text-align: center;
+}
+
 .ai-suggestions {
   display: flex;
   flex-direction: column;
