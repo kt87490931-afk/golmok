@@ -328,7 +328,8 @@ Deno.serve(async (req) => {
     const regionMap = await loadRegionMap(supabase);
     const intent = await callGemini(apiKey, model, INTENT_PROMPT, question, 256);
 
-    if (intent.isRelevant === false) {
+    const looksMarketRelated = /상권|매출|유동|업소|창업|소상공인|음식|카페|치킨|편의점|분석|통계|동탄|수원|화성/i.test(question);
+    if (intent.isRelevant === false && !looksMarketRelated) {
       await supabase.from("ai_logs").insert({
         user_id: userId,
         session_id: sessionId,
