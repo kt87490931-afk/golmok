@@ -104,3 +104,30 @@ $$;
 
 REVOKE ALL ON FUNCTION public.check_ai_daily_limit(UUID, TEXT, INT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.check_ai_daily_limit(UUID, TEXT, INT) TO service_role;
+
+-- Edge Function 전용: AI·소진공 설정 (비밀키 포함, service_role만)
+CREATE OR REPLACE FUNCTION public.get_ai_server_config()
+RETURNS TABLE(key TEXT, value TEXT)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT s.key::text, s.value
+  FROM public.app_settings s
+  WHERE s.key IN (
+    'GEMINI_API_KEY',
+    'GEMINI_ENABLED',
+    'GEMINI_DAILY_LIMIT',
+    'GEMINI_MAX_TOKENS',
+    'GEMINI_MODEL',
+    'SOJANGGONG_API_ENABLED',
+    'SOJANGGONG_API_MODE',
+    'SOJANGGONG_WEATHER_KEY',
+    'SOJANGGONG_HPREPORT_KEY',
+    'SOJANGGONG_STORSTTUS_KEY'
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.get_ai_server_config() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_ai_server_config() TO service_role;

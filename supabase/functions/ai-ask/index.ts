@@ -272,21 +272,10 @@ Deno.serve(async (req) => {
       userId = userData?.user?.id ?? null;
     }
 
-    const { data: settingsRows } = await supabase
-      .from("app_settings")
-      .select("key,value")
-      .in("key", [
-        "GEMINI_API_KEY",
-        "GEMINI_ENABLED",
-        "GEMINI_DAILY_LIMIT",
-        "GEMINI_MAX_TOKENS",
-        "GEMINI_MODEL",
-        "SOJANGGONG_API_ENABLED",
-        "SOJANGGONG_API_MODE",
-        "SOJANGGONG_WEATHER_KEY",
-        "SOJANGGONG_HPREPORT_KEY",
-        "SOJANGGONG_STORSTTUS_KEY",
-      ]);
+    const { data: settingsRows, error: settingsErr } = await supabase.rpc("get_ai_server_config");
+    if (settingsErr) {
+      console.error("get_ai_server_config", settingsErr);
+    }
 
     const cfg: Record<string, string> = {};
     (settingsRows || []).forEach((r: { key: string; value: string }) => {
@@ -431,7 +420,14 @@ endpoint: ${apiResult.endpoint}
       dataSource,
     });
   } catch (err) {
-    console.error("ai-ask", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("ai-ask", msg);
+    if (/Gemini|API key|API_KEY|401|403|400/i.test(msg)) {
+      return jsonResponse({
+        success: false,
+        error: "Gemini API 호출에 실패했습니다. Google AI Studio에서 발급한 API 키(AIzaSy...)인지 확인해주세요.",
+      }, 502);
+    }
     return jsonResponse({ success: false, error: "잠시 후 다시 시도해주세요" }, 500);
   }
 });
