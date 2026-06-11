@@ -1,4 +1,4 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260681';
+import { askGemini, getTabExamples } from './gemini.js?v=20260682';
 import { supabase } from './supabase_client.js';
 
 let currentTab = 'market';
@@ -44,6 +44,27 @@ function escHtml(s) {
 
 function escAttr(s) {
   return String(s || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+}
+
+/** JSON 조각·코드 블록이 섞인 답변을 사용자용 문장으로 정리 */
+function normalizeAnswerText(text) {
+  let t = String(text || '').trim();
+  if (!t) return '';
+
+  t = t.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+  if (/^\s*[\{\[]/.test(t) || /\{\s*"answer"\s*:/.test(t)) {
+    try {
+      const obj = JSON.parse(t);
+      if (obj?.answer && typeof obj.answer === 'string') return obj.answer.trim();
+    } catch {
+      const m = t.match(/"answer"\s*:\s*"([\s\S]*?)(?:"|$)/);
+      if (m?.[1]?.trim()) return m[1].trim();
+    }
+    return '';
+  }
+
+  return t;
 }
 
 function getTabLabel() {
@@ -208,10 +229,10 @@ function appendDataMsg(result) {
           <div class="ai-data-source">
             📍 <strong>${escHtml(regionLabel)}${upjongLabel ? ` · ${escHtml(upjongLabel)}` : ''}</strong>
             기준 소진공 데이터
-            ${result.dataSource === 'mock' ? '<span class="ai-data-mock"> · 샘플</span>' : ''}
+            ${result.dataSource === 'mock' || result.dataSource === 'mock_fallback' ? '<span class="ai-data-mock"> · 샘플</span>' : ''}
           </div>` : ''}
         ${renderDataCards(d)}
-        <div class="ai-answer-box">${escHtml(result.answer)}</div>
+        <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '답변을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.')}</div>
         ${result.summary ? `<div class="ai-summary">💡 ${escHtml(result.summary)}</div>` : ''}
         ${renderSuggestions(result.suggestions || getTabExamples(currentTab))}
       </div>
@@ -405,7 +426,7 @@ async function showAIStatusBanner() {
       banner.innerHTML = '⚠️ AI 기능이 현재 <strong>OFF</strong> 상태입니다. 어드민 → AI 관리에서 ON으로 변경 후 API 키를 등록하세요.';
     } else {
       banner.hidden = false;
-      banner.innerHTML = `ℹ️ 일일 질문 한도 <strong>${escapeHtml(limit)}회</strong> · 소진공 API 데이터만 답변합니다. (API 키 등록 전에는 답변 불가)`;
+      banner.innerHTML = `ℹ️ 일일 질문 한도 <strong>${escHtml(limit)}회</strong> · 소진공 API 데이터만 답변합니다. (API 키 등록 전에는 답변 불가)`;
     }
   } catch {
     /* ignore */

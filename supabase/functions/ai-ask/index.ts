@@ -45,7 +45,7 @@ const ANSWER_PROMPT = `당신은 골목대장 소상공인 AI 어시스턴트입
 2. 데이터가 없으면 "해당 데이터를 찾을 수 없습니다"라고 하세요
 3. 친근하고 실용적으로 (대장님이라고 부르기)
 4. 3~4문장 이내
-JSON만 반환: {"answer":"...","summary":"...","suggestions":["q1","q2","q3","q4"]}`;
+5. JSON, 코드, 마크다운 없이 순수 한국어 문장만 출력하세요.`;
 
 const TAB_EXAMPLES: Record<string, string[]> = {
   market: [
@@ -146,6 +146,80 @@ async function callGemini(
   return parseGeminiJson(raw);
 }
 
+function looksLikeJsonFragment(text: string) {
+  const t = String(text || "").trim();
+  if (!t) return true;
+  if (/^\s*[\{\[]/.test(t)) return true;
+  if (/^"answer"\s*:/.test(t)) return true;
+  if (/\{\s*"answer"\s*:/.test(t)) return true;
+  return false;
+}
+
+function sanitizeAnswerText(raw: string): string {
+  const cleaned = String(raw || "").replace(/```json/gi, "").replace(/```/g, "").trim();
+  if (!cleaned) return "";
+
+  if (!looksLikeJsonFragment(cleaned)) return cleaned;
+
+  const parsed = parseGeminiJson(cleaned);
+  if (parsed.answer && !looksLikeJsonFragment(parsed.answer)) {
+    return String(parsed.answer).trim();
+  }
+
+  const partial = cleaned.match(/"answer"\s*:\s*"([\s\S]*?)(?:"|$)/);
+  if (partial?.[1]?.trim()) return partial[1].trim();
+
+  return "";
+}
+
+function buildFallbackAnswer(region: string, upjong: string, data: Record<string, unknown>) {
+  const parts: string[] = [];
+  const label = [region, upjong].filter(Boolean).join(" ");
+  if (data.monthlyRevenue != null) {
+    parts.push(`${label} 업종 월 평균 매출은 약 ${Math.round(Number(data.monthlyRevenue) / 10000)}만원 수준이에요.`);
+  }
+  if (data.dailyPopulation != null) {
+    parts.push(`일 평균 유동인구는 약 ${(Number(data.dailyPopulation) / 10000).toFixed(1)}만명이에요.`);
+  }
+  if (data.storeCount != null) {
+    parts.push(`동종 업소는 ${data.storeCount}곳 정도예요.`);
+  }
+  if (data.weatherScore != null) {
+    parts.push(`창업기상도는 ${data.weatherScore}점(${data.weatherLabel || "양호"})이에요.`);
+  }
+  if (parts.length) {
+    return `대장님, ${parts.join(" ")} 상권분석 탭에서 더 자세히 확인하실 수 있어요!`;
+  }
+  return "대장님, 해당 지역 데이터를 확인했어요. 상권분석 탭에서 상세 차트를 확인해 보세요!";
+}
+
+async function callGeminiAnswer(
+  apiKey: string,
+  model: string,
+  systemPrompt: string,
+  userText: string,
+  maxTokens: number,
+) {
+  const url =
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: "user", parts: [{ text: userText }] }],
+      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.3 },
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini 오류 ${res.status}: ${errText.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  return sanitizeAnswerText(raw);
+}
+
 function parseGeminiJson(raw: string) {
   const cleaned = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
   try {
@@ -162,7 +236,7 @@ function parseGeminiJson(raw: string) {
         return { answer: m[1] };
       }
     }
-    return { answer: cleaned || raw };
+    return { answer: "" };
   }
 }
 
@@ -485,19 +559,24 @@ endpoint: ${apiResult.endpoint}
 데이터: ${JSON.stringify(apiData)}${fallbackNote}
 위 데이터만 보고 답변하세요.`;
 
-    const result = await callGemini(
+    const answerTokens = Math.max(maxTokens, 512);
+    let answerText = await callGeminiAnswer(
       apiKey,
       model,
       ANSWER_PROMPT,
       `질문: ${question}\n\n${dataContext}`,
-      maxTokens,
+      answerTokens,
     );
+
+    if (!answerText || looksLikeJsonFragment(answerText)) {
+      answerText = buildFallbackAnswer(regionName || "", upjongLabel, apiData as Record<string, unknown>);
+    }
 
     await supabase.from("ai_logs").insert({
       user_id: userId,
       session_id: sessionId,
       question: question.slice(0, 500),
-      answer: String(result.answer || "").slice(0, 1000),
+      answer: answerText.slice(0, 1000),
       intent: String(intent.requestType || "기타"),
       api_called: apiResult.endpoint,
       blocked: false,
@@ -506,11 +585,9 @@ endpoint: ${apiResult.endpoint}
     return jsonResponse({
       success: true,
       blocked: false,
-      answer: result.answer || "답변을 생성하지 못했습니다",
-      summary: result.summary || "",
-      suggestions: Array.isArray(result.suggestions) && result.suggestions.length
-        ? result.suggestions
-        : (TAB_EXAMPLES[tab] || TAB_EXAMPLES.market),
+      answer: answerText,
+      summary: "",
+      suggestions: TAB_EXAMPLES[tab] || TAB_EXAMPLES.market,
       apiData,
       intent: { region: regionName, upjong: upjongLabel, requestType: intent.requestType },
       dataSource,
