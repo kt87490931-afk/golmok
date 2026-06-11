@@ -451,6 +451,25 @@ export async function getHotPosts(limit = 3) {
   return data || [];
 }
 
+/** AI 검색 — 관련 커뮤니티 글 (관련도+조회+좋아요, 최대 5) */
+export async function searchRelatedPosts(query, { region = null, upjong = null, limit = 5 } = {}) {
+  const q = String(query || '').trim();
+  if (q.length < 2) return [];
+
+  const { data, error } = await supabase.rpc('search_related_posts', {
+    p_query: q.slice(0, 200),
+    p_region: region || null,
+    p_upjong: upjong || null,
+    p_limit: limit,
+  });
+
+  if (error) {
+    console.warn('search_related_posts', error.message);
+    return [];
+  }
+  return data || [];
+}
+
 export async function getPopularAreas(limit = 5) {
   const { data, error } = await supabase
     .from('popular_areas')

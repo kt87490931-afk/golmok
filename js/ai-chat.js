@@ -1,5 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260682';
+import { askGemini, getTabExamples } from './gemini.js?v=20260683';
 import { supabase } from './supabase_client.js';
+import { searchRelatedPosts } from './community.js?v=20260683';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -65,6 +66,54 @@ function normalizeAnswerText(text) {
   }
 
   return t;
+}
+
+const RELATED_CAT_LABELS = {
+  qna: '질문·고민',
+  info: '정보공유',
+  startup: '창업준비',
+  issue: '이슈',
+  event: '이벤트',
+};
+
+function getRelatedPostUrl(postId) {
+  const isMobile = document.body.classList.contains('m-shell');
+  const base = isMobile ? '../community.html' : 'community.html';
+  return `${base}?id=${encodeURIComponent(postId)}`;
+}
+
+function renderRelatedPosts(posts) {
+  if (!posts?.length) return '';
+  return `
+    <div class="ai-related-posts">
+      <div class="ai-related-title"><i class="ti ti-message-2"></i> 관련 커뮤니티 글</div>
+      <ul class="ai-related-list">
+        ${posts.map((p) => `
+          <li>
+            <a href="${getRelatedPostUrl(p.id)}" class="ai-related-item">
+              <span class="ai-related-cat">${escHtml(RELATED_CAT_LABELS[p.category] || '게시글')}</span>
+              <span class="ai-related-subj">${escHtml(p.title)}</span>
+              <span class="ai-related-meta">
+                ${p.region_dong ? escHtml(p.region_dong) + ' · ' : ''}👁 ${p.view_count || 0} · ❤ ${p.like_count || 0}
+              </span>
+            </a>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  `;
+}
+
+async function fetchRelatedPosts(question, intent) {
+  try {
+    return await searchRelatedPosts(question, {
+      region: intent?.region || null,
+      upjong: intent?.upjong || null,
+      limit: 5,
+    });
+  } catch {
+    return [];
+  }
 }
 
 function getTabLabel() {
@@ -188,7 +237,7 @@ function renderDataCards(d) {
   `;
 }
 
-function appendAIMsg(text, suggestions = []) {
+function appendAIMsg(text, suggestions = [], relatedHtml = '') {
   const msgs = document.getElementById('ai-messages');
   if (!msgs) return;
   const div = document.createElement('div');
@@ -200,14 +249,16 @@ function appendAIMsg(text, suggestions = []) {
         골목대장 AI
         <span class="badge">${getTabLabel()} 모드</span>
       </div>
-      <div class="msg-ai-bubble">${text}${renderSuggestions(suggestions)}</div>
+      <div class="msg-ai-bubble">${text}${relatedHtml}${renderSuggestions(suggestions)}</div>
     </div>
   `;
   msgs.appendChild(div);
   scrollMessages();
 }
 
-function appendDataMsg(result) {
+async function appendDataMsg(result, question) {
+  const related = await fetchRelatedPosts(question, result.intent);
+  const relatedHtml = renderRelatedPosts(related);
   const msgs = document.getElementById('ai-messages');
   if (!msgs) return;
   const d = result.apiData || {};
@@ -234,6 +285,7 @@ function appendDataMsg(result) {
         ${renderDataCards(d)}
         <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '답변을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.')}</div>
         ${result.summary ? `<div class="ai-summary">💡 ${escHtml(result.summary)}</div>` : ''}
+        ${relatedHtml}
         ${renderSuggestions(result.suggestions || getTabExamples(currentTab))}
       </div>
     </div>
@@ -242,8 +294,10 @@ function appendDataMsg(result) {
   scrollMessages();
 }
 
-function appendBlockedMsg(answer, suggestions) {
-  appendAIMsg(`<div class="msg-blocked">⚠️ ${escHtml(answer)}</div>`, suggestions);
+async function appendBlockedMsg(answer, suggestions, question, intent) {
+  const related = await fetchRelatedPosts(question, intent);
+  const relatedHtml = renderRelatedPosts(related);
+  appendAIMsg(`<div class="msg-blocked">⚠️ ${escHtml(answer)}</div>`, suggestions, relatedHtml);
 }
 
 function appendErrorMsg(text) {
@@ -307,12 +361,12 @@ window.sendAIMessage = async function sendAIMessage() {
   }
 
   if (result.blocked || result.needMoreInfo) {
-    appendBlockedMsg(result.answer, result.suggestions || getTabExamples(currentTab));
+    await appendBlockedMsg(result.answer, result.suggestions || getTabExamples(currentTab), q, result.intent);
     return;
   }
 
   if (result.answer) {
-    appendDataMsg(result);
+    await appendDataMsg(result, q);
     return;
   }
 
