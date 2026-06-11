@@ -1,5 +1,5 @@
-﻿import { fetchBizinfoPrograms } from '../bizinfo.js?v=20260687';
-import { getInfoPosts } from '../community.js?v=20260687';
+﻿import { fetchBizinfoPrograms } from '../bizinfo.js?v=20260688';
+import { getInfoPosts } from '../community.js?v=20260688';
 import { renderPostList } from '../community_ui.js';
 import { initPageShell, bootPage } from '../page_common.js';
 

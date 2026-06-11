@@ -21,15 +21,24 @@ export function stripHtml(s: string) {
 export function isBizinfoKeyConfigured(key?: string | null) {
   if (!key) return false;
   const v = String(key).trim();
-  if (!v || v.length < 8) return false;
+  if (!v || v.length < 4) return false;
   if (v.startsWith("YOUR_") || v.startsWith("REPLACE_") || v.startsWith("여기에")) return false;
   return true;
 }
 
 export function normalizeBizinfoItems(raw: unknown): BizProgram[] {
   const root = raw as Record<string, unknown>;
-  const jsonArray = (root?.jsonArray ?? root) as Record<string, unknown> | undefined;
-  let items = jsonArray?.item;
+  const jsonArray = root?.jsonArray;
+
+  let items: unknown;
+  if (Array.isArray(jsonArray)) {
+    items = jsonArray;
+  } else if (jsonArray && typeof jsonArray === "object") {
+    items = (jsonArray as Record<string, unknown>).item;
+  } else {
+    items = root?.item;
+  }
+
   if (!items) return [];
   if (!Array.isArray(items)) items = [items];
 

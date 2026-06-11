@@ -1,6 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260687';
+import { askGemini, getTabExamples } from './gemini.js?v=20260688';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260687';
+import { searchRelatedPosts } from './community.js?v=20260688';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -13,6 +13,21 @@ const TAB_LABELS = {
   policy: '정책·지원',
   stats: '통계정보',
 };
+
+function isPolicyQuestion(text) {
+  return /정책|지원금|보조금|융자|대출|정책자금|창업\s*지원|폐업|재기|지원사업|신청\s*방법|소상공인\s*지원|기업마당/i.test(String(text || ''));
+}
+
+function applyPolicyTabUI() {
+  currentTab = 'policy';
+  document.querySelectorAll('.ai-tab').forEach((t) => {
+    t.classList.toggle('act', t.dataset.tab === 'policy');
+  });
+  document.querySelectorAll('.msg-ai-name .badge').forEach((b) => {
+    b.textContent = `${getTabLabel()} 모드`;
+  });
+  updateExampleBtns();
+}
 
 const TAB_EXAMPLE_META = {
   market: [
@@ -401,6 +416,10 @@ window.sendAIMessage = async function sendAIMessage() {
   const q = input?.value?.trim();
   if (!q || isThinking) return;
 
+  if (currentTab !== 'policy' && isPolicyQuestion(q)) {
+    applyPolicyTabUI();
+  }
+
   const examples = document.getElementById('ai-examples');
   if (examples) examples.style.display = 'none';
 
@@ -526,6 +545,7 @@ window.goBackFromAI = function goBackFromAI() {
 function consumeInitialQuery() {
   const q = new URLSearchParams(window.location.search).get('q');
   if (!q?.trim()) return;
+  if (isPolicyQuestion(q)) applyPolicyTabUI();
   const input = document.getElementById('ai-input');
   if (input) {
     input.value = q.trim();
