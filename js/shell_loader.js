@@ -40,7 +40,7 @@ function applyActiveNav(active) {
   document.querySelectorAll('[data-gm-nav]').forEach((el) => {
     el.classList.toggle('act', el.dataset.gmNav === active);
   });
-  const mtab = ['home', 'analysis', 'profile'].includes(active) ? active : null;
+  const mtab = ['home', 'analysis', 'ai', 'profile'].includes(active) ? active : null;
   document.querySelectorAll('[data-gm-mtab]').forEach((el) => {
     if (mtab) el.classList.toggle('act', el.dataset.gmMtab === mtab);
   });
@@ -63,14 +63,21 @@ function bindShellGlobals(ctx) {
   }
   window.focusHeroSearch = function focusHeroSearch() {
     const onHome = /index\.html$/.test(location.pathname) || /\/m\/?$/.test(location.pathname);
-    if (!onHome) {
-      location.href = ctx.pages.home + '#hero';
+    if (onHome) {
+      const q = document.getElementById('ai-input')?.value?.trim();
+      if (q) {
+        location.href = `${ctx.pages.aiSearch}?q=${encodeURIComponent(q)}`;
+        return;
+      }
+      document.getElementById('ai-input')?.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    document.getElementById('ai-input')?.focus();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    location.href = ctx.pages.aiSearch;
   };
-  window.startVoice = window.startVoice || (() => window.showToast('음성검색 준비 중입니다'));
+  window.startVoice = window.startVoice || (() => {
+    location.href = ctx.pages.aiSearch;
+  });
   document.getElementById('write-btn-m')?.addEventListener('click', () => {
     document.getElementById('open-write')?.click() || document.getElementById('write-modal')?.classList.add('open');
   });
@@ -173,6 +180,9 @@ async function injectShell(parts, contentNode, opts = {}) {
 
   if (shellType === 'analysis') {
     document.body.classList.add('gm-shell-analysis');
+  }
+  if (shellType === 'ai') {
+    document.body.classList.add('gm-shell-ai');
   }
 
   const layout = buildLayout(parts, contentNode, shellType, ctx);

@@ -1,5 +1,5 @@
 /** 골목대장 v3 공통 셸 — 경로·토큰·활성 메뉴 */
-export const SHELL_VER = '20260677';
+export const SHELL_VER = '20260680';
 
 export function detectContext() {
   const path = window.location.pathname || '';
@@ -18,6 +18,7 @@ export function detectContext() {
     policy: isM ? '../policy.html' : 'policy.html',
     profile: isM ? 'profile.html' : 'profile.html',
     post: isM ? 'post.html' : 'post.html',
+    aiSearch: isM ? 'ai-search.html' : 'ai-search.html',
   };
   return { isM, root, assets, css: root + 'css/', js: root + 'js/', partials: root + 'partials/', pages };
 }
@@ -35,7 +36,8 @@ export function applyTokens(html, ctx) {
     .replace(/@@BY_INDUSTRY@@/g, p.byIndustry)
     .replace(/@@EVENTS@@/g, p.events)
     .replace(/@@POLICY@@/g, p.policy)
-    .replace(/@@PROFILE@@/g, p.profile);
+    .replace(/@@PROFILE@@/g, p.profile)
+    .replace(/@@AI_SEARCH@@/g, p.aiSearch);
 }
 
 /** data-gm-active → href 키 */
@@ -51,6 +53,7 @@ export const ACTIVE_MAP = {
   policy: 'policy',
   profile: 'profile',
   post: 'post',
+  ai: 'aiSearch',
 };
 
 export function hrefForActive(active, ctx) {

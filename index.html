@@ -363,14 +363,19 @@ window.setQ = function (q) {
 };
 window.doSearch = function () {
   const v = document.getElementById('ai-input')?.value?.trim();
-  if (v && window.sendAI) window.sendAI();
-  else if (v) document.querySelector('[data-open-analysis]')?.click();
+  if (!v) return;
+  window.location.href = `ai-search.html?q=${encodeURIComponent(v)}`;
 };
 window.focusHeroSearch = function () {
+  const v = document.getElementById('ai-input')?.value?.trim();
+  if (v) {
+    window.location.href = `ai-search.html?q=${encodeURIComponent(v)}`;
+    return;
+  }
   document.getElementById('ai-input')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
-window.startVoice = function () { showToast('음성검색 준비 중입니다'); };
+window.startVoice = function () { window.location.href = 'ai-search.html'; };
 window.changeRegion = function () { showToast('지역 변경은 프로필 설정에서 가능합니다'); };
 </script>
 </body>
