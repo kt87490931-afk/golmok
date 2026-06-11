@@ -1,6 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260684';
+import { askGemini, getTabExamples } from './gemini.js?v=20260685';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260684';
+import { searchRelatedPosts } from './community.js?v=20260685';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -82,10 +82,10 @@ function getRelatedPostUrl(postId) {
   return `${base}?id=${encodeURIComponent(postId)}`;
 }
 
-function renderRelatedPosts(posts) {
+function renderRelatedPostsBody(posts) {
   const hasPosts = posts?.length > 0;
-  const bodyHtml = hasPosts
-    ? `<ul class="ai-related-list">
+  if (hasPosts) {
+    return `<ul class="ai-related-list">
         ${posts.map((p) => `
           <li>
             <a href="${getRelatedPostUrl(p.id)}" class="ai-related-item">
@@ -97,15 +97,28 @@ function renderRelatedPosts(posts) {
             </a>
           </li>
         `).join('')}
-      </ul>`
-    : `<p class="ai-related-empty">관련 커뮤니티 글이 없습니다.</p>`;
+      </ul>`;
+  }
+  return `<p class="ai-related-empty">관련 커뮤니티 글이 없습니다.</p>`;
+}
 
+function renderRelatedPosts(posts) {
   return `
     <div class="ai-related-posts">
       <div class="ai-related-title"><i class="ti ti-message-2"></i> 관련 커뮤니티 글</div>
-      ${bodyHtml}
+      <div class="ai-related-body">${renderRelatedPostsBody(posts)}</div>
     </div>
   `;
+}
+
+async function hydrateRelatedPosts(slotEl, question, intent) {
+  if (!slotEl) return;
+  try {
+    const related = await fetchRelatedPosts(question, intent);
+    slotEl.innerHTML = renderRelatedPostsBody(related);
+  } catch {
+    slotEl.innerHTML = renderRelatedPostsBody([]);
+  }
 }
 
 async function fetchRelatedPosts(question, intent) {
@@ -241,9 +254,9 @@ function renderDataCards(d) {
   `;
 }
 
-function appendAIMsg(text, suggestions = [], relatedHtml = '') {
+function appendAIMsg(text, suggestions = [], withRelated = false) {
   const msgs = document.getElementById('ai-messages');
-  if (!msgs) return;
+  if (!msgs) return null;
   const div = document.createElement('div');
   div.className = 'msg-ai';
   div.innerHTML = `
@@ -253,16 +266,15 @@ function appendAIMsg(text, suggestions = [], relatedHtml = '') {
         골목대장 AI
         <span class="badge">${getTabLabel()} 모드</span>
       </div>
-      <div class="msg-ai-bubble">${text}${relatedHtml}${renderSuggestions(suggestions)}</div>
+      <div class="msg-ai-bubble">${text}${withRelated ? renderRelatedPosts([]) : ''}${renderSuggestions(suggestions)}</div>
     </div>
   `;
   msgs.appendChild(div);
   scrollMessages();
+  return div.querySelector('.ai-related-body');
 }
 
 async function appendDataMsg(result, question) {
-  const related = await fetchRelatedPosts(question, result.intent);
-  const relatedHtml = renderRelatedPosts(related);
   const msgs = document.getElementById('ai-messages');
   if (!msgs) return;
   const d = result.apiData || {};
@@ -289,19 +301,19 @@ async function appendDataMsg(result, question) {
         ${renderDataCards(d)}
         <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '답변을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.')}</div>
         ${result.summary ? `<div class="ai-summary">💡 ${escHtml(result.summary)}</div>` : ''}
-        ${relatedHtml}
+        ${renderRelatedPosts([])}
         ${renderSuggestions(result.suggestions || getTabExamples(currentTab))}
       </div>
     </div>
   `;
   msgs.appendChild(div);
   scrollMessages();
+  await hydrateRelatedPosts(div.querySelector('.ai-related-body'), question, intent);
 }
 
 async function appendBlockedMsg(answer, suggestions, question, intent) {
-  const related = await fetchRelatedPosts(question, intent);
-  const relatedHtml = renderRelatedPosts(related);
-  appendAIMsg(`<div class="msg-blocked">⚠️ ${escHtml(answer)}</div>`, suggestions, relatedHtml);
+  const relatedSlot = appendAIMsg(`<div class="msg-blocked">⚠️ ${escHtml(answer)}</div>`, suggestions, true);
+  await hydrateRelatedPosts(relatedSlot, question, intent);
 }
 
 function appendErrorMsg(text) {
