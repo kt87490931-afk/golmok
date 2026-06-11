@@ -72,26 +72,16 @@ export async function askGemini(question, tab = 'market') {
   }
 }
 
-export function getTabExamples(tab) {
-  const examples = {
-    market: [
-      '동탄2동 카페 매출이 궁금해',
-      '수원 인계동 치킨집 경쟁 현황',
-      '화성 봉담읍 음식점 유동인구',
-      '동탄에서 창업기상도 어때?',
-    ],
-    policy: [
-      '창업 지원금 신청 방법 알려줘',
-      '소상공인 정책자금이 있나요?',
-      '폐업 지원금 받을 수 있나요?',
-      '소진공 교육 프로그램이 있나요?',
-    ],
-    stats: [
-      '동탄 상권 매출 통계 보여줘',
-      '수원시 카페 업소 수 추이',
-      '화성시 음식점 업소 현황',
-      '동탄2동 창업기상도 점수',
-    ],
-  };
-  return examples[tab] || examples.market;
+export function getChatExamples() {
+  return [
+    '동탄2동 카페 매출이 궁금해',
+    '소상공인 지원금 신청 방법 알려줘',
+    '동탄 상권 매출 통계 보여줘',
+    '수원 인계동 치킨집 경쟁 현황',
+  ];
+}
+
+/** @deprecated use getChatExamples */
+export function getTabExamples() {
+  return getChatExamples();
 }

@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../css/main-v3.css?v=20260680">
 <link rel="stylesheet" href="../css/main-v3-m.css?v=20260680">
 <link rel="stylesheet" href="../css/shell-pages.css?v=20260680">
-<link rel="stylesheet" href="../css/ai-chat.css?v=20260689">
+<link rel="stylesheet" href="../css/ai-chat.css?v=20260690">
 </head>
 <body class="m-shell gm-shell-ai" data-gm-active="ai" data-gm-shell="ai">
 
@@ -41,21 +41,7 @@
         </div>
         <div class="ai-hd-title">
           <h1><em>골목대장 AI</em>에게 물어보세요</h1>
-          <p>소상공인진흥공단 빅데이터만 근거로 답변드려요</p>
-        </div>
-        <div class="ai-tabs" role="tablist">
-          <button type="button" class="ai-tab act" data-tab="market"
-            onclick="window.switchAITab('market',this)">
-            <i class="ti ti-map"></i> 상권정보
-          </button>
-          <button type="button" class="ai-tab" data-tab="stats"
-            onclick="window.switchAITab('stats',this)">
-            <i class="ti ti-chart-bar"></i> 통계정보
-          </button>
-          <button type="button" class="ai-tab" data-tab="policy"
-            onclick="window.switchAITab('policy',this)">
-            <i class="ti ti-file-text"></i> 정책·지원
-          </button>
+          <p>상권·통계·정책 지원, 무엇이든 물어보세요</p>
         </div>
       </div>
 
@@ -63,13 +49,10 @@
         <div class="msg-ai" id="welcome-msg">
           <div class="msg-ai-av"><img src="assets/gmlogo.png" alt="골목대장" class="ai-av-img" width="34" height="34"></div>
           <div class="msg-ai-body">
-            <div class="msg-ai-name">
-              골목대장 AI
-              <span class="badge">상권정보 모드</span>
-            </div>
+            <div class="msg-ai-name">골목대장 AI</div>
             <div class="msg-ai-bubble intro">
-              안녕하세요, 대장님! 소진공 Open API 데이터만 근거로 답변드려요.<br>
-              지역(행정동)과 업종을 함께 알려주세요 📍
+              안녕하세요, 대장님! 상권·통계·정책 질문 무엇이든 물어보세요.<br>
+              상권 질문은 지역(행정동)을 함께 알려주세요 📍
             </div>
           </div>
         </div>
@@ -113,6 +96,6 @@
 
 <script type="module" src="../js/shell_loader.js?v=20260680"></script>
 <script type="module" src="js/auth.js?v=20260680"></script>
-<script type="module" src="../js/ai-chat.js?v=20260689"></script>
+<script type="module" src="../js/ai-chat.js?v=20260690"></script>
 </body>
 </html>

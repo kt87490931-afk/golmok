@@ -1,54 +1,28 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260689';
+import { askGemini, getChatExamples } from './gemini.js?v=20260690';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260689';
+import { searchRelatedPosts } from './community.js?v=20260690';
 
-let currentTab = 'market';
 let isThinking = false;
 let recognition = null;
 let isListening = false;
 let thinkId = null;
 
-const TAB_LABELS = {
-  market: '상권정보',
-  policy: '정책·지원',
-  stats: '통계정보',
-};
-
 function isPolicyQuestion(text) {
   return /정책|지원금|보조금|융자|대출|정책자금|창업\s*지원|폐업|재기|지원사업|신청\s*방법|소상공인\s*지원|기업마당/i.test(String(text || ''));
 }
 
-function applyPolicyTabUI() {
-  currentTab = 'policy';
-  document.querySelectorAll('.ai-tab').forEach((t) => {
-    t.classList.toggle('act', t.dataset.tab === 'policy');
-  });
-  document.querySelectorAll('.msg-ai-name .badge').forEach((b) => {
-    b.textContent = `${getTabLabel()} 모드`;
-  });
-  updateExampleBtns();
+function resolveApiTab(question) {
+  return isPolicyQuestion(question) ? 'policy' : 'market';
 }
 
-const TAB_EXAMPLE_META = {
-  market: [
-    { text: '동탄에서 치킨집 배달 많은 요일은?', icon: 'ti-bike' },
-    { text: '수원 인계동 카페 경쟁 현황 알려줘', icon: 'ti-coffee' },
-    { text: '화성 봉담읍 음식점 매출 추이', icon: 'ti-chart-line' },
-    { text: '너의 사용법이 궁금해!', icon: 'ti-help-circle' },
-  ],
-  policy: [
-    { text: '창업하고 싶은데 지원받을 수 있는 게 있나요?', icon: 'ti-file-text' },
-    { text: '현재 지원받을 수 있는 정책이 있나요?', icon: 'ti-building-bank' },
-    { text: '소상공인을 위한 대출이 있나요?', icon: 'ti-cash' },
-    { text: '폐업 지원금 신청 방법은?', icon: 'ti-alert-circle' },
-  ],
-  stats: [
-    { text: '동탄 상권 매출 통계 보여줘', icon: 'ti-chart-bar' },
-    { text: '수원시 카페 업소 수 추이', icon: 'ti-trending-up' },
-    { text: '화성시 음식점 업소 현황', icon: 'ti-store' },
-    { text: '동탄2동 창업기상도 점수', icon: 'ti-cloud' },
-  ],
-};
+const CHAT_EXAMPLES = [
+  { text: '동탄2동 카페 매출이 궁금해', icon: 'ti-map-pin' },
+  { text: '수원 인계동 치킨집 경쟁 현황 알려줘', icon: 'ti-coffee' },
+  { text: '소상공인 지원금 신청 방법 알려줘', icon: 'ti-file-text' },
+  { text: '동탄 상권 매출 통계 보여줘', icon: 'ti-chart-bar' },
+  { text: '화성 봉담읍 음식점 유동인구', icon: 'ti-users' },
+  { text: '창업 지원금 받을 수 있나요?', icon: 'ti-building-bank' },
+];
 
 function escHtml(s) {
   return String(s || '')
@@ -157,37 +131,21 @@ async function fetchRelatedPosts(question, intent) {
   }
 }
 
-function getTabLabel() {
-  return TAB_LABELS[currentTab] || '상권정보';
-}
-
 function scrollMessages() {
   const msgs = document.getElementById('ai-messages');
   if (msgs) msgs.scrollTop = msgs.scrollHeight;
 }
 
-window.switchAITab = function switchAITab(tab, btn) {
-  currentTab = tab;
-  document.querySelectorAll('.ai-tab').forEach((t) => {
-    t.classList.toggle('act', t === btn);
-  });
-  document.querySelectorAll('.msg-ai-name .badge').forEach((b) => {
-    b.textContent = `${getTabLabel()} 모드`;
-  });
-  updateExampleBtns();
-};
-
 function updateExampleBtns() {
   const wrap = document.getElementById('ai-examples');
   if (!wrap) return;
-  const examples = TAB_EXAMPLE_META[currentTab] || TAB_EXAMPLE_META.market;
-  wrap.innerHTML = examples.map((ex) => `
+  wrap.innerHTML = CHAT_EXAMPLES.map((ex) => `
     <button type="button" class="ai-example-btn"
       onclick="window.sendAIExample('${escAttr(ex.text)}')">
       <i class="ti ${ex.icon}"></i>
       <div>
         <div>${escHtml(ex.text)}</div>
-        <div class="ai-example-label">${escHtml(getTabLabel())}</div>
+        <div class="ai-example-label">예시 질문</div>
       </div>
     </button>
   `).join('');
@@ -286,10 +244,7 @@ function appendAIMsg(text, suggestions = [], withRelated = false) {
   div.innerHTML = `
     <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="msg-ai-body">
-      <div class="msg-ai-name">
-        골목대장 AI
-        <span class="badge">${getTabLabel()} 모드</span>
-      </div>
+      <div class="msg-ai-name">골목대장 AI</div>
       <div class="msg-ai-bubble">${text}${withRelated ? renderRelatedPosts([]) : ''}${renderSuggestions(suggestions)}</div>
     </div>
   `;
@@ -326,10 +281,7 @@ async function appendPolicyMsg(result, question) {
   div.innerHTML = `
     <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="msg-ai-body">
-      <div class="msg-ai-name">
-        골목대장 AI
-        <span class="badge">${getTabLabel()} 모드</span>
-      </div>
+      <div class="msg-ai-name">골목대장 AI</div>
       <div class="msg-ai-bubble">
         <div class="ai-data-source">
           📋 <strong>기업마당</strong> 지원사업 공고 · 실시간
@@ -340,7 +292,7 @@ async function appendPolicyMsg(result, question) {
           ${renderPolicyCards(result.policyPrograms)}
         </div>
         ${renderRelatedPosts([])}
-        ${renderSuggestions(result.suggestions || getTabExamples(currentTab))}
+        ${renderSuggestions(result.suggestions || getChatExamples())}
       </div>
     </div>
   `;
@@ -362,10 +314,7 @@ async function appendDataMsg(result, question) {
   div.innerHTML = `
     <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="msg-ai-body">
-      <div class="msg-ai-name">
-        골목대장 AI
-        <span class="badge">${getTabLabel()} 모드</span>
-      </div>
+      <div class="msg-ai-name">골목대장 AI</div>
       <div class="msg-ai-bubble">
         ${regionLabel ? `
           <div class="ai-data-source">
@@ -377,7 +326,7 @@ async function appendDataMsg(result, question) {
         <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '답변을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.')}</div>
         ${result.summary ? `<div class="ai-summary">💡 ${escHtml(result.summary)}</div>` : ''}
         ${renderRelatedPosts([])}
-        ${renderSuggestions(result.suggestions || getTabExamples(currentTab))}
+        ${renderSuggestions(result.suggestions || getChatExamples())}
       </div>
     </div>
   `;
@@ -425,10 +374,6 @@ window.sendAIMessage = async function sendAIMessage() {
   const q = input?.value?.trim();
   if (!q || isThinking) return;
 
-  if (currentTab !== 'policy' && isPolicyQuestion(q)) {
-    applyPolicyTabUI();
-  }
-
   const examples = document.getElementById('ai-examples');
   if (examples) examples.style.display = 'none';
 
@@ -443,7 +388,7 @@ window.sendAIMessage = async function sendAIMessage() {
   const sendBtn = document.getElementById('send-btn');
   if (sendBtn) sendBtn.disabled = true;
 
-  const result = await askGemini(q, currentTab);
+  const result = await askGemini(q, resolveApiTab(q));
 
   removeThinking(thinkId);
   isThinking = false;
@@ -456,7 +401,7 @@ window.sendAIMessage = async function sendAIMessage() {
   }
 
   if (result.blocked || result.needMoreInfo) {
-    await appendBlockedMsg(result.answer, result.suggestions || getTabExamples(currentTab), q, result.intent);
+    await appendBlockedMsg(result.answer, result.suggestions || getChatExamples(), q, result.intent);
     return;
   }
 
@@ -554,7 +499,6 @@ window.goBackFromAI = function goBackFromAI() {
 function consumeInitialQuery() {
   const q = new URLSearchParams(window.location.search).get('q');
   if (!q?.trim()) return;
-  if (isPolicyQuestion(q)) applyPolicyTabUI();
   const input = document.getElementById('ai-input');
   if (input) {
     input.value = q.trim();

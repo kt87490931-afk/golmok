@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="css/main-v3.css?v=20260680">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260680">
-<link rel="stylesheet" href="css/ai-chat.css?v=20260689">
+<link rel="stylesheet" href="css/ai-chat.css?v=20260690">
 </head>
 <body data-gm-active="ai" data-gm-shell="ai">
 
@@ -39,21 +39,7 @@
         </div>
         <div class="ai-hd-title">
           <h1><em>골목대장 AI</em>에게 물어보세요</h1>
-          <p>소상공인진흥공단 빅데이터만 근거로 답변드려요</p>
-        </div>
-        <div class="ai-tabs" role="tablist">
-          <button type="button" class="ai-tab act" data-tab="market"
-            onclick="window.switchAITab('market',this)">
-            <i class="ti ti-map"></i> 상권정보
-          </button>
-          <button type="button" class="ai-tab" data-tab="stats"
-            onclick="window.switchAITab('stats',this)">
-            <i class="ti ti-chart-bar"></i> 통계정보
-          </button>
-          <button type="button" class="ai-tab" data-tab="policy"
-            onclick="window.switchAITab('policy',this)">
-            <i class="ti ti-file-text"></i> 정책·지원
-          </button>
+          <p>상권·통계·정책 지원, 무엇이든 물어보세요</p>
         </div>
       </div>
 
@@ -61,22 +47,14 @@
         <div class="msg-ai" id="welcome-msg">
           <div class="msg-ai-av"><img src="assets/gmlogo.png" alt="골목대장" class="ai-av-img" width="34" height="34"></div>
           <div class="msg-ai-body">
-            <div class="msg-ai-name">
-              골목대장 AI
-              <span class="badge">상권정보 모드</span>
-            </div>
+            <div class="msg-ai-name">골목대장 AI</div>
             <div class="msg-ai-bubble intro">
               안녕하세요, 대장님! 저는 <strong>골목대장 소상공인 AI</strong>입니다 😊<br><br>
-              소상공인진흥공단 Open API 데이터만을 근거로 답변드려요.<br><br>
-              <div class="ai-section-title"><i class="ti ti-database"></i> 활용 데이터</div>
-              <div style="font-size:13px;color:#444;display:flex;flex-direction:column;gap:4px;">
-                <div>📊 업종별 매출 · 🏪 업소 수 · 👥 유동인구</div>
-                <div>🌤️ 창업기상도 · 📈 테마상권 통계</div>
-              </div>
-              <div class="ai-section-title" style="margin-top:14px;"><i class="ti ti-bulb"></i> 이렇게 물어보세요</div>
+              소상공인진흥공단·기업마당 데이터를 근거로 상권·통계·정책 질문에 답변드려요.<br><br>
+              <div class="ai-section-title"><i class="ti ti-bulb"></i> 이렇게 물어보세요</div>
               <div style="font-size:12px;color:#888;line-height:1.8;">
-                지역(행정동)과 업종을 함께 알려주세요 📍<br>
-                예) <strong>"동탄2동 카페 매출이 궁금해!"</strong>
+                상권: <strong>"동탄2동 카페 매출이 궁금해!"</strong><br>
+                정책: <strong>"소상공인 지원금 신청 방법"</strong>
               </div>
             </div>
           </div>
@@ -121,6 +99,6 @@
 
 <script type="module" src="js/shell_loader.js?v=20260680"></script>
 <script type="module" src="js/auth.js?v=20260680"></script>
-<script type="module" src="js/ai-chat.js?v=20260689"></script>
+<script type="module" src="js/ai-chat.js?v=20260690"></script>
 </body>
 </html>
