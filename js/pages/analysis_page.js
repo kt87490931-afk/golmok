@@ -57,8 +57,6 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: '테마상권',
     endpoint: 'hpReport',
-    gisEmbed: 'hpReport',
-    gisParams: { leftMenu: 'themeSj', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_HPREPORT_KEY',
     live: true,
   },
@@ -66,8 +64,6 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: 'SNS분석',
     endpoint: 'snsAnaly',
-    gisEmbed: 'hpReport',
-    gisParams: { leftMenu: 'snsAnaly', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_SNS_KEY',
     live: true,
   },
@@ -75,8 +71,6 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: '배달분석',
     endpoint: 'delivery',
-    gisEmbed: 'hpReport',
-    gisParams: { leftMenu: 'delivery', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_DELIVERY_KEY',
     live: true,
   },
@@ -84,8 +78,6 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: '관광축제',
     endpoint: 'tour',
-    gisEmbed: 'hpReport',
-    gisParams: { leftMenu: 'tour', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_TOUR_KEY',
     live: true,
   },
@@ -93,8 +85,6 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: '업력현황',
     endpoint: 'stcarSttus',
-    gisEmbed: 'hpReport',
-    gisParams: { leftMenu: 'stcarSttus', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_STCARSTTUS_KEY',
     live: true,
     usageHint: '지역을 선택한 뒤 iframe 안의 「현황 보기」 버튼을 눌러 데이터를 확인하세요.',
@@ -103,8 +93,6 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: '매출추이',
     endpoint: 'slsIdex',
-    gisEmbed: 'hpReport',
-    gisParams: { leftMenu: 'slsIdex', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_SLSIDEX_KEY',
     live: true,
     usageHint: '지역·업종을 선택한 뒤 iframe 안의 「현황 보기」 버튼을 눌러 차트를 확인하세요.',
@@ -147,7 +135,10 @@ function getProbePanel() {
 
 function hideProbePanel() {
   const panel = getProbePanel();
-  if (panel) panel.hidden = true;
+  if (!panel) return;
+  panel.hidden = true;
+  panel.setAttribute('aria-hidden', 'true');
+  panel.style.display = 'none';
 }
 
 function updateUsageHint(entry) {
@@ -167,6 +158,8 @@ function showProbeLoading(label) {
   const pre = document.getElementById('api-probe-result');
   if (!panel || !pre) return;
   panel.hidden = false;
+  panel.setAttribute('aria-hidden', 'false');
+  panel.style.display = '';
   const title = document.getElementById('api-probe-title');
   if (title) title.textContent = `${label} — API 연결 확인 중...`;
   pre.textContent = 'JSON 응답을 요청하고 있습니다...';
@@ -353,6 +346,7 @@ window.switchTab = switchTab;
 window.toggleGroup = toggleGroup;
 
 async function initSbizAnalysisPage() {
+  hideProbePanel();
   bindTabBar();
   bindOutsideClick();
   bindProbePanel();
