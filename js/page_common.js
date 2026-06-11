@@ -24,7 +24,9 @@ export function initPageShell(activePage) {
 export function bootPage(fn) {
   const run = () => {
     fn();
-    import('./footer_ui.js').then((m) => m.mountSiteFooter()).catch(() => {});
+    import('./footer_ui.js').then((m) => {
+      if (!document.querySelector('.gm-footer')) m.mountSiteFooter();
+    }).catch(() => {});
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
   else run();
