@@ -220,11 +220,67 @@ async function runApiProbe(entry, iframeUrl) {
   renderProbeResult(entry.label, entry, result, iframeUrl);
 }
 
+const MOBILE_TAB_BP = 768;
+
+function isMobileTabBar() {
+  return window.innerWidth <= MOBILE_TAB_BP;
+}
+
+/** 모바일: 상위 overflow 클립을 피하기 위해 드롭다운을 body 직속으로 이동 */
+function portalizeTabMenus() {
+  document.querySelectorAll('.tab-group-menu').forEach((menu) => {
+    if (isMobileTabBar()) {
+      if (!menu.dataset.portaled) {
+        menu._portalHost = menu.parentElement;
+        document.body.appendChild(menu);
+        menu.dataset.portaled = '1';
+      }
+    } else if (menu.dataset.portaled && menu._portalHost) {
+      menu._portalHost.appendChild(menu);
+      delete menu.dataset.portaled;
+      menu._portalHost = null;
+    }
+  });
+}
+
+function ensureTabMenuBackdrop() {
+  let el = document.getElementById('analysis-tab-menu-backdrop');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'analysis-tab-menu-backdrop';
+    el.className = 'analysis-tab-menu-backdrop';
+    el.setAttribute('aria-hidden', 'true');
+    el.addEventListener('click', () => closeMobileTabMenus());
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function syncTabMenuBodyState() {
+  const anyOpen = document.querySelector('.tab-group-menu.open');
+  const openOnMobile = Boolean(anyOpen) && isMobileTabBar();
+  document.body.classList.toggle('analysis-tab-menu-open', openOnMobile);
+  const backdrop = document.getElementById('analysis-tab-menu-backdrop');
+  if (backdrop) backdrop.style.display = openOnMobile ? 'block' : 'none';
+}
+
+function closeMobileTabMenus() {
+  document.querySelectorAll('.tab-group-menu').forEach((m) => {
+    if (m.id !== 'menu-' + currentGroup) m.classList.remove('open');
+  });
+  document.querySelectorAll('.tab-group-btn').forEach((b) => {
+    const groupId = b.closest('.tab-group')?.id?.replace('group-', '');
+    if (groupId !== currentGroup) b.classList.remove('active');
+  });
+  syncTabMenuBodyState();
+}
+
 function openGroup(groupKey) {
   document.querySelectorAll('.tab-group-menu').forEach((m) => m.classList.remove('open'));
   document.querySelectorAll('.tab-group-btn').forEach((b) => b.classList.remove('active'));
   document.getElementById('menu-' + groupKey)?.classList.add('open');
   document.querySelector(`#group-${groupKey} .tab-group-btn`)?.classList.add('active');
+  syncTabMenuBodyState();
 }
 
 async function switchTab(tabKey, btnEl) {
@@ -288,10 +344,11 @@ async function switchTab(tabKey, btnEl) {
   else url.searchParams.set('tab', id);
   window.history.replaceState({}, '', url);
 
-  if (window.innerWidth <= 768) {
+  if (isMobileTabBar()) {
     document.querySelectorAll('.tab-group-menu').forEach((m) => m.classList.remove('open'));
     document.querySelectorAll('.tab-group-btn').forEach((b) => b.classList.remove('active'));
     document.querySelector(`#group-${entry.group} .tab-group-btn`)?.classList.add('active');
+    syncTabMenuBodyState();
   }
 }
 
@@ -306,18 +363,13 @@ function toggleGroup(groupKey, btnEl) {
     menu?.classList.add('open');
     btnEl?.classList.add('active');
   }
+  syncTabMenuBodyState();
 }
 
 function bindOutsideClick() {
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.tab-group')) {
-      document.querySelectorAll('.tab-group-menu').forEach((m) => {
-        if (m.id !== 'menu-' + currentGroup) m.classList.remove('open');
-      });
-      document.querySelectorAll('.tab-group-btn').forEach((b) => {
-        const groupId = b.closest('.tab-group')?.id?.replace('group-', '');
-        if (groupId !== currentGroup) b.classList.remove('active');
-      });
+    if (!e.target.closest('.tab-group') && !e.target.closest('.tab-group-menu')) {
+      closeMobileTabMenus();
     }
   });
 }
@@ -351,6 +403,12 @@ window.toggleGroup = toggleGroup;
 
 async function initSbizAnalysisPage() {
   hideProbePanel();
+  ensureTabMenuBackdrop();
+  portalizeTabMenus();
+  window.addEventListener('resize', () => {
+    portalizeTabMenus();
+    syncTabMenuBodyState();
+  });
   bindTabBar();
   bindOutsideClick();
   bindProbePanel();

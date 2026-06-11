@@ -232,16 +232,29 @@ body.gm-shell-analysis:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap) {
 
 @media (max-width: 768px) {
   .analysis-tab-bar {
-    overflow-x: auto;
+    /* overflow-x:auto 는 fixed 바텀시트(.tab-group-menu)를 클립함 */
+    overflow: visible;
     padding: 0;
     top: 0;
     flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
 
-  .analysis-tab-bar::-webkit-scrollbar {
+  body.analysis-tab-menu-open .gm-page-inner:has(.sbiz-analysis-wrap),
+  body.analysis-tab-menu-open .sbiz-analysis-wrap,
+  body.analysis-tab-menu-open .page-main-content:has(.sbiz-analysis-wrap) {
+    overflow: visible !important;
+  }
+
+  .analysis-tab-menu-backdrop {
     display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 340;
+  }
+
+  body.analysis-tab-menu-open .analysis-tab-menu-backdrop {
+    display: block;
   }
 
   .tab-group-btn {
@@ -253,17 +266,20 @@ body.gm-shell-analysis:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap) {
   .tab-group-menu {
     position: fixed;
     top: auto;
-    /* 하단 탭바(z-index 300) 위에 표시 — bottom:0 이면 마지막 메뉴가 탭바에 가려짐 */
     bottom: calc(var(--bn-h, 56px) + env(safe-area-inset-bottom, 0px));
     left: 0;
     right: 0;
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
     border-radius: 16px 16px 0 0;
     border: none;
     box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-    padding: 8px 0 16px;
+    padding: 8px 0 calc(12px + env(safe-area-inset-bottom, 0px));
     min-width: auto;
-    max-height: min(60vh, calc(100dvh - var(--hd-h, 60px) - var(--bn-h, 56px) - 48px));
+    max-height: min(70vh, calc(100dvh - var(--hd-h, 60px) - var(--bn-h, 56px) - 32px));
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     z-index: 350;
   }
 
