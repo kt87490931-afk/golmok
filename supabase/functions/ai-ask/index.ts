@@ -355,7 +355,7 @@ Deno.serve(async (req) => {
     }
 
     const regionCode = resolveRegionCode(regionName, regionMap);
-    if (!regionCode || intent.needMoreInfo === true) {
+    if (!regionCode) {
       return jsonResponse({
         success: true,
         needMoreInfo: true,
