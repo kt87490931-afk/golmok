@@ -1,6 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260688';
+import { askGemini, getTabExamples } from './gemini.js?v=20260689';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260688';
+import { searchRelatedPosts } from './community.js?v=20260689';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -60,6 +60,15 @@ function escHtml(s) {
 
 function escAttr(s) {
   return String(s || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+}
+
+function aiLogoSrc() {
+  return document.body.classList.contains('m-shell') ? 'assets/gmlogo.png' : 'assets/gmlogo.png';
+}
+
+function aiAvatarHtml(size = 34) {
+  const src = aiLogoSrc();
+  return `<img src="${escAttr(src)}" alt="골목대장" class="ai-av-img" width="${size}" height="${size}">`;
 }
 
 /** JSON 조각·코드 블록이 섞인 답변을 사용자용 문장으로 정리 */
@@ -275,7 +284,7 @@ function appendAIMsg(text, suggestions = [], withRelated = false) {
   const div = document.createElement('div');
   div.className = 'msg-ai';
   div.innerHTML = `
-    <div class="msg-ai-av">🤖</div>
+    <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="msg-ai-body">
       <div class="msg-ai-name">
         골목대장 AI
@@ -315,7 +324,7 @@ async function appendPolicyMsg(result, question) {
   const div = document.createElement('div');
   div.className = 'msg-ai';
   div.innerHTML = `
-    <div class="msg-ai-av">🤖</div>
+    <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="msg-ai-body">
       <div class="msg-ai-name">
         골목대장 AI
@@ -351,7 +360,7 @@ async function appendDataMsg(result, question) {
   const div = document.createElement('div');
   div.className = 'msg-ai';
   div.innerHTML = `
-    <div class="msg-ai-av">🤖</div>
+    <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="msg-ai-body">
       <div class="msg-ai-name">
         골목대장 AI
@@ -395,7 +404,7 @@ function appendThinking() {
   div.className = 'msg-thinking';
   div.id = id;
   div.innerHTML = `
-    <div class="msg-ai-av">🤖</div>
+    <div class="msg-ai-av">${aiAvatarHtml()}</div>
     <div class="thinking-dots">
       <div class="thinking-dot"></div>
       <div class="thinking-dot"></div>
@@ -564,16 +573,14 @@ async function showAIStatusBanner() {
     const map = {};
     (data || []).forEach((r) => { map[r.key] = r.value; });
     const enabled = map.GEMINI_ENABLED === 'true';
-    const limit = map.GEMINI_DAILY_LIMIT ?? '0';
-    const limitLabel = !limit || limit === '0' ? '무제한' : `${escHtml(limit)}회`;
     const banner = document.getElementById('ai-status-banner');
     if (!banner) return;
     if (!enabled) {
       banner.hidden = false;
       banner.innerHTML = '⚠️ AI 기능이 현재 <strong>OFF</strong> 상태입니다. 어드민 → AI 관리에서 ON으로 변경 후 API 키를 등록하세요.';
     } else {
-      banner.hidden = false;
-      banner.innerHTML = `ℹ️ 일일 질문 <strong>${limitLabel}</strong> · 소진공 API 데이터 기반 답변 · API 비용 관리를 위해 필요 시 어드민에서 한도를 설정할 수 있습니다.`;
+      banner.hidden = true;
+      banner.innerHTML = '';
     }
   } catch {
     /* ignore */
