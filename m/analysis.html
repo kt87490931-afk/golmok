@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../css/main-v3.css?v=20260663">
 <link rel="stylesheet" href="../css/main-v3-m.css?v=20260663">
 <link rel="stylesheet" href="../css/shell-pages.css?v=20260663">
-<link rel="stylesheet" href="../css/analysis-tabs.css?v=20260666">
+<link rel="stylesheet" href="../css/analysis-tabs.css?v=20260668">
 </head>
 <body class="m-shell gm-shell-analysis" data-gm-active="analysis" data-gm-shell="analysis">
 
@@ -62,11 +62,12 @@
         </div>
       </div>
     </div>
+    <div id="analysis-usage-hint" class="analysis-usage-hint" hidden role="note"></div>
     <div class="sbiz-iframe-shell">
       <div id="analysis-iframe-loading" class="analysis-iframe-loading">상권지도 불러오는 중...</div>
       <iframe id="analysis-iframe" title="소상공인365 상권분석" loading="lazy" allow="geolocation"></iframe>
     </div>
-    <div id="api-probe-panel" class="api-probe-panel" hidden>
+    <div id="api-probe-panel" class="api-probe-panel" hidden aria-hidden="true">
       <div class="api-probe-hd">
         <span id="api-probe-title">API 연결 확인</span>
         <button type="button" id="api-probe-close" class="api-probe-close">닫기</button>
@@ -78,6 +79,6 @@
 
 <script type="module" src="../js/shell_loader.js?v=20260659"></script>
 <script type="module" src="js/auth.js?v=20260659"></script>
-<script type="module" src="../js/pages/analysis_page.js?v=20260666"></script>
+<script type="module" src="../js/pages/analysis_page.js?v=20260668"></script>
 </body>
 </html>

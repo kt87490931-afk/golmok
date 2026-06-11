@@ -293,7 +293,28 @@ body.gm-shell-analysis:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap) {
   }
 }
 
-/* API 연결 테스트 패널 (테마분석 5종) */
+/* 지역·업종 선택 안내 (업력현황·매출추이) */
+.analysis-usage-hint {
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8b5a10;
+  background: #fff8e7;
+  border-bottom: 1px solid #fae3b0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.analysis-usage-hint::before {
+  content: '💡';
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* API 연결 테스트 패널 — ?debug=1 일 때만 표시 */
 .api-probe-panel {
   margin: 0;
   border-top: 1px solid #e8e4dc;

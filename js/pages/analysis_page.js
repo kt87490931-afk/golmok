@@ -2,6 +2,12 @@ import { initPageShell, bootPage } from '../page_common.js';
 import { getApiKey } from '../api-config.js?v=20260665';
 import { probeOpenApi } from '../sojanggong-api.js?v=20260666';
 
+/** 개발자 전용: ?debug=1 또는 ?api_debug=1 일 때만 API 프로브 패널 표시 */
+function isApiDebugEnabled() {
+  const q = new URLSearchParams(window.location.search);
+  return q.get('debug') === '1' || q.get('api_debug') === '1';
+}
+
 /** tab id → API 설정 */
 const TAB_ENTRIES = {
   map: {
@@ -51,6 +57,8 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: '테마상권',
     endpoint: 'hpReport',
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'themeSj', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_HPREPORT_KEY',
     live: true,
   },
@@ -58,41 +66,48 @@ const TAB_ENTRIES = {
     group: 'theme',
     label: 'SNS분석',
     endpoint: 'snsAnaly',
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'snsAnaly', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_SNS_KEY',
     live: true,
-    probe: true,
   },
   delivery: {
     group: 'theme',
     label: '배달분석',
     endpoint: 'delivery',
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'delivery', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_DELIVERY_KEY',
     live: true,
-    probe: true,
   },
   festival: {
     group: 'theme',
     label: '관광축제',
     endpoint: 'tour',
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'tour', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_TOUR_KEY',
     live: true,
-    probe: true,
   },
   history: {
     group: 'theme',
     label: '업력현황',
     endpoint: 'stcarSttus',
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'stcarSttus', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_STCARSTTUS_KEY',
     live: true,
-    probe: true,
+    usageHint: '지역을 선택한 뒤 iframe 안의 「현황 보기」 버튼을 눌러 데이터를 확인하세요.',
   },
   sales: {
     group: 'theme',
     label: '매출추이',
     endpoint: 'slsIdex',
+    gisEmbed: 'hpReport',
+    gisParams: { leftMenu: 'slsIdex', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_SLSIDEX_KEY',
     live: true,
-    probe: true,
+    usageHint: '지역·업종을 선택한 뒤 iframe 안의 「현황 보기」 버튼을 눌러 차트를 확인하세요.',
   },
 };
 
@@ -135,6 +150,18 @@ function hideProbePanel() {
   if (panel) panel.hidden = true;
 }
 
+function updateUsageHint(entry) {
+  const el = document.getElementById('analysis-usage-hint');
+  if (!el) return;
+  if (entry?.usageHint) {
+    el.textContent = entry.usageHint;
+    el.hidden = false;
+  } else {
+    el.textContent = '';
+    el.hidden = true;
+  }
+}
+
 function showProbeLoading(label) {
   const panel = getProbePanel();
   const pre = document.getElementById('api-probe-result');
@@ -145,7 +172,21 @@ function showProbeLoading(label) {
   pre.textContent = 'JSON 응답을 요청하고 있습니다...';
 }
 
-function renderProbeResult(label, entry, result) {
+function maskCertKeyInUrl(url) {
+  if (!url) return url;
+  try {
+    const u = new URL(url);
+    if (u.searchParams.has('certKey')) {
+      const raw = u.searchParams.get('certKey') || '';
+      u.searchParams.set('certKey', raw.length > 8 ? `${raw.slice(0, 4)}…${raw.slice(-4)}` : '****');
+    }
+    return u.toString();
+  } catch {
+    return url.replace(/certKey=[^&]+/i, 'certKey=****');
+  }
+}
+
+function renderProbeResult(label, entry, result, iframeUrl) {
   const panel = getProbePanel();
   const pre = document.getElementById('api-probe-result');
   if (!panel || !pre) return;
@@ -154,17 +195,22 @@ function renderProbeResult(label, entry, result) {
   const title = document.getElementById('api-probe-title');
   if (title) title.textContent = `${label} (${entry.endpoint}) — API 데이터 샘플`;
 
+  const safeProbe = { ...result };
+  if (safeProbe.url) safeProbe.url = maskCertKeyInUrl(safeProbe.url);
+
   const summary = {
     endpoint: entry.endpoint,
     keyName: entry.keyName,
-    iframe: '상단 iframe에서 시각화 확인',
-    probe: result,
+    embed: entry.gisEmbed ? 'gis/openApi (iframe 권장)' : '#/openApi (SPA)',
+    iframeUrl: maskCertKeyInUrl(iframeUrl),
+    note: '하단 JSON 프로브는 브라우저 CORS로 실패할 수 있습니다. 화면은 상단 iframe을 확인하세요.',
+    probe: safeProbe,
   };
   pre.textContent = JSON.stringify(summary, null, 2);
 }
 
-async function runApiProbe(entry) {
-  if (!entry.probe || !entry.endpoint) {
+async function runApiProbe(entry, iframeUrl) {
+  if (!isApiDebugEnabled() || !entry.endpoint) {
     hideProbePanel();
     return;
   }
@@ -174,7 +220,7 @@ async function runApiProbe(entry) {
 
   const result = await probeOpenApi(entry.endpoint, entry.keyName);
   if (seq !== probeSeq) return;
-  renderProbeResult(entry.label, entry, result);
+  renderProbeResult(entry.label, entry, result, iframeUrl);
 }
 
 function openGroup(groupKey) {
@@ -204,6 +250,8 @@ async function switchTab(tabKey, btnEl) {
   currentGroup = entry.group;
   openGroup(entry.group);
 
+  updateUsageHint(entry);
+
   if (!entry.live) {
     hideProbePanel();
     iframe.style.display = 'none';
@@ -230,7 +278,11 @@ async function switchTab(tabKey, btnEl) {
         loading.textContent = '화면을 불러오지 못했습니다.';
       };
       iframe.src = src;
-      runApiProbe(entry).catch((e) => console.warn('api probe', e));
+      if (isApiDebugEnabled()) {
+        runApiProbe(entry, src).catch((e) => console.warn('api probe', e));
+      } else {
+        hideProbePanel();
+      }
     }
   }
 
