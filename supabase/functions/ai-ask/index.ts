@@ -143,11 +143,26 @@ async function callGemini(
   }
   const data = await res.json();
   const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  const cleaned = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+  return parseGeminiJson(raw);
+}
+
+function parseGeminiJson(raw: string) {
+  const cleaned = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
   try {
-    return JSON.parse(cleaned);
+    const obj = JSON.parse(cleaned);
+    if (obj && typeof obj.answer === "string") return obj;
+    if (typeof obj === "string") return { answer: obj };
+    return obj;
   } catch {
-    return { raw, answer: raw };
+    const m = cleaned.match(/"answer"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (m) {
+      try {
+        return { answer: JSON.parse(`"${m[1]}"`) };
+      } catch {
+        return { answer: m[1] };
+      }
+    }
+    return { answer: cleaned || raw };
   }
 }
 
@@ -156,7 +171,7 @@ function normalizeMetrics(raw: Record<string, unknown>, region?: string, upjong?
   return {
     region: region || String(d.region ?? d.adongNm ?? ""),
     upjong: upjong || String(d.upjong ?? d.indutyNm ?? ""),
-    dailyPopulation: numOrNull(d.dailyPopulation ?? d.dayFlpopCnt ?? d.population),
+    dailyPopulation: numOrNull(d.dailyPopulation ?? d.dayFlpopCnt ?? d.population ?? d.avgPopulation),
     populationChange: numOrNull(d.populationChange ?? d.flpopChange),
     monthlyRevenue: numOrNull(d.monthlyRevenue ?? d.mmAvrgSelngAmt ?? d.avgRevenue),
     revenueChange: numOrNull(d.revenueChange ?? d.selngChange),
@@ -166,6 +181,48 @@ function normalizeMetrics(raw: Record<string, unknown>, region?: string, upjong?
     weatherLabel: String(d.weatherLabel ?? d.wthrLbl ?? d.label ?? ""),
     peakDay: String(d.peakDay ?? d.peakDow ?? ""),
     peakTime: String(d.peakTime ?? d.peakTm ?? ""),
+    survivalRate12m: numOrNull(d.survivalRate12m ?? d.survRt),
+    competitionScore: numOrNull(d.competitionScore ?? d.cmpetScr),
+  };
+}
+
+const MOCK_PAYLOADS: Record<string, Record<string, unknown>> = {
+  weather: {
+    dailyPopulation: 316000,
+    populationChange: 17.7,
+    monthlyRevenue: 13160000,
+    revenueChange: -2.2,
+    storeCount: 175,
+    storeChange: -17.8,
+    weatherScore: 72,
+    weatherLabel: "맑음",
+    peakDay: "금요일",
+    peakTime: "18~23시",
+  },
+  hpReport: {
+    totalStore: 175,
+    avgRevenue: 13160000,
+    avgPopulation: 316000,
+    competitionScore: 62,
+    survivalRate12m: 68,
+    rankInRegion: 3,
+    totalInRegion: 24,
+  },
+  storSttus: { storeCount: 175, totalCount: 175 },
+};
+
+function buildMockResult(
+  endpoint: string,
+  regionLabel: string,
+  upjongLabel: string,
+  mockFallback: boolean,
+) {
+  const payload = MOCK_PAYLOADS[endpoint] || MOCK_PAYLOADS.weather;
+  return {
+    mock: true,
+    mockFallback,
+    data: normalizeMetrics({ data: payload }, regionLabel, upjongLabel),
+    endpoint,
   };
 }
 
@@ -188,29 +245,13 @@ async function fetchSojanggong(
 
   const mode = cfg.SOJANGGONG_API_MODE || "mock";
   if (mode === "mock") {
-    return {
-      mock: true,
-      data: normalizeMetrics({
-        data: {
-          dailyPopulation: 316000,
-          populationChange: 17.7,
-          monthlyRevenue: 13160000,
-          revenueChange: -2.2,
-          storeCount: 175,
-          storeChange: -17.8,
-          weatherScore: 72,
-          weatherLabel: "맑음",
-          peakDay: "금요일",
-          peakTime: "18~23시",
-        },
-      }, regionLabel, upjongLabel),
-      endpoint,
-    };
+    return buildMockResult(endpoint, regionLabel, upjongLabel, false);
   }
 
   const certKey = cfg[keyName];
   if (!certKey || certKey.startsWith("YOUR_") || certKey.startsWith("REPLACE_")) {
-    return { error: "KEY_MISSING" as const };
+    console.warn(`Sojanggong key missing: ${keyName}, using mock`);
+    return buildMockResult(endpoint, regionLabel, upjongLabel, true);
   }
 
   const url = new URL(`${SOJANGGONG_BASE}/${endpoint}`);
@@ -221,26 +262,74 @@ async function fetchSojanggong(
   });
 
   try {
-    const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
-    if (!res.ok) return { error: `HTTP_${res.status}` as const };
-    const json = await res.json();
+    const res = await fetch(url.toString(), {
+      headers: {
+        Accept: "application/json",
+        Referer: "https://bigdata.sbiz.or.kr/",
+        "User-Agent": "Mozilla/5.0 (compatible; GolmokMaster/1.0)",
+      },
+    });
+    const text = await res.text();
+    if (!res.ok || text.trim().startsWith("<")) {
+      console.warn(`Sojanggong ${endpoint} HTTP ${res.status}, mock fallback`);
+      return buildMockResult(endpoint, regionLabel, upjongLabel, true);
+    }
+    let json: Record<string, unknown>;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      return buildMockResult(endpoint, regionLabel, upjongLabel, true);
+    }
+    if (json.result === "fail" || json.error || json.errMsg) {
+      return buildMockResult(endpoint, regionLabel, upjongLabel, true);
+    }
     return {
-      data: normalizeMetrics(json as Record<string, unknown>, regionLabel, upjongLabel),
+      mock: false,
+      mockFallback: false,
+      data: normalizeMetrics(json, regionLabel, upjongLabel),
       endpoint,
     };
-  } catch {
-    return { error: "FETCH_FAILED" as const };
+  } catch (e) {
+    console.warn(`Sojanggong ${endpoint} fetch error`, e);
+    return buildMockResult(endpoint, regionLabel, upjongLabel, true);
   }
 }
 
 function pickEndpoint(requestType: string) {
-  if (requestType === "창업기상도") {
-    return { endpoint: "weather", key: "SOJANGGONG_WEATHER_KEY" };
+  const t = String(requestType || "매출");
+  if (t === "창업기상도" || t === "유동인구" || t === "매출") {
+    return {
+      endpoint: "weather",
+      key: "SOJANGGONG_WEATHER_KEY",
+      extraParams: {} as Record<string, string>,
+    };
   }
-  if (requestType === "통계") {
-    return { endpoint: "hpReport", key: "SOJANGGONG_HPREPORT_KEY" };
+  if (t === "통계" || t === "경쟁분석") {
+    return {
+      endpoint: "hpReport",
+      key: "SOJANGGONG_HPREPORT_KEY",
+      extraParams: { radius: "500" },
+    };
   }
-  return { endpoint: "storSttus", key: "SOJANGGONG_STORSTTUS_KEY" };
+  if (t === "업소수") {
+    return {
+      endpoint: "storSttus",
+      key: "SOJANGGONG_STORSTTUS_KEY",
+      extraParams: { pageIndex: "1", pageSize: "20" },
+    };
+  }
+  if (t === "배달") {
+    return {
+      endpoint: "delivery",
+      key: "SOJANGGONG_DELIVERY_KEY",
+      extraParams: {},
+    };
+  }
+  return {
+    endpoint: "weather",
+    key: "SOJANGGONG_WEATHER_KEY",
+    extraParams: {},
+  };
 }
 
 Deno.serve(async (req) => {
@@ -368,32 +457,32 @@ Deno.serve(async (req) => {
 
     const upjongLabel = intent.upjong || "음식";
     const upjongCode = resolveUpjongCode(upjongLabel);
-    const { endpoint, key } = pickEndpoint(String(intent.requestType || "매출"));
+    const { endpoint, key, extraParams } = pickEndpoint(String(intent.requestType || "매출"));
 
     const apiResult = await fetchSojanggong(
       cfg,
       endpoint,
       key,
-      { regionCode, upjongCode, radius: "500", pageIndex: "1", pageSize: "20" },
+      { regionCode, upjongCode, ...extraParams },
       regionName || "",
       upjongLabel,
     );
 
-    if ("error" in apiResult && apiResult.error) {
-      const msg = apiResult.error === "KEY_MISSING"
-        ? "해당 API 키가 아직 등록되지 않았습니다. 어드민에서 확인해주세요."
-        : "소진공 API에서 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.";
-      return jsonResponse({ success: false, error: msg });
+    if ("error" in apiResult && apiResult.error === "API_DISABLED") {
+      return jsonResponse({ success: false, error: "소진공 API가 비활성화되어 있습니다." });
     }
 
     const apiData = apiResult.data;
-    const dataSource = apiResult.mock ? "mock" : "api";
+    const dataSource = apiResult.mockFallback ? "mock_fallback" : apiResult.mock ? "mock" : "api";
+    const fallbackNote = apiResult.mockFallback
+      ? "\n(참고: 서버에서 실시간 API 호출이 제한되어 샘플 데이터로 답변합니다. 상권분석 탭 iframe에서 실데이터를 확인하세요.)"
+      : "";
     const dataContext = `[소진공 API 데이터]
 지역: ${regionName}
 업종: ${upjongLabel}
 요청: ${intent.requestType || "매출"}
 endpoint: ${apiResult.endpoint}
-데이터: ${JSON.stringify(apiData)}
+데이터: ${JSON.stringify(apiData)}${fallbackNote}
 위 데이터만 보고 답변하세요.`;
 
     const result = await callGemini(
