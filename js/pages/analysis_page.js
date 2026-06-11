@@ -44,14 +44,14 @@ const TAB_ENTRIES = {
     label: '간단분석',
     endpoint: 'simple',
     keyName: 'SOJANGGONG_SIMPLE_KEY',
-    live: false,
+    live: true,
   },
   detail: {
     group: 'analysis',
     label: '상세분석',
     endpoint: 'detail',
     keyName: 'SOJANGGONG_DETAIL_KEY',
-    live: false,
+    live: true,
   },
   theme: {
     group: 'theme',
