@@ -169,4 +169,47 @@ export async function getStoreStatus({ regionCode, upjongCode, pageIndex = 1, pa
   });
 }
 
+/** 연결 테스트 — JSON 응답 샘플 (CORS 시 iframe으로 확인) */
+export async function probeOpenApi(endpoint, keyName, extraParams = {}) {
+  const enabled = await isApiEnabled();
+  if (!enabled) return { ok: false, error: '소진공 API가 비활성 상태입니다' };
+
+  const mode = await getApiMode();
+  if (mode === 'mock') {
+    return { ok: true, mode: 'mock', json: getMockData(endpoint), note: '데이터 모드가 mock입니다. 어드민에서 real로 전환하세요.' };
+  }
+
+  const certKey = await getApiKey(keyName);
+  if (!certKey || certKey.startsWith('REPLACE_') || certKey.startsWith('YOUR_')) {
+    return { ok: false, error: `API 키 미설정: ${keyName}` };
+  }
+
+  const url = buildApiUrl(endpoint, { certKey, type: 'json', ...extraParams });
+  try {
+    const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
+    const text = await res.text();
+    let json = null;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      json = null;
+    }
+    return {
+      ok: res.ok,
+      status: res.status,
+      url,
+      json,
+      rawPreview: json ? undefined : text.slice(0, 1500),
+      keys: json && typeof json === 'object' ? Object.keys(json.data || json.result || json).slice(0, 20) : [],
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err.message,
+      url,
+      hint: '브라우저 CORS 차단 가능 — 위 iframe 화면으로 데이터를 확인하세요.',
+    };
+  }
+}
+
 export { getApiMode };

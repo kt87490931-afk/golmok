@@ -292,3 +292,43 @@ body.gm-shell-analysis:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap) {
     height: 100% !important;
   }
 }
+
+/* API 연결 테스트 패널 (테마분석 5종) */
+.api-probe-panel {
+  margin: 0;
+  border-top: 1px solid #e8e4dc;
+  background: #fffdf8;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+.api-probe-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c17f24;
+  border-bottom: 1px solid #f5f1e8;
+}
+.api-probe-close {
+  border: 1px solid #e8e4dc;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #555;
+}
+.api-probe-result {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow: auto;
+  flex: 1;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

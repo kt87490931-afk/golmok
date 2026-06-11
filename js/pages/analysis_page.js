@@ -1,7 +1,8 @@
 import { initPageShell, bootPage } from '../page_common.js';
-import { getApiKey } from '../api-config.js?v=20260644';
+import { getApiKey } from '../api-config.js?v=20260665';
+import { probeOpenApi } from '../sojanggong-api.js?v=20260666';
 
-/** tab id → API 설정 (live=true: Supabase 실키 4종만 오픈) */
+/** tab id → API 설정 */
 const TAB_ENTRIES = {
   map: {
     group: 'status',
@@ -20,7 +21,6 @@ const TAB_ENTRIES = {
   hotplace: {
     group: 'status',
     label: '핫플레이스',
-    /** /hotplace/gis 는 사이트 전체(헤더 포함) — gis/openApi 임베드 전용 URL 사용 */
     gisEmbed: 'hpReport',
     gisParams: { leftMenu: 'hotPlace', mapOnly: 'Y' },
     keyName: 'SOJANGGONG_HPREPORT_KEY',
@@ -59,41 +59,45 @@ const TAB_ENTRIES = {
     label: 'SNS분석',
     endpoint: 'snsAnaly',
     keyName: 'SOJANGGONG_SNS_KEY',
-    live: false,
+    live: true,
+    probe: true,
   },
   delivery: {
     group: 'theme',
     label: '배달분석',
     endpoint: 'delivery',
     keyName: 'SOJANGGONG_DELIVERY_KEY',
-    live: false,
+    live: true,
+    probe: true,
   },
   festival: {
     group: 'theme',
     label: '관광축제',
     endpoint: 'tour',
     keyName: 'SOJANGGONG_TOUR_KEY',
-    live: false,
+    live: true,
+    probe: true,
   },
   history: {
     group: 'theme',
     label: '업력현황',
     endpoint: 'stcarSttus',
     keyName: 'SOJANGGONG_STCARSTTUS_KEY',
-    live: false,
+    live: true,
+    probe: true,
   },
   sales: {
     group: 'theme',
     label: '매출추이',
     endpoint: 'slsIdex',
     keyName: 'SOJANGGONG_SLSIDEX_KEY',
-    live: false,
+    live: true,
+    probe: true,
   },
 };
 
 const COMING_SOON_MSG = '추가 API 승인 후 오픈 예정입니다';
 
-/** 이전 URL 파라미터 호환 */
 const TAB_ALIASES = {
   tour: 'festival',
   stcar: 'history',
@@ -102,6 +106,7 @@ const TAB_ALIASES = {
 
 let currentTab = 'map';
 let currentGroup = 'status';
+let probeSeq = 0;
 
 function normalizeTabId(tabKey) {
   const key = tabKey || 'map';
@@ -119,6 +124,57 @@ async function buildTabUrl(entry) {
     return `https://bigdata.sbiz.or.kr/#${entry.hashPath}?${qs.toString()}`;
   }
   return `https://bigdata.sbiz.or.kr/#/openApi/${entry.endpoint}?${qs.toString()}`;
+}
+
+function getProbePanel() {
+  return document.getElementById('api-probe-panel');
+}
+
+function hideProbePanel() {
+  const panel = getProbePanel();
+  if (panel) panel.hidden = true;
+}
+
+function showProbeLoading(label) {
+  const panel = getProbePanel();
+  const pre = document.getElementById('api-probe-result');
+  if (!panel || !pre) return;
+  panel.hidden = false;
+  const title = document.getElementById('api-probe-title');
+  if (title) title.textContent = `${label} — API 연결 확인 중...`;
+  pre.textContent = 'JSON 응답을 요청하고 있습니다...';
+}
+
+function renderProbeResult(label, entry, result) {
+  const panel = getProbePanel();
+  const pre = document.getElementById('api-probe-result');
+  if (!panel || !pre) return;
+
+  panel.hidden = false;
+  const title = document.getElementById('api-probe-title');
+  if (title) title.textContent = `${label} (${entry.endpoint}) — API 데이터 샘플`;
+
+  const summary = {
+    endpoint: entry.endpoint,
+    keyName: entry.keyName,
+    iframe: '상단 iframe에서 시각화 확인',
+    probe: result,
+  };
+  pre.textContent = JSON.stringify(summary, null, 2);
+}
+
+async function runApiProbe(entry) {
+  if (!entry.probe || !entry.endpoint) {
+    hideProbePanel();
+    return;
+  }
+
+  const seq = ++probeSeq;
+  showProbeLoading(entry.label);
+
+  const result = await probeOpenApi(entry.endpoint, entry.keyName);
+  if (seq !== probeSeq) return;
+  renderProbeResult(entry.label, entry, result);
 }
 
 function openGroup(groupKey) {
@@ -149,6 +205,7 @@ async function switchTab(tabKey, btnEl) {
   openGroup(entry.group);
 
   if (!entry.live) {
+    hideProbePanel();
     iframe.style.display = 'none';
     iframe.removeAttribute('src');
     loading.style.display = 'flex';
@@ -160,6 +217,7 @@ async function switchTab(tabKey, btnEl) {
 
     const src = await buildTabUrl(entry);
     if (!src) {
+      hideProbePanel();
       loading.innerHTML =
         '<span style="color:#E24B4A;">API 키가 설정되지 않았습니다.<br><span style="font-size:12px;color:#999;">어드민 API 관리에서 확인하세요.</span></span>';
       iframe.removeAttribute('src');
@@ -172,6 +230,7 @@ async function switchTab(tabKey, btnEl) {
         loading.textContent = '화면을 불러오지 못했습니다.';
       };
       iframe.src = src;
+      runApiProbe(entry).catch((e) => console.warn('api probe', e));
     }
   }
 
@@ -214,6 +273,10 @@ function bindOutsideClick() {
   });
 }
 
+function bindProbePanel() {
+  document.getElementById('api-probe-close')?.addEventListener('click', hideProbePanel);
+}
+
 function initTab() {
   const params = new URLSearchParams(window.location.search);
   const tabParam = normalizeTabId(params.get('tab') || 'map');
@@ -240,6 +303,7 @@ window.toggleGroup = toggleGroup;
 async function initSbizAnalysisPage() {
   bindTabBar();
   bindOutsideClick();
+  bindProbePanel();
   initTab();
   window.addEventListener('golmok:auth-changed', () => {
     const btn = document.querySelector(`[data-tab="${currentTab}"]`);
