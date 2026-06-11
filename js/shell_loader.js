@@ -268,6 +268,7 @@ export async function initShell() {
     }
     applyActiveNav(active);
     bindShellGlobals(ctx);
+    await mountSiteFooter(ctx).catch((e) => console.warn('footer', e));
     document.body.dataset.gmShellDone = '1';
     return;
   }
