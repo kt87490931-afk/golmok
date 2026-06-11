@@ -253,16 +253,18 @@ body.gm-shell-analysis:not(.m-shell) .gm-page-inner:has(.sbiz-analysis-wrap) {
   .tab-group-menu {
     position: fixed;
     top: auto;
-    bottom: 0;
+    /* 하단 탭바(z-index 300) 위에 표시 — bottom:0 이면 마지막 메뉴가 탭바에 가려짐 */
+    bottom: calc(var(--bn-h, 56px) + env(safe-area-inset-bottom, 0px));
     left: 0;
     right: 0;
     border-radius: 16px 16px 0 0;
     border: none;
     box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-    padding: 8px 0 20px;
+    padding: 8px 0 16px;
     min-width: auto;
-    max-height: 60vh;
+    max-height: min(60vh, calc(100dvh - var(--hd-h, 60px) - var(--bn-h, 56px) - 48px));
     overflow-y: auto;
+    z-index: 350;
   }
 
   .tab-group-menu::before {
