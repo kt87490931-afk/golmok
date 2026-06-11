@@ -11,14 +11,14 @@
 <div class="admin-wrap">
   <div class="admin-main">
     <div class="admin-topbar">
-      <div class="admin-page-title" id="admin-page-title">푸터 / 약관 관리</div>
+      <div class="admin-page-title" id="admin-page-title">푸터 관리</div>
     </div>
     <div class="admin-content">
       <div class="admin-card">
-        <div class="admin-card-title"><i class="ti ti-layout-bottombar"></i> 사업자 정보 · SNS · 약관 링크</div>
+        <div class="admin-card-title"><i class="ti ti-layout-bottombar"></i> 사업자 정보 · SNS</div>
         <p style="font-size:13px;color:#666;margin-bottom:16px;line-height:1.6;">
-          사이트 하단 푸터에 표시됩니다. 약관 <strong>본문</strong>은 각 HTML 페이지(terms.html, privacy.html 등)이며,
-          여기서는 링크 목록과 사업자 정보를 관리합니다. SNS URL이 비어 있으면 기본 placeholder URL이 사용됩니다.
+          사이트 하단 푸터에 표시됩니다. 약관 <strong>본문</strong> 수정은
+          <a href="legal-manager.html" style="color:#C17F24;">약관 본문 관리</a>에서 하세요.
         </p>
         <div id="footer-settings-root"></div>
       </div>
@@ -27,11 +27,11 @@
 </div>
 <script type="module">
 import { requireAdmin } from './js/admin-auth.js?v=20260630';
-import { initAdminPage } from './js/admin.js?v=20260675';
-import { loadFooterSettings } from './js/footer-manager-admin.js?v=20260676';
+import { initAdminPage } from './js/admin.js?v=20260677';
+import { loadFooterSettings } from './js/footer-manager-admin.js?v=20260677';
 
 const adminUser = await requireAdmin();
-await initAdminPage({ activePage: 'footer', pageTitle: '푸터 / 약관 관리', adminUser });
+await initAdminPage({ activePage: 'footer', pageTitle: '푸터 관리', adminUser });
 loadFooterSettings();
 </script>
 </body>

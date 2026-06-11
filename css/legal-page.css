@@ -1,0 +1,16 @@
+/* 약관·정책 공통 페이지 */
+.legal-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #C17F24;
+  margin-bottom: 6px;
+}
+.legal-logo img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}

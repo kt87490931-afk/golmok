@@ -12,12 +12,11 @@ const FOOTER_KEYS = [
   { key: 'FOOTER_SNS_FACEBOOK', label: 'Facebook URL', type: 'url' },
   { key: 'FOOTER_SNS_INSTAGRAM', label: 'Instagram URL', type: 'url' },
   { key: 'FOOTER_SNS_YOUTUBE', label: 'YouTube URL', type: 'url' },
-  { key: 'FOOTER_LEGAL_LINKS', label: '약관 링크 (JSON)', type: 'json' },
 ];
 
 async function clearFooterCache() {
   try {
-    const mod = await import('../../js/footer_ui.js?v=20260676');
+    const mod = await import('../../js/footer_ui.js?v=20260677');
     mod.clearFooterSettingsCache?.();
   } catch (_) {
     /* ignore */
@@ -27,16 +26,12 @@ async function clearFooterCache() {
 function fieldHtml(row) {
   const meta = FOOTER_KEYS.find((k) => k.key === row.key);
   const label = meta?.label || row.key;
-  const isJson = meta?.type === 'json';
   const val = row.value || '';
   return `<div class="footer-field" style="margin-bottom:16px;">
     <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#333;">${escapeHtml(label)}
       <span style="font-size:10px;color:#999;font-weight:400;margin-left:6px;">${escapeHtml(row.key)}</span>
     </label>
-    ${isJson
-      ? `<textarea data-footer-id="${row.id}" data-footer-key="${escapeHtml(row.key)}" rows="6" style="width:100%;padding:10px;border:1px solid #E8E4DC;border-radius:8px;font-family:monospace;font-size:12px;">${escapeHtml(val)}</textarea>
-         <div style="font-size:11px;color:#999;margin-top:4px;">예: [{"label":"이용약관","href":"terms.html","bold":false}]</div>`
-      : `<input type="text" data-footer-id="${row.id}" data-footer-key="${escapeHtml(row.key)}" value="${escapeHtml(val)}" style="width:100%;padding:10px;border:1px solid #E8E4DC;border-radius:8px;font-size:13px;">`}
+    <input type="text" data-footer-key="${escapeHtml(row.key)}" value="${escapeHtml(val)}" style="width:100%;padding:10px;border:1px solid #E8E4DC;border-radius:8px;font-size:13px;">
   </div>`;
 }
 
@@ -63,9 +58,10 @@ export async function loadFooterSettings() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;">
       ${rows.map((r) => fieldHtml(r)).join('')}
     </div>
-    <div style="margin-top:20px;display:flex;gap:10px;">
+    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <button type="button" id="btn-footer-save" class="btn-primary" style="padding:10px 24px;border:none;border-radius:8px;background:#F5A623;color:#fff;font-weight:700;cursor:pointer;">저장</button>
-      <a href="../index.html" target="_blank" rel="noopener" style="padding:10px 16px;font-size:13px;color:#C17F24;">사이트에서 미리보기 ↗</a>
+      <a href="legal-manager.html" style="padding:10px 16px;font-size:13px;color:#C17F24;">약관 본문 관리 →</a>
+      <a href="../index.html" target="_blank" rel="noopener" style="padding:10px 16px;font-size:13px;color:#888;">사이트 미리보기 ↗</a>
     </div>`;
 
   document.getElementById('btn-footer-save')?.addEventListener('click', saveFooterSettings);
@@ -83,12 +79,6 @@ async function saveFooterSettings() {
     for (const el of inputs) {
       const key = el.dataset.footerKey;
       const value = el.value.trim();
-      const id = el.dataset.footerId;
-
-      if (key === 'FOOTER_LEGAL_LINKS' && value) {
-        JSON.parse(value);
-      }
-
       const { error } = await supabase.rpc('upsert_admin_app_setting', {
         p_key: key,
         p_value: value,

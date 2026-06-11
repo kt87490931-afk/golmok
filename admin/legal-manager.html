@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>약관 본문 관리 - 골목대장 어드민</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-page-title" id="admin-page-title">약관 본문 관리</div>
+    </div>
+    <div class="admin-content">
+      <p style="font-size:13px;color:#666;margin-bottom:16px;line-height:1.6;">
+        이용약관·개인정보처리방침 등 <strong>본문 내용</strong>을 수정합니다. 푸터 사업자정보는
+        <a href="footer-manager.html" style="color:#C17F24;">푸터 관리</a>에서 수정하세요.
+      </p>
+      <div id="legal-editor-root"></div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { requireAdmin } from './js/admin-auth.js?v=20260630';
+import { initAdminPage } from './js/admin.js?v=20260677';
+import { loadLegalSettings } from './js/legal-manager-admin.js?v=20260677';
+
+const adminUser = await requireAdmin();
+await initAdminPage({ activePage: 'legal', pageTitle: '약관 본문 관리', adminUser });
+loadLegalSettings();
+</script>
+</body>
+</html>

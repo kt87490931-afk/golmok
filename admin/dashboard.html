@@ -38,7 +38,10 @@
       </div>
       <div class="admin-card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
         <a href="footer-manager.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;background:#1A1A1A;color:#F5A623;font-size:14px;font-weight:600;text-decoration:none;">
-          <i class="ti ti-layout-bottombar"></i> 푸터 / 약관 관리
+          <i class="ti ti-layout-bottombar"></i> 푸터 관리
+        </a>
+        <a href="legal-manager.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;border:1px solid #E8E4DC;color:#333;font-size:14px;text-decoration:none;">
+          <i class="ti ti-file-text"></i> 약관 본문
         </a>
         <a href="api-manager.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;border:1px solid #E8E4DC;color:#333;font-size:14px;text-decoration:none;">
           <i class="ti ti-plug"></i> API 관리
@@ -77,7 +80,7 @@
 </div>
 <script type="module">
 import { supabase, requireAdmin, formatNumber, escapeHtml } from './js/admin-auth.js?v=20260616';
-import { initAdminPage } from './js/admin.js?v=20260675';
+import { initAdminPage } from './js/admin.js?v=20260677';
 
 const catLabels = { all: '전체', qna: '질문', info: '정보', startup: '창업', issue: '이슈', event: '이벤트' };
 

@@ -15,7 +15,8 @@ export function getSidebarHtml(activePage) {
       section: '시스템',
       links: [
         { page: 'api', href: 'api-manager.html', icon: 'ti-plug', label: 'API 관리' },
-        { page: 'footer', href: 'footer-manager.html', icon: 'ti-layout-bottombar', label: '푸터 / 약관' },
+        { page: 'footer', href: 'footer-manager.html', icon: 'ti-layout-bottombar', label: '푸터 관리' },
+        { page: 'legal', href: 'legal-manager.html', icon: 'ti-file-text', label: '약관 본문' },
         { page: 'ai', href: 'ai-manager.html', icon: 'ti-robot', label: 'AI 관리', soon: true },
       ],
     },

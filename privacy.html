@@ -26,7 +26,16 @@ body {
   padding-bottom: 20px;
   margin-bottom: 32px;
 }
-.logo { font-size: 20px; font-weight: 700; color: #C17F24; margin-bottom: 6px; }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #C17F24;
+  margin-bottom: 6px;
+}
+.logo img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
 h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
 .updated { font-size: 13px; color: #999; }
 h2 {
@@ -67,16 +76,20 @@ td { padding: 10px 12px; border: 1px solid #E8E4DC; color: #333; }
 <link rel="stylesheet" href="css/main-v3.css?v=20260654">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260654">
 </head>
-<body data-gm-active="home" data-gm-shell="auth">
+<body data-gm-active="home" data-gm-shell="auth" data-legal-slug="privacy">
 <div class="wrap">
   <div class="header">
-    <div class="logo">😼 골목대장</div>
-    <h1>개인정보 처리방침</h1>
-    <div class="updated">시행일: 2026년 6월 4일</div>
+    <div class="logo">
+      <img src="assets/gmlogo.png" alt="골목대장 로고">
+      <span>골목대장</span>
+    </div>
+    <h1 id="legal-title">개인정보 처리방침</h1>
+    <div class="updated" id="legal-updated">시행일: 2026년 6월 4일</div>
   </div>
 
   <a href="javascript:history.back()" class="back-btn">← 돌아가기</a>
 
+  <div id="legal-body">
   <div class="highlight">
     골목대장은 이용자의 개인정보를 소중히 여기며 관련 법령을 준수합니다.
     본 방침은 수집하는 개인정보의 항목, 수집 및 이용 목적,
@@ -209,8 +222,10 @@ td { padding: 10px 12px; border: 1px solid #E8E4DC; color: #333; }
   <ul>
     <li>2026년 6월 4일: 최초 시행</li>
   </ul>
+  </div>
 
 </div>
-<script type="module" src="js/shell_loader.js?v=20260675"></script>
+<script type="module" src="js/legal_page.js?v=20260677"></script>
+<script type="module" src="js/shell_loader.js?v=20260677"></script>
 </body>
 </html>
