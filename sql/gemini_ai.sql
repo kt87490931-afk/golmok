@@ -7,7 +7,7 @@ VALUES
   ('GEMINI_ENABLED', 'false', 'AI 기능 ON/OFF', false),
   ('GEMINI_DAILY_LIMIT', '10', '사용자·세션당 일일 최대 호출 횟수', false),
   ('GEMINI_MAX_TOKENS', '300', '최대 출력 토큰 수', false),
-  ('GEMINI_MODEL', 'gemini-2.0-flash', 'Gemini 모델명', false)
+  ('GEMINI_MODEL', 'gemini-2.5-flash', 'Gemini 모델명', false)
 ON CONFLICT (key) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS public.ai_logs (

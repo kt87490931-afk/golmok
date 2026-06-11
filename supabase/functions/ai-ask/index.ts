@@ -323,9 +323,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const model = cfg.GEMINI_MODEL || "gemini-2.0-flash";
+    const model = cfg.GEMINI_MODEL || "gemini-2.5-flash";
     const maxTokens = parseInt(cfg.GEMINI_MAX_TOKENS || "300", 10);
-    const intent = await callGemini(apiKey, model, INTENT_PROMPT, question, 120);
+    const regionMap = await loadRegionMap(supabase);
+    const intent = await callGemini(apiKey, model, INTENT_PROMPT, question, 256);
 
     if (intent.isRelevant === false) {
       await supabase.from("ai_logs").insert({
@@ -346,10 +347,15 @@ Deno.serve(async (req) => {
 
     let regionName = intent.region || null;
     if (!regionName && regionHint) regionName = regionHint;
+    if (!regionName) {
+      const hit = Object.keys(regionMap)
+        .sort((a, b) => b.length - a.length)
+        .find((k) => question.includes(k));
+      if (hit) regionName = hit;
+    }
 
-    const regionMap = await loadRegionMap(supabase);
     const regionCode = resolveRegionCode(regionName, regionMap);
-    if (!regionCode || intent.needMoreInfo) {
+    if (!regionCode || intent.needMoreInfo === true) {
       return jsonResponse({
         success: true,
         needMoreInfo: true,

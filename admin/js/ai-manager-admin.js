@@ -8,7 +8,7 @@ const GEMINI_FIELDS = [
     key: 'GEMINI_MODEL',
     label: 'Gemini 모델',
     type: 'select',
-    options: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite'],
+    options: ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-2.5-flash-lite'],
     desc: '의도 파악 + 답변 생성에 사용',
   },
 ];
