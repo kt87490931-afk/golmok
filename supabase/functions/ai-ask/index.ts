@@ -74,13 +74,41 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
-function resolveRegionCode(name?: string | null) {
+let _regionMapCache: { map: Record<string, string>; at: number } | null = null;
+const REGION_CACHE_MS = 5 * 60 * 1000;
+
+async function loadRegionMap(supabase: ReturnType<typeof createClient>) {
+  if (_regionMapCache && Date.now() - _regionMapCache.at < REGION_CACHE_MS) {
+    return _regionMapCache.map;
+  }
+  const map: Record<string, string> = { ...REGION_CODES };
+  try {
+    const { data } = await supabase.rpc("get_region_code_lookup");
+    for (const row of data || []) {
+      if (row.name) map[row.name] = row.code;
+      if (row.aliases) {
+        String(row.aliases).split(",").forEach((a) => {
+          const alias = a.trim();
+          if (alias) map[alias] = row.code;
+        });
+      }
+    }
+  } catch (e) {
+    console.warn("region_codes lookup fallback", e);
+  }
+  _regionMapCache = { map, at: Date.now() };
+  return map;
+}
+
+function resolveRegionCode(name: string | null | undefined, regionMap: Record<string, string>) {
   if (!name) return null;
   const t = String(name).trim();
   if (/^\d{7,10}$/.test(t)) return t;
-  if (REGION_CODES[t]) return REGION_CODES[t];
-  const hit = Object.keys(REGION_CODES).find((k) => t.includes(k));
-  return hit ? REGION_CODES[hit] : null;
+  if (regionMap[t]) return regionMap[t];
+  const hit = Object.keys(regionMap)
+    .sort((a, b) => b.length - a.length)
+    .find((k) => t.includes(k));
+  return hit ? regionMap[hit] : null;
 }
 
 function resolveUpjongCode(name?: string | null) {
@@ -330,7 +358,8 @@ Deno.serve(async (req) => {
     let regionName = intent.region || null;
     if (!regionName && regionHint) regionName = regionHint;
 
-    const regionCode = resolveRegionCode(regionName);
+    const regionMap = await loadRegionMap(supabase);
+    const regionCode = resolveRegionCode(regionName, regionMap);
     if (!regionCode || intent.needMoreInfo) {
       return jsonResponse({
         success: true,

@@ -1,4 +1,5 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260680';
+import { askGemini, getTabExamples } from './gemini.js?v=20260681';
+import { supabase } from './supabase_client.js';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -390,9 +391,31 @@ function bindShellVoice() {
   window.startVoice = () => window.toggleVoice();
 }
 
+async function showAIStatusBanner() {
+  try {
+    const { data } = await supabase.rpc('get_ai_public_config');
+    const map = {};
+    (data || []).forEach((r) => { map[r.key] = r.value; });
+    const enabled = map.GEMINI_ENABLED === 'true';
+    const limit = map.GEMINI_DAILY_LIMIT || '10';
+    const banner = document.getElementById('ai-status-banner');
+    if (!banner) return;
+    if (!enabled) {
+      banner.hidden = false;
+      banner.innerHTML = '⚠️ AI 기능이 현재 <strong>OFF</strong> 상태입니다. 어드민 → AI 관리에서 ON으로 변경 후 API 키를 등록하세요.';
+    } else {
+      banner.hidden = false;
+      banner.innerHTML = `ℹ️ 일일 질문 한도 <strong>${escapeHtml(limit)}회</strong> · 소진공 API 데이터만 답변합니다. (API 키 등록 전에는 답변 불가)`;
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
 function initAIChatPage() {
   updateExampleBtns();
   bindShellVoice();
+  showAIStatusBanner();
   consumeInitialQuery();
 }
 

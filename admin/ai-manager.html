@@ -14,56 +14,70 @@
       <div class="admin-page-title" id="admin-page-title">AI 관리</div>
     </div>
     <div class="admin-content">
-      <div class="coming-soon-banner">
-        <div class="icon">🤖</div>
-        <h3>AI 관리</h3>
-        <p>
-          Gemini AI 토큰 사용량 모니터링,<br>
-          시스템 프롬프트 관리, AI 기능 ON/OFF 제어,<br>
-          질문 트리 설정을 관리합니다.<br><br>
-          Gemini API 연동 후 활성화됩니다.
-        </p>
+      <div class="admin-card">
+        <div class="admin-card-title"><i class="ti ti-chart-dots"></i> AI 사용 현황</div>
+        <div id="ai-stats-root"><p style="color:#999;">불러오는 중...</p></div>
       </div>
+
       <div class="admin-card">
         <div class="admin-card-title"><i class="ti ti-robot"></i> Gemini AI 설정</div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F5F1E8;">
-            <div>
-              <div style="font-size:14px;font-weight:500;">AI 기능 ON/OFF</div>
-              <div style="font-size:12px;color:#999;margin-top:2px;">비용 급증 시 즉시 차단</div>
-            </div>
-            <div style="background:#E8E4DC;border-radius:20px;width:48px;height:26px;cursor:not-allowed;opacity:.5;"></div>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F5F1E8;">
-            <div>
-              <div style="font-size:14px;font-weight:500;">maxOutputTokens</div>
-              <div style="font-size:12px;color:#999;margin-top:2px;">현재 설정값: 80 토큰</div>
-            </div>
-            <input type="number" value="80" disabled style="width:80px;border:1px solid #E8E4DC;border-radius:8px;padding:6px 10px;font-size:13px;opacity:.5;">
-          </div>
-          <div style="padding:12px 0;">
-            <div style="font-size:14px;font-weight:500;margin-bottom:8px;">시스템 프롬프트</div>
-            <textarea disabled rows="5" style="width:100%;border:1px solid #E8E4DC;border-radius:8px;padding:10px;font-size:12px;font-family:monospace;opacity:.5;resize:none;">당신은 소상공인 상권 검색 키워드 추출기입니다.
-상권·업종·지역과 무관한 질문은 {"intent":"기타"} 만 반환.
-최대 80토큰 이내 JSON만 반환.</textarea>
-          </div>
+        <p style="font-size:13px;color:#666;margin-bottom:12px;line-height:1.6;">
+          소진공 API 데이터만 답변하는 RAG 구조입니다. <strong>Gemini API 키</strong>는 마지막에 등록하세요.
+          키 없이도 ON/OFF·한도·모델·지역코드 설정은 가능합니다.
+        </p>
+        <div id="ai-settings-root"></div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title"><i class="ti ti-map-pin"></i> 행정동 지역 코드</div>
+        <p style="font-size:13px;color:#666;margin-bottom:12px;">
+          AI 질문의 지역명 → 소진공 <code>regionCode</code> 매핑 (Edge Function에서 사용)
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:14px;">
+          <input type="text" id="region-sido" placeholder="시도 (경기)" style="padding:8px;border:1px solid #E8E4DC;border-radius:8px;font-size:12px;">
+          <input type="text" id="region-sigungu" placeholder="시군구 (화성시)" style="padding:8px;border:1px solid #E8E4DC;border-radius:8px;font-size:12px;">
+          <input type="text" id="region-name" placeholder="행정동명 *" style="padding:8px;border:1px solid #E8E4DC;border-radius:8px;font-size:12px;">
+          <input type="text" id="region-code" placeholder="regionCode *" style="padding:8px;border:1px solid #E8E4DC;border-radius:8px;font-size:12px;">
+          <input type="text" id="region-aliases" placeholder="별칭 (쉼표구분)" style="padding:8px;border:1px solid #E8E4DC;border-radius:8px;font-size:12px;grid-column:span 2;">
+        </div>
+        <button type="button" id="btn-region-add" style="padding:8px 16px;border:none;border-radius:8px;background:#F5A623;color:#fff;font-weight:600;cursor:pointer;margin-bottom:16px;">+ 지역 추가</button>
+        <div style="overflow-x:auto;">
+          <table class="admin-table" style="width:100%;font-size:12px;">
+            <thead>
+              <tr>
+                <th>시도</th><th>시군구</th><th>지역명</th><th>코드</th><th>별칭</th><th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="region-codes-tbody"></tbody>
+          </table>
         </div>
       </div>
+
       <div class="admin-card">
-        <div class="admin-card-title"><i class="ti ti-chart-line"></i> 토큰 사용량</div>
-        <div style="text-align:center;padding:30px;color:#999;">Gemini API 연동 후 실시간 사용량이 표시됩니다</div>
+        <div class="admin-card-title"><i class="ti ti-list"></i> 최근 AI 호출 로그</div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table" style="width:100%;font-size:12px;">
+            <thead>
+              <tr>
+                <th>시간</th><th>질문</th><th>의도</th><th>API</th><th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="ai-logs-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <script type="module">
-import { requireAdmin } from './js/admin-auth.js?v=20260616';
-import { initAdminPage } from './js/admin.js?v=20260677';
-document.addEventListener('DOMContentLoaded', async () => {
-  const admin = await requireAdmin();
-  if (!admin) return;
-  await initAdminPage({ activePage: 'ai', pageTitle: 'AI 관리', adminUser: admin });
-});
+import { requireAdmin } from './js/admin-auth.js?v=20260681';
+import { initAdminPage } from './js/admin.js?v=20260681';
+import { loadAIManager, bindRegionForm } from './js/ai-manager-admin.js?v=20260681';
+
+const adminUser = await requireAdmin();
+await initAdminPage({ activePage: 'ai', pageTitle: 'AI 관리', adminUser });
+bindRegionForm();
+await loadAIManager();
 </script>
 </body>
 </html>
