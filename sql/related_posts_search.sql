@@ -101,10 +101,6 @@ BEGIN
           WHERE lower(left(coalesce(p.content, ''), 1000)) LIKE '%' || k.token || '%'
         ), 0), 18)
         + CASE WHEN length(v_query) >= 3 AND lower(p.title) LIKE '%' || v_query || '%' THEN 15 ELSE 0 END
-        + CASE WHEN v_region IS NOT NULL AND (
-          coalesce(p.region_dong, '') ILIKE '%' || v_region || '%'
-          OR coalesce(p.region_full, '') ILIKE '%' || v_region || '%'
-        ) THEN 15 ELSE 0 END
         + CASE WHEN v_upjong IS NOT NULL AND (
           coalesce(p.upjong3nm, '') ILIKE '%' || v_upjong || '%'
           OR coalesce(p.upjong2nm, '') ILIKE '%' || v_upjong || '%'
