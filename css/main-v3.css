@@ -291,7 +291,7 @@ input,textarea,select{font-family:inherit}
 .sec-more{font-size:12px;color:var(--gold);cursor:pointer}
 .quick-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(6,1fr);
   gap:10px;
 }
 .quick-item{
@@ -693,7 +693,7 @@ input,textarea,select{font-family:inherit}
   }
   .aside{display:none}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
-  .quick-grid{grid-template-columns:repeat(5,1fr)}
+  .quick-grid{grid-template-columns:repeat(6,1fr)}
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
