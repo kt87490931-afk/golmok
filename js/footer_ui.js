@@ -429,8 +429,22 @@ function dedupeFooters() {
   return footers[0] || null;
 }
 
+/** index 메인(data-gm-shell=home)에서만 푸터 표시. 모바일·PC 공통. */
+export function shouldMountSiteFooter(ctx = detectContext()) {
+  if (document.body.dataset.gmFooter === 'off') return false;
+  if (document.body.dataset.gmFooter === 'on') return true;
+  return (document.body.dataset.gmShell || '') === 'home';
+}
+
+function removeSiteFooter() {
+  document.querySelectorAll('.gm-footer, #site-footer').forEach((el) => el.remove());
+}
+
 async function mountSiteFooterInner(ctx) {
-  if (document.body.dataset.gmFooter === 'off') return;
+  if (!shouldMountSiteFooter(ctx)) {
+    removeSiteFooter();
+    return;
+  }
 
   dedupeFooters();
 
