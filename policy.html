@@ -400,6 +400,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main-v3.css?v=20260657">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260657">
+<style>
+.bizinfo-card{display:block;padding:14px;background:#fff;border:1px solid #E8E4DC;border-radius:12px;text-decoration:none;color:inherit;transition:border-color .15s,background .15s}
+.bizinfo-card:hover{border-color:#4A90D9;background:#F8FBFF}
+.bizinfo-cat{display:inline-block;font-size:10px;font-weight:600;color:#2B6CB0;background:#EBF4FF;padding:2px 6px;border-radius:4px;margin-bottom:6px}
+.bizinfo-title{font-size:14px;font-weight:700;color:#1A1A1A;line-height:1.4;margin-bottom:6px}
+.bizinfo-meta,.bizinfo-period,.bizinfo-target{font-size:11px;color:#888;margin-bottom:3px}
+.bizinfo-sum{font-size:12px;color:#555;margin-top:6px;line-height:1.5}
+</style>
 </head>
 <body class="gm-shell-loaded" data-gm-active="policy" data-gm-shell="standard">
 
@@ -476,9 +484,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <h2 style="font-size:20px;font-weight:700;">정책·지원</h2>
           <p style="font-size:13px;color:#999;margin-top:4px;">소상공인을 위한 정부 지원 정책 정보</p>
         </div>
-        <div style="background:linear-gradient(135deg,#F5A623,#E8920E);border-radius:14px;padding:20px;margin-bottom:20px;color:#fff;">
-          <div style="font-size:14px;font-weight:700;margin-bottom:6px;">🔔 소상공인365 API 연동</div>
-          <div style="font-size:13px;opacity:.9;line-height:1.6;">창업기상도·상권분석·업소현황 데이터가 연동되었습니다. 어드민에서 Mock/Real 모드를 전환할 수 있습니다.</div>
+        <div style="background:linear-gradient(135deg,#4A90D9,#2B6CB0);border-radius:14px;padding:20px;margin-bottom:20px;color:#fff;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px;">🔔 기업마당 API 연동</div>
+          <div style="font-size:13px;opacity:.9;line-height:1.6;">소상공인·중소기업 지원사업 공고를 실시간으로 불러옵니다. (출처: <a href="https://www.bizinfo.go.kr" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">기업마당</a>)</div>
+        </div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">📋 지원사업 공고 (실시간)</div>
+        <div id="bizinfo-policy-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+          <div style="padding:20px;text-align:center;color:#888;background:#faf9f7;border-radius:12px;border:1px dashed #e8e4dc;">불러오는 중...</div>
         </div>
         <div style="font-size:14px;font-weight:700;margin-bottom:12px;">🔗 바로가기</div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px;">
@@ -750,6 +762,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/policy.js?v=20260630"></script>
+<script type="module" src="js/pages/policy.js?v=20260687"></script>
 </body>
 </html>

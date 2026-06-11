@@ -1,5 +1,13 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import {
+  fetchBizinfoPrograms,
+  filterAndRankPrograms,
+  formatProgramsForGemini,
+  inferPolicyFilters,
+  isBizinfoKeyConfigured,
+  type BizProgram,
+} from "./bizinfo_lib.ts";
 
 const SOJANGGONG_BASE = "https://bigdata.sbiz.or.kr/openApi";
 
@@ -60,7 +68,22 @@ const TAB_EXAMPLES: Record<string, string[]> = {
     "화성시 음식점 창업기상도",
     "동탄2동 테마상권 분석",
   ],
+  policy: [
+    "소상공인 정책자금 신청 방법 알려줘",
+    "창업 지원금 받을 수 있나요?",
+    "경기 소상공인 지원사업 알려줘",
+    "폐업 지원금 신청 조건은?",
+  ],
 };
+
+const POLICY_ANSWER_PROMPT = `당신은 골목대장 소상공인 AI 어시스턴트입니다.
+아래 [기업마당 지원사업 공고]만 근거로 답변하세요.
+규칙:
+1. 제공된 공고 외 내용을 지어내지 마세요
+2. 공고명·소관기관·신청기간·대상·공고URL을 활용해 실용적으로 안내
+3. 친근하게 (대장님이라고 부르기)
+4. 3~5문장, 순수 한국어 문장만 (JSON/마크다운 금지)
+5. 마지막에 "자세한 신청은 공고 링크에서 확인"을 한 번 언급`;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -472,19 +495,91 @@ Deno.serve(async (req) => {
     }
 
     if (tab === "policy") {
+      if (cfg.BIZINFO_API_ENABLED === "false") {
+        return jsonResponse({ success: false, error: "기업마당 정책 API가 비활성화되어 있습니다." });
+      }
+
+      const bizKey = cfg.BIZINFO_API_KEY;
+      if (!isBizinfoKeyConfigured(bizKey)) {
+        return jsonResponse({
+          success: false,
+          error: "기업마당 API 키(BIZINFO_API_KEY)가 등록되지 않았습니다. 어드민 → AI 관리에서 발급받은 crtfcKey를 저장해주세요.",
+        });
+      }
+
+      const model = cfg.GEMINI_MODEL || "gemini-2.5-flash";
+      const maxTokens = parseInt(cfg.GEMINI_MAX_TOKENS || "300", 10);
+      const filters = inferPolicyFilters(question);
+
+      let programs: BizProgram[] = [];
+      try {
+        const all = await fetchBizinfoPrograms(bizKey!, {
+          searchCnt: 80,
+          searchLclasId: filters.searchLclasId,
+          hashtags: filters.hashtags || undefined,
+        });
+        programs = filterAndRankPrograms(all, question, 5);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error("bizinfo fetch", msg);
+        return jsonResponse({
+          success: false,
+          error: "기업마당 API 호출에 실패했습니다. API 키·시스템 IP 등록을 확인해주세요.",
+        });
+      }
+
+      if (!programs.length) {
+        await supabase.from("ai_logs").insert({
+          user_id: userId,
+          session_id: sessionId,
+          question: question.slice(0, 500),
+          intent: "정책",
+          api_called: "bizinfo",
+          blocked: false,
+        });
+        return jsonResponse({
+          success: true,
+          blocked: false,
+          answer: "대장님, 현재 조건에 맞는 소상공인 지원사업 공고를 찾지 못했어요. '정책자금', '창업 지원'처럼 구체적으로 질문해 주시거나 기업마당에서 직접 검색해 보세요.",
+          policyPrograms: [],
+          dataSource: "bizinfo",
+          suggestions: TAB_EXAMPLES.policy,
+        });
+      }
+
+      const dataContext = `[기업마당 지원사업 공고]\n${formatProgramsForGemini(programs)}`;
+      const answerTokens = Math.max(maxTokens, 512);
+      let answerText = await callGeminiAnswer(
+        apiKey,
+        model,
+        POLICY_ANSWER_PROMPT,
+        `질문: ${question}\n\n${dataContext}`,
+        answerTokens,
+      );
+
+      if (!answerText) {
+        answerText = `대장님, 관련 지원사업 ${programs.length}건을 찾았어요. '${programs[0].title}' 등 아래 공고를 확인해 보세요!`;
+      }
+
       await supabase.from("ai_logs").insert({
         user_id: userId,
         session_id: sessionId,
         question: question.slice(0, 500),
-        intent: "정책차단",
-        blocked: true,
+        answer: answerText.slice(0, 1000),
+        intent: "정책",
+        api_called: "bizinfo",
+        blocked: false,
       });
+
       return jsonResponse({
         success: true,
-        blocked: true,
-        answer:
-          "정책·지원 정보는 현재 소진공 상권 Open API 범위에 포함되지 않아 답변드릴 수 없어요. 상권정보·통계정보 탭에서 지역과 업종을 알려주시면 소진공 데이터로 분석해드릴게요!",
-        suggestions: TAB_EXAMPLES.market,
+        blocked: false,
+        answer: answerText,
+        summary: "",
+        policyPrograms: programs,
+        suggestions: TAB_EXAMPLES.policy,
+        intent: { policyCategory: filters.searchLclasId || null },
+        dataSource: "bizinfo",
       });
     }
 

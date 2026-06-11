@@ -11,6 +11,7 @@ const GEMINI_FIELDS = [
     options: ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-2.5-flash-lite'],
     desc: '의도 파악 + 답변 생성에 사용',
   },
+  { key: 'BIZINFO_API_ENABLED', label: '기업마당 정책 API', type: 'toggle', desc: '정책·지원 탭 / policy.html 지원사업 공고' },
 ];
 
 function isKeyConfigured(value) {
@@ -46,6 +47,8 @@ async function loadAISettings() {
 
   const apiKeyRow = (data || []).find((r) => r.key === 'GEMINI_API_KEY');
   const apiConfigured = isKeyConfigured(apiKeyRow?.value);
+  const bizKeyRow = (data || []).find((r) => r.key === 'BIZINFO_API_KEY');
+  const bizConfigured = isKeyConfigured(bizKeyRow?.value);
 
   let fieldsHtml = GEMINI_FIELDS.map((f) => {
     const val = map[f.key] ?? '';
@@ -86,6 +89,18 @@ async function loadAISettings() {
     <input type="password" disabled placeholder="API 키는 별도 등록 예정"
       style="width:100%;max-width:400px;padding:8px 10px;border:1px solid #E8E4DC;border-radius:8px;font-size:13px;background:#f9f9f9;">
     ${apiConfigured ? `<div style="font-size:11px;color:#1D9E75;margin-top:6px;">****${escapeHtml(String(apiKeyRow.value).slice(-6))}</div>` : ''}
+  </div>`;
+
+  fieldsHtml += `<div style="padding:14px 0;border-bottom:1px solid #F5F1E8;">
+    <div style="font-size:14px;font-weight:600;">기업마당 API 키 (crtfcKey)</div>
+    <div style="font-size:12px;color:#999;margin:4px 0 8px;">
+      <a href="https://www.bizinfo.go.kr/apiDetail.do?id=bizinfoApi" target="_blank" rel="noopener">기업마당 API 신청</a>
+      · 현재 ${bizConfigured ? '등록됨' : '미등록'}
+    </div>
+    <input type="password" id="bizinfo-api-key-input" data-bizinfo-key="1"
+      placeholder="${bizConfigured ? '변경 시 새 키 입력' : '발급받은 crtfcKey 입력'}"
+      style="width:100%;max-width:400px;padding:8px 10px;border:1px solid #E8E4DC;border-radius:8px;font-size:13px;">
+    ${bizConfigured ? `<div style="font-size:11px;color:#1D9E75;margin-top:6px;">****${escapeHtml(String(bizKeyRow.value).slice(-6))}</div>` : ''}
   </div>`;
 
   root.innerHTML = `
@@ -129,7 +144,22 @@ async function saveAISettings() {
       });
       if (error) throw error;
     }
+
+    const bizKeyInput = document.getElementById('bizinfo-api-key-input');
+    const newBizKey = bizKeyInput?.value?.trim();
+    if (newBizKey) {
+      const { error } = await supabase.rpc('upsert_admin_app_setting', {
+        p_key: 'BIZINFO_API_KEY',
+        p_value: newBizKey,
+        p_description: '기업마당 지원사업정보 API crtfcKey',
+        p_is_secret: true,
+      });
+      if (error) throw error;
+      if (bizKeyInput) bizKeyInput.value = '';
+    }
+
     showAdminToast('AI 설정이 저장되었습니다');
+    loadAISettings();
     loadAIStats();
   } catch (err) {
     showAdminToast(`저장 실패: ${err.message}`, 'error');

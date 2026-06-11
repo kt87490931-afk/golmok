@@ -1,6 +1,6 @@
-import { askGemini, getTabExamples } from './gemini.js?v=20260686';
+import { askGemini, getTabExamples } from './gemini.js?v=20260687';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260686';
+import { searchRelatedPosts } from './community.js?v=20260687';
 
 let currentTab = 'market';
 let isThinking = false;
@@ -274,6 +274,57 @@ function appendAIMsg(text, suggestions = [], withRelated = false) {
   return div.querySelector('.ai-related-body');
 }
 
+function renderPolicyCards(programs = []) {
+  if (!programs?.length) {
+    return `<p class="ai-policy-empty">관련 지원사업 공고를 찾지 못했습니다.</p>`;
+  }
+  return `<ul class="ai-policy-list">
+    ${programs.map((p) => `
+      <li>
+        <a href="${escAttr(p.url)}" target="_blank" rel="noopener" class="ai-policy-item">
+          <span class="ai-policy-cat">${escHtml(p.category || '지원사업')}</span>
+          <span class="ai-policy-subj">${escHtml(p.title)}</span>
+          <span class="ai-policy-meta">
+            ${p.author ? escHtml(p.author) : ''}${p.period ? ` · 📅 ${escHtml(p.period)}` : ''}
+          </span>
+        </a>
+      </li>
+    `).join('')}
+  </ul>`;
+}
+
+async function appendPolicyMsg(result, question) {
+  const msgs = document.getElementById('ai-messages');
+  if (!msgs) return;
+
+  const div = document.createElement('div');
+  div.className = 'msg-ai';
+  div.innerHTML = `
+    <div class="msg-ai-av">🤖</div>
+    <div class="msg-ai-body">
+      <div class="msg-ai-name">
+        골목대장 AI
+        <span class="badge">${getTabLabel()} 모드</span>
+      </div>
+      <div class="msg-ai-bubble">
+        <div class="ai-data-source">
+          📋 <strong>기업마당</strong> 지원사업 공고 · 실시간
+        </div>
+        <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '답변을 생성하지 못했습니다.')}</div>
+        <div class="ai-policy-section">
+          <div class="ai-related-title"><i class="ti ti-file-text"></i> 관련 지원사업 공고</div>
+          ${renderPolicyCards(result.policyPrograms)}
+        </div>
+        ${renderRelatedPosts([])}
+        ${renderSuggestions(result.suggestions || getTabExamples(currentTab))}
+      </div>
+    </div>
+  `;
+  msgs.appendChild(div);
+  scrollMessages();
+  await hydrateRelatedPosts(div.querySelector('.ai-related-body'), question, result.intent);
+}
+
 async function appendDataMsg(result, question) {
   const msgs = document.getElementById('ai-messages');
   if (!msgs) return;
@@ -378,6 +429,11 @@ window.sendAIMessage = async function sendAIMessage() {
 
   if (result.blocked || result.needMoreInfo) {
     await appendBlockedMsg(result.answer, result.suggestions || getTabExamples(currentTab), q, result.intent);
+    return;
+  }
+
+  if (result.dataSource === 'bizinfo' || result.policyPrograms) {
+    await appendPolicyMsg(result, q);
     return;
   }
 
