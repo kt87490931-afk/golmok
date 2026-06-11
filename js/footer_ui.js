@@ -75,9 +75,7 @@ const DEFAULT_FOOTER = {
 
   FOOTER_BIZ_NO: '000-00-00000',
 
-  FOOTER_MAIL_ORDER_NO: '통신판매업 신고번호 2024-서울○○-0000',
-
-  FOOTER_JOB_NO: '직업정보제공사업 신고번호 J0000000000000',
+  FOOTER_MAIL_ORDER_NO: '',
 
   FOOTER_HOSTING: '호스팅 사업자 Amazon Web Service (AWS)',
 
@@ -255,9 +253,7 @@ function renderBizInfo(container, settings) {
 
   const biz = settings.FOOTER_BIZ_NO?.trim() || DEFAULT_FOOTER.FOOTER_BIZ_NO;
 
-  const mailOrder = settings.FOOTER_MAIL_ORDER_NO?.trim() || DEFAULT_FOOTER.FOOTER_MAIL_ORDER_NO;
-
-  const jobNo = settings.FOOTER_JOB_NO?.trim() || DEFAULT_FOOTER.FOOTER_JOB_NO;
+  const mailOrder = settings.FOOTER_MAIL_ORDER_NO?.trim() || '';
 
   const hosting = settings.FOOTER_HOSTING?.trim() || DEFAULT_FOOTER.FOOTER_HOSTING;
 
@@ -291,15 +287,9 @@ function renderBizInfo(container, settings) {
 
 
 
-  const row2 = `
-
-    <div class="gm-biz-row">
-
-      <span>${escapeHtml(mailOrder)}</span>
-
-      <span>${escapeHtml(jobNo)}</span>
-
-    </div>`;
+  const row2 = mailOrder
+    ? `<div class="gm-biz-row"><span>${escapeHtml(mailOrder)}</span></div>`
+    : '';
 
 
 

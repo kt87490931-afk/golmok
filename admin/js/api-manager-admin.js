@@ -176,9 +176,12 @@ function editSetting(id, key, isSecret) {
   if (newValue === null || newValue === '') return;
 
   supabase
-    .from('app_settings')
-    .update({ value: newValue, updated_at: new Date().toISOString() })
-    .eq('id', id)
+    .rpc('upsert_admin_app_setting', {
+      p_key: key,
+      p_value: newValue,
+      p_description: API_META[key]?.label || key,
+      p_is_secret: !!isSecret,
+    })
     .then(({ error }) => {
       if (!error) {
         clearApiSettingsCacheSafe();
@@ -203,10 +206,12 @@ export async function toggleApiEnabled(btn) {
   }
 
   const newVal = data?.value !== 'true';
-  const { error: upErr } = await supabase
-    .from('app_settings')
-    .update({ value: String(newVal), updated_at: new Date().toISOString() })
-    .eq('key', 'SOJANGGONG_API_ENABLED');
+  const { error: upErr } = await supabase.rpc('upsert_admin_app_setting', {
+    p_key: 'SOJANGGONG_API_ENABLED',
+    p_value: String(newVal),
+    p_description: 'API 전체 ON/OFF',
+    p_is_secret: false,
+  });
 
   if (upErr) {
     showAdminToast('상태 변경 실패', 'error');
@@ -235,10 +240,12 @@ export async function toggleApiMode(btn) {
   }
 
   const newMode = data?.value === 'mock' ? 'real' : 'mock';
-  const { error: upErr } = await supabase
-    .from('app_settings')
-    .update({ value: newMode, updated_at: new Date().toISOString() })
-    .eq('key', 'SOJANGGONG_API_MODE');
+  const { error: upErr } = await supabase.rpc('upsert_admin_app_setting', {
+    p_key: 'SOJANGGONG_API_MODE',
+    p_value: newMode,
+    p_description: '데이터 모드',
+    p_is_secret: false,
+  });
 
   if (upErr) {
     showAdminToast('모드 변경 실패', 'error');

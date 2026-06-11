@@ -28,7 +28,7 @@
 <script type="module">
 import { requireAdmin } from './js/admin-auth.js?v=20260630';
 import { initAdminPage } from './js/admin.js?v=20260675';
-import { loadFooterSettings } from './js/footer-manager-admin.js?v=20260674';
+import { loadFooterSettings } from './js/footer-manager-admin.js?v=20260676';
 
 const adminUser = await requireAdmin();
 await initAdminPage({ activePage: 'footer', pageTitle: '푸터 / 약관 관리', adminUser });

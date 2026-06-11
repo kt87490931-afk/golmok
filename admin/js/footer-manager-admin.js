@@ -5,7 +5,6 @@ const FOOTER_KEYS = [
   { key: 'FOOTER_CEO', label: '대표자', type: 'text' },
   { key: 'FOOTER_BIZ_NO', label: '사업자등록번호', type: 'text' },
   { key: 'FOOTER_MAIL_ORDER_NO', label: '통신판매업 신고번호', type: 'text' },
-  { key: 'FOOTER_JOB_NO', label: '직업정보제공사업 신고번호', type: 'text' },
   { key: 'FOOTER_HOSTING', label: '호스팅 사업자', type: 'text' },
   { key: 'FOOTER_ADDRESS', label: '주소', type: 'text' },
   { key: 'FOOTER_PHONE', label: '전화', type: 'text' },
@@ -18,7 +17,7 @@ const FOOTER_KEYS = [
 
 async function clearFooterCache() {
   try {
-    const mod = await import('../../js/footer_ui.js?v=20260674');
+    const mod = await import('../../js/footer_ui.js?v=20260676');
     mod.clearFooterSettingsCache?.();
   } catch (_) {
     /* ignore */
@@ -90,21 +89,13 @@ async function saveFooterSettings() {
         JSON.parse(value);
       }
 
-      if (id) {
-        const { error } = await supabase
-          .from('app_settings')
-          .update({ value, updated_at: new Date().toISOString() })
-          .eq('id', id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('app_settings').insert({
-          key,
-          value,
-          description: FOOTER_KEYS.find((k) => k.key === key)?.label || key,
-          is_secret: false,
-        });
-        if (error) throw error;
-      }
+      const { error } = await supabase.rpc('upsert_admin_app_setting', {
+        p_key: key,
+        p_value: value,
+        p_description: FOOTER_KEYS.find((k) => k.key === key)?.label || key,
+        p_is_secret: false,
+      });
+      if (error) throw error;
     }
     await clearFooterCache();
     showAdminToast('푸터 설정이 저장되었습니다');
