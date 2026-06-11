@@ -22,8 +22,12 @@ export function initPageShell(activePage) {
 }
 
 export function bootPage(fn) {
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
-  else fn();
+  const run = () => {
+    fn();
+    import('./footer_ui.js').then((m) => m.mountSiteFooter()).catch(() => {});
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
 }
 
 export function bindInfiniteScroll(loadFn) {

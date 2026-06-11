@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>푸터 관리 - 골목대장 어드민</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-page-title" id="admin-page-title">푸터 / 약관 관리</div>
+    </div>
+    <div class="admin-content">
+      <div class="admin-card">
+        <div class="admin-card-title"><i class="ti ti-layout-bottombar"></i> 사업자 정보 · SNS · 약관 링크</div>
+        <p style="font-size:13px;color:#666;margin-bottom:16px;line-height:1.6;">
+          하단 푸터에 표시됩니다. 약관 <strong>본문</strong>은 각 HTML 페이지(terms.html, privacy.html 등)이며, 여기서는 링크 목록만 관리합니다.
+          SNS URL이 비어 있으면 해당 아이콘은 숨겨집니다.
+        </p>
+        <div id="footer-settings-root"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { requireAdmin } from './js/admin-auth.js?v=20260630';
+import { initAdminPage } from './js/admin.js?v=20260630';
+import { loadFooterSettings } from './js/footer-manager-admin.js?v=20260673';
+
+const adminUser = await requireAdmin();
+await initAdminPage({ activePage: 'footer', pageTitle: '푸터 / 약관 관리', adminUser });
+loadFooterSettings();
+</script>
+</body>
+</html>

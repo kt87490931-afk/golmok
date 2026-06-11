@@ -119,3 +119,13 @@ body.gm-shell-auth {
 body.gm-shell-auth.m-shell .mobile-tabs {
   display: flex;
 }
+
+body.gm-shell-loaded {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+body.gm-shell-loaded .layout {
+  flex: 1;
+}

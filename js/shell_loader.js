@@ -5,6 +5,7 @@
  * - minimal: 게시글·프로필 등 단독 페이지
  */
 import { SHELL_VER, detectContext, applyTokens, hrefForActive } from './shell_config.js';
+import { mountSiteFooter } from './footer_ui.js';
 
 const PARTIALS = ['header-v3.html', 'sidebar-v3.html', 'mobile-tabs-v3.html', 'modals-v3.html'];
 
@@ -286,6 +287,7 @@ export async function initShell() {
     applyActiveNav(active);
     bindShellGlobals(ctx);
     bindWriteModalFallback();
+    await mountSiteFooter(ctx).catch((e) => console.warn('footer', e));
   }
   document.body.dataset.gmShellDone = '1';
 }
