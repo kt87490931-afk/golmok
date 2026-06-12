@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="js/desktop-route.js"></script>
-<title>이벤트·행사 - 골목대장</title>
+<script src="js/mobile-route.js"></script>
+<title>대장님들의 멘토링 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -254,8 +254,32 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pcbdg{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:4px;}
 .pcpin{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--chd);}
 .pcpin i{font-size:13px;}
-.pctit{font-size:14px;font-weight:500;color:var(--text1);margin-bottom:5px;}
-.pcbody{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.pc-link-head{display:block;text-decoration:none;color:inherit;margin-bottom:8px;}
+.pc-link-head:hover .pctit{color:var(--chd);}
+.pc-link-head .pctit{font-size:14px;font-weight:600;color:var(--text1);margin-bottom:4px;line-height:1.45;}
+.pc-preview{font-size:12px;color:var(--text3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pc-meta-hint{font-size:11px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:4px;}
+.pd-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text2);margin-bottom:14px;padding:0;font-family:inherit;}
+.pd-back-btn:hover{color:var(--chd);}
+.pd-loading,.pd-error{padding:40px 16px;text-align:center;color:var(--text3);font-size:14px;line-height:1.6;}
+.pd-article{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:20px;}
+.pd-author{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.pd-author .pcav{width:44px;height:44px;}
+.pd-author-meta{flex:1;min-width:0;}
+.pd-author-name{font-size:15px;font-weight:600;}
+.pd-author-info{font-size:12px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.pd-follow-btn{display:flex;align-items:center;gap:4px;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:500;flex-shrink:0;font-family:inherit;}
+.pd-title{font-size:20px;font-weight:700;line-height:1.45;margin-bottom:12px;}
+.pd-body{font-size:15px;line-height:1.75;color:var(--text2);margin-bottom:16px;white-space:pre-wrap;word-break:break-word;}
+.pd-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;}
+.pd-act-btn{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;color:var(--text2);font-family:inherit;}
+.pd-act-btn:hover{border-color:var(--ch);color:var(--chd);}
+.pd-comments-head{font-size:15px;font-weight:700;margin-bottom:12px;}
+.pd-comment-list{margin-bottom:8px;}
+.pd-comment-bar--inline{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.pd-comment-input{flex:1;border:1px solid var(--border);border-radius:20px;padding:10px 14px;font-size:14px;outline:none;font-family:inherit;}
+.pd-comment-input:focus{border-color:var(--ch);}
+.pd-comment-submit{background:var(--ch);color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
 .pcbot{display:flex;align-items:center;gap:14px;}
 .pca{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text3);cursor:pointer;transition:color .12s;}
 .pca:hover{color:var(--chd);}
@@ -303,10 +327,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .hott{font-size:12px;color:var(--text1);line-height:1.5;flex:1;}
 .hotc{font-size:11px;color:var(--text3);margin-top:2px;}
 .foli{display:flex;align-items:center;gap:8px;padding:7px 0;}
-.flav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.flav{width:36px;height:36px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.neighbor-av-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
 .flnm{font-size:12px;font-weight:500;color:var(--text1);}
 .fltp{font-size:11px;color:var(--text3);}
-.flbtn{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid var(--ch);color:var(--chd);cursor:pointer;background:transparent;font-weight:500;transition:background .12s,color .12s;}
+.flbtn{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid var(--ch);color:var(--chd);cursor:pointer;background:transparent;font-weight:500;transition:background .15s,color .15s,border-color .15s;flex-shrink:0;}
 .flbtn:hover{background:var(--ch);color:#fff;}
 
 /* ───── MODAL OVERLAY (글쓰기) ───── */
@@ -333,6 +358,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 #logged-panel .lbtn-logout{margin-top:12px;background:var(--chl);color:var(--chdd);}
 .cat-select-btn{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;}
 .cat-select-btn.act{background:var(--ch);border-color:var(--ch);color:#fff;font-weight:500;}
+.write-auto-tags{display:none;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;padding:8px 10px;background:#F5F1E8;border-radius:10px;border:1px solid var(--border);}
 .auth-modal-sheet{max-width:480px;width:100%;max-height:90vh;overflow-y:auto;}
 .auth-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 12px;}
 .auth-modal-brand{display:flex;align-items:center;gap:10px;}
@@ -390,13 +416,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pcimgs--duo .pcimg,.pcimgs--multi .pcimg{max-height:200px;}
 }
 </style>
+<link rel="stylesheet" href="css/responsive.css?v=20260642">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/main-v3.css?v=20260702">
-<link rel="stylesheet" href="../css/shell-pages.css?v=20260702">
-<link rel="stylesheet" href="../css/main-v3-m.css?v=20260702">
+<link rel="stylesheet" href="css/main-v3.css?v=20260710">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260702">
+<link rel="stylesheet" href="css/community.css?v=20260710">
+<link rel="stylesheet" href="css/mentoring.css?v=20260710">
 </head>
-<body class="m-shell gm-shell-loaded" data-gm-active="events" data-gm-shell="standard">
+<body class="gm-shell-loaded" data-gm-active="mentoring" data-gm-shell="standard">
 
 <header class="hd">
   <a href="index.html" class="hd-logo">
@@ -414,7 +442,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <a href="analysis.html" data-gm-nav="analysis">상권분석</a>
     <a href="analysis.html?tab=weather" data-gm-nav="weather">창업기상도</a>
     <a href="analysis.html?tab=hotplace" data-gm-nav="hotplace">핫플레이스</a>
-    <a href="../policy.html" data-gm-nav="policy">정책·지원</a>
+    <a href="policy.html" data-gm-nav="policy">정책·지원</a>
   </nav>
   <div class="hd-right">
     <div class="hd-search-btn" onclick="focusHeroSearch()">
@@ -445,12 +473,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
   <div class="sb-sec">
     <div class="sb-label">커뮤니티</div>
-    <a href="../community.html" class="sb-a" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
-    <a href="../neighborhood.html" class="sb-a" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
-    <a href="mentoring.html" class="sb-a" data-gm-nav="mentoring"><i class="ti ti-users"></i> 대장님들의 멘토링</a>
-    <a href="../by-industry.html" class="sb-a" data-gm-nav="by-industry"><i class="ti ti-tag"></i> 업종별</a>
-    <a href="events.html" class="sb-a" data-gm-nav="events" class="act"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
-    <a href="../policy.html" class="sb-a" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책·지원</a>
+    <a href="community.html" class="sb-a" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
+    <a href="neighborhood.html" class="sb-a" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
+    <a href="mentoring.html" class="sb-a act" data-gm-nav="mentoring"><i class="ti ti-users"></i> 대장님들의 멘토링</a>
+    <a href="by-industry.html" class="sb-a" data-gm-nav="by-industry"><i class="ti ti-tag"></i> 업종별</a>
+    <a href="events.html" class="sb-a" data-gm-nav="events"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
+    <a href="policy.html" class="sb-a" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책·지원</a>
   </div>
   <div class="sb-sec">
     <div class="sb-label">내 활동</div>
@@ -467,30 +495,99 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <main class="main">
 <div class="gm-page-inner">
-<div class="main-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <h2 style="font-size:20px;font-weight:700;">이벤트·행사</h2>
-            <p style="font-size:13px;color:#999;margin-top:4px;">우리동네 이벤트와 행사 정보</p>
+<div class="main-content" id="board-list-view">
+        <div class="comm-wrap">
+          <div class="comm-page-hd">
+            <h2 class="comm-page-title">대장님들의 멘토링</h2>
+            <p class="comm-page-sub">선배 대장님들의 노하우와 경험을 나눠보세요</p>
           </div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;"><i class="ti ti-speakerphone"></i> 이벤트 등록</button>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;">
-          <button type="button" class="event-filter-btn act" data-type="all" style="padding:7px 16px;border-radius:20px;font-size:13px;border:none;background:#F5A623;color:#fff;cursor:pointer;white-space:nowrap;font-weight:500;">전체</button>
-          <button type="button" class="event-filter-btn" data-type="discount" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🏷️ 할인이벤트</button>
-          <button type="button" class="event-filter-btn" data-type="groupbuy" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🛒 공동구매</button>
-          <button type="button" class="event-filter-btn" data-type="meeting" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">👥 모임·행사</button>
-          <button type="button" class="event-filter-btn" data-type="issue" style="padding:7px 16px;border-radius:20px;font-size:13px;border:1px solid #E8E4DC;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">⚠️ 이슈</button>
-        </div>
-        <div id="events-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"></div>
-        <div id="events-empty" style="display:none;text-align:center;padding:60px 20px;background:#fff;border-radius:12px;border:1px solid #E8E4DC;margin-top:12px;">
-          <div style="font-size:48px;margin-bottom:12px;">📢</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">등록된 이벤트가 없습니다</div>
-          <button type="button" onclick="openEventWriteModal()" style="background:#F5A623;color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;cursor:pointer;margin-top:12px;">이벤트 등록하기</button>
+
+          <div class="gm-score-banner" id="gm-score-banner">
+            <div class="gm-score-banner-inner">
+              <i class="ti ti-trophy"></i>
+              <div>
+                <strong>골목지수</strong>
+                <p>글쓰기 +10 · 댓글 +3 — 활동할수록 쌓이는 대장님 신뢰 점수입니다</p>
+              </div>
+              <button type="button" class="gm-score-banner-close" id="gm-score-banner-close" aria-label="닫기"><i class="ti ti-x"></i></button>
+            </div>
+          </div>
+
+          <div class="write-inducer">
+            <div class="write-inducer-av" id="write-inducer-av">
+              <span id="write-av-initial">?</span>
+            </div>
+            <div class="write-inducer-ph">대장님, 오늘 어떠셨나요?</div>
+            <div class="write-inducer-actions">
+              <span class="write-inducer-act" data-action="photo"><i class="ti ti-photo"></i> 사진</span>
+              <span class="write-inducer-act"><i class="ti ti-map-pin"></i> 위치</span>
+            </div>
+            <button type="button" class="write-inducer-btn">게시하기</button>
+          </div>
+
+          <div class="mentoring-cat-wrap">
+            <button type="button" class="mentoring-cat-tab act" data-cat="all">전체</button>
+            <button type="button" class="mentoring-cat-tab" data-cat="question">질문</button>
+            <button type="button" class="mentoring-cat-tab" data-cat="knowhow">노하우</button>
+            <button type="button" class="mentoring-cat-tab" data-cat="success">성공사례</button>
+            <button type="button" class="mentoring-cat-tab" data-cat="failure">실패담</button>
+          </div>
+
+          <div class="comm-list-hd">
+            <div class="comm-total">전체 <strong id="mentoring-total-count">-</strong>개</div>
+            <div class="mentoring-sort">
+              <button type="button" class="mentoring-sort-btn act" data-sort="latest">최신순</button>
+              <button type="button" class="mentoring-sort-btn" data-sort="popular">인기순</button>
+            </div>
+          </div>
+
+          <div id="mentoring-post-list" class="comm-board-list"></div>
         </div>
       </div>
+      <div class="main-content" id="shell-post-detail" style="display:none;"></div>
 </div>
 </main>
+<!-- ── 우측 위젯 (PC) ── -->
+<aside class="aside">
+  <!-- 인기 검색 상권 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-trending-up"></i> 인기 검색 상권
+      <span class="widget-more">더보기</span>
+    </div>
+    <div id="popular-areas-list-aside">
+      <div class="rank-row"><span class="rank-n">1</span><span class="rank-name">동탄 센트럴파크</span><span class="rank-tag up">급상승</span></div>
+      <div class="rank-row"><span class="rank-n">2</span><span class="rank-name">수원 행궁동</span><span class="rank-tag hot">인기</span></div>
+      <div class="rank-row"><span class="rank-n">3</span><span class="rank-name">화성 봉담읍</span><span class="rank-tag new">신규</span></div>
+      <div class="rank-row"><span class="rank-n">4</span><span class="rank-name">수원 인계동</span></div>
+      <div class="rank-row"><span class="rank-n">5</span><span class="rank-name">오산 세마동</span></div>
+    </div>
+  </div>
+
+  <!-- 지금 뜨는 글 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-flame"></i> 지금 뜨는 글
+      <a href="community.html" class="widget-more">전체보기</a>
+    </div>
+    <div id="hot-posts-list">
+      <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- 이웃 대장님 -->
+  <div class="widget">
+    <div class="widget-title">
+      <i class="ti ti-users"></i> 이웃 대장님
+      <span class="widget-more">더보기</span>
+    </div>
+    <div id="neighbor-list">
+      <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
+    </div>
+  </div>
+
+</aside>
+
 </div>
 
 <nav class="mobile-tabs" aria-label="하단 메뉴">
@@ -516,7 +613,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </a>
   </div>
 </nav>
-<script src="../js/shell_globals.js?v=20260656"></script>
+<script src="js/shell_globals.js?v=20260657"></script>
 
 <!-- 글쓰기 모달 -->
 <div class="modal-bg" id="write-modal">
@@ -525,15 +622,22 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <span class="modal-title">게시글 작성</span>
       <button class="modal-close" id="close-modal"><i class="ti ti-x"></i></button>
     </div>
-    <div class="write-cats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+    <div class="write-cats" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
       <button type="button" class="cat-select-btn" data-cat="info">정보공유</button>
-      <button type="button" class="cat-select-btn act" data-cat="qna">질문·고민</button>
+      <button type="button" class="cat-select-btn" data-cat="qna">질문·고민</button>
       <button type="button" class="cat-select-btn" data-cat="startup">창업준비</button>
       <button type="button" class="cat-select-btn" data-cat="issue">이슈</button>
       <button type="button" class="cat-select-btn" data-cat="event">이벤트</button>
     </div>
+    <div class="write-cats mentoring-write-cats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+      <button type="button" class="cat-select-btn act" data-cat="question">질문</button>
+      <button type="button" class="cat-select-btn" data-cat="knowhow">노하우</button>
+      <button type="button" class="cat-select-btn" data-cat="success">성공사례</button>
+      <button type="button" class="cat-select-btn" data-cat="failure">실패담</button>
+    </div>
     <input id="post-title" type="text" placeholder="제목 (선택)" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:8px;outline:none;font-family:inherit;">
-    <textarea id="post-content" placeholder="대장님들과 이야기를 나눠보세요...&#10;&#10;위치, 업종 태그는 로그인 프로필 기준으로 자동 적용됩니다."></textarea>
+    <textarea id="post-content" placeholder="대장님들과 이야기를 나눠보세요..."></textarea>
+    <div id="write-auto-tags" class="write-auto-tags"></div>
     <input type="file" id="image-file-input" accept="image/*" multiple style="display:none;">
     <div id="image-preview-wrap" style="display:none;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
     <div id="event-date-wrap" style="display:none;margin-top:8px;">
@@ -542,8 +646,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
     <div class="modal-acts">
       <button type="button" class="mab" id="btn-photo-upload"><i class="ti ti-photo"></i> 사진 <span id="image-count" style="color:#F5A623;"></span></button>
-      <button class="mab"><i class="ti ti-map-pin"></i> 위치</button>
-      <button class="mab"><i class="ti ti-tag"></i> 업종태그</button>
+      <button type="button" class="mab" id="btn-location-tag"><i class="ti ti-map-pin"></i> 위치</button>
+      <button type="button" class="mab" id="btn-upjong-tag"><i class="ti ti-tag"></i> 업종태그</button>
       <button class="mab"><i class="ti ti-speakerphone"></i> 이벤트</button>
       <button class="modal-submit" id="submit-post">게시하기</button>
     </div>
@@ -603,6 +707,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div id="analysis-wizard-body"></div>
     </div>
     <div id="analysis-result" style="display:none;">
+      <div style="width:100%;height:360px;border-radius:14px;overflow:hidden;border:1px solid #E8E4DC;margin-bottom:16px;position:relative;">
+        <iframe id="analysis-map-iframe" style="width:100%;height:100%;border:none;display:none;" title="소진공 상권지도" loading="lazy" allow="geolocation"></iframe>
+        <div id="analysis-map-loading" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F7F3EB;color:#999;font-size:14px;">지도를 불러오는 중...</div>
+      </div>
+      <div id="theme-analysis-wrap"></div>
       <div style="background:#FFF8E7;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid #FAC775;">
         <div style="font-size:12px;color:#8B5A10;margin-bottom:4px;">분석 조건</div>
         <div id="analysis-condition" style="font-size:14px;font-weight:700;color:#C17F24;"></div>
@@ -632,7 +741,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div id="peak-info" style="font-size:12px;color:#555;margin-top:10px;padding:8px 12px;background:#FFF8E7;border-radius:8px;"></div>
       </div>
       <div style="background:linear-gradient(135deg,#F5A623,#E8920E);border-radius:12px;padding:14px;">
-        <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;"><i class="ti ti-robot"></i> 골목대장 AI 분석 <span style="background:rgba(255,255,255,.25);padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;">Mock 데이터</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;"><i class="ti ti-robot"></i> 골목대장 AI 분석 <span id="analysis-mode-badge" style="background:rgba(255,255,255,.25);padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;">...</span></div>
         <div id="ai-comment" style="font-size:13px;color:#fff;line-height:1.7;"></div>
       </div>
       <button type="button" id="btn-reset-analysis" style="width:100%;margin-top:12px;background:#fff;border:1px solid #E8E4DC;border-radius:12px;padding:12px;font-size:14px;color:#555;cursor:pointer;"><i class="ti ti-search"></i> 다시 검색</button>
@@ -663,27 +772,7 @@ function showToast(msg){
 
 // 글쓰기·피드·필터: community_ui.js
 
-// AI 채팅
-const aiInput=document.getElementById('ai-input');
-const aiSend=document.getElementById('ai-send');
-const aiMsgs=document.getElementById('ai-messages');
-const responses=['더 자세히 알려주세요!','소진공 데이터 기준으로 분석하고 있어요.','해당 업종의 상권 분석을 시작할게요.','잠시만요, 데이터를 불러오고 있어요...','좋은 질문이에요! 관련 정보를 찾아볼게요.'];
-function addMsg(text,isUser){
-  const div=document.createElement('div');
-  div.className=isUser?'musr':'mbot';
-  div.textContent=text;
-  aiMsgs.appendChild(div);
-  aiMsgs.scrollTop=aiMsgs.scrollHeight;
-}
-function sendAI(){
-  const val=aiInput.value.trim();
-  if(!val)return;
-  addMsg(val,true);
-  aiInput.value='';
-  setTimeout(()=>addMsg(responses[Math.floor(Math.random()*responses.length)],false),700);
-}
-aiSend.addEventListener('click',sendAI);
-aiInput.addEventListener('keydown',(e)=>{if(e.key==='Enter')sendAI();});
+// 레거시 rcol AI 제거 — 우측 위젯(ai-widget-input)·shell_globals 사용
 
 // 사이드바 네비 활성화
 document.querySelectorAll('.ni').forEach(ni=>{
@@ -694,11 +783,12 @@ document.querySelectorAll('.ni').forEach(ni=>{
 });
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
-<script type="module" src="js/auth.js?v=20260615"></script>
-<script type="module" src="js/community_ui.js?v=20260619"></script>
-<script type="module" src="js/analysis.js?v=20260615"></script>
+<script type="module" src="js/auth.js?v=20260628"></script>
+<script type="module" src="js/golmok-score.js?v=20260710"></script>
+<script type="module" src="js/community_ui.js?v=20260710"></script>
+<script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/events.js?v=20260619"></script>
+<script type="module" src="js/pages/mentoring.js?v=20260710"></script>
 </body>
 </html>

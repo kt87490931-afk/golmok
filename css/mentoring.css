@@ -1,0 +1,184 @@
+/* 대장님들의 멘토링 + 골목지수 */
+
+.gm-score-banner {
+  margin: 16px 20px 0;
+  background: linear-gradient(135deg, #fff8e7 0%, #faeeda 100%);
+  border: 1px solid #fac775;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.gm-score-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.gm-score-banner-inner > i {
+  font-size: 28px;
+  color: #c17f24;
+  flex-shrink: 0;
+}
+
+.gm-score-banner-inner strong {
+  display: block;
+  font-size: 14px;
+  color: #8b5a10;
+  margin-bottom: 2px;
+}
+
+.gm-score-banner-inner p {
+  font-size: 12px;
+  color: #633806;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.gm-score-banner-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  line-height: 1;
+}
+
+.gm-score-banner-close:hover {
+  color: #c17f24;
+}
+
+.golmok-score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 18px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f5a623, #e8920e);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.write-inducer-ph .golmok-score-badge {
+  margin-left: 8px;
+}
+
+.golmok-score-toast {
+  position: fixed;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: #1a1a1a;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 320;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.golmok-score-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.golmok-score-toast i {
+  color: #f5a623;
+  font-size: 16px;
+}
+
+.golmok-score-toast strong {
+  color: #fac775;
+}
+
+.mentoring-cat-wrap {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px;
+  margin-top: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mentoring-cat-tab {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #e8e4dc;
+  background: #fff;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.mentoring-cat-tab:hover {
+  border-color: #fac775;
+  color: #c17f24;
+}
+
+.mentoring-cat-tab.act {
+  background: #f5a623;
+  border-color: #f5a623;
+  color: #fff;
+  font-weight: 600;
+}
+
+.mentoring-sort {
+  display: flex;
+  gap: 6px;
+}
+
+.mentoring-sort-btn {
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid #e8e4dc;
+  background: #fff;
+  color: #555;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mentoring-sort-btn.act {
+  background: #fff8e7;
+  border-color: #f5a623;
+  color: #c17f24;
+  font-weight: 600;
+}
+
+.mentoring-write-cats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .gm-score-banner {
+    margin: 12px 12px 0;
+  }
+
+  .mentoring-cat-wrap {
+    padding: 0 12px;
+  }
+
+  .golmok-score-toast {
+    bottom: 72px;
+    max-width: calc(100vw - 32px);
+  }
+}

@@ -53,6 +53,7 @@
   var map = {
     'index.html': 'index.html',
     'community.html': 'index.html',
+    'mentoring.html': 'mentoring.html',
     'neighborhood.html': 'index.html',
     'by-industry.html': 'index.html',
     'analysis.html': 'analysis.html',

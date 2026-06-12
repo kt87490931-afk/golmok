@@ -5,9 +5,11 @@ const POST_SELECT = `
   users (
     id, nickname, profile_image,
     upjong3nm, region_dong, region_full, region_sigungu,
-    follower_count
+    follower_count, golmok_score
   )
 `;
+
+const COMMUNITY_BOARD_FILTER = 'board.eq.community,board.is.null';
 
 export async function getCurrentUser() {
   const {
@@ -69,7 +71,11 @@ export async function getAllPosts({
   withCount = false,
 } = {}) {
   const selectOpts = withCount ? { count: 'exact' } : undefined;
-  let query = supabase.from('posts').select(POST_SELECT, selectOpts).eq('is_deleted', false);
+  let query = supabase
+    .from('posts')
+    .select(POST_SELECT, selectOpts)
+    .eq('is_deleted', false)
+    .or(COMMUNITY_BOARD_FILTER);
 
   if (category !== 'all') query = query.eq('category', category);
 
@@ -95,6 +101,7 @@ export async function getDongPosts({ regionDong, category = 'all', page = 0, lim
     .select(POST_SELECT)
     .eq('region_dong', regionDong)
     .eq('is_deleted', false)
+    .or(COMMUNITY_BOARD_FILTER)
     .order('created_at', { ascending: false })
     .range(page * limit, (page + 1) * limit - 1);
 
@@ -111,6 +118,7 @@ export async function getSigunguPosts({ regionSigungu, category = 'all', page = 
     .select(POST_SELECT)
     .eq('region_sigungu', regionSigungu)
     .eq('is_deleted', false)
+    .or(COMMUNITY_BOARD_FILTER)
     .order('created_at', { ascending: false })
     .range(page * limit, (page + 1) * limit - 1);
 
@@ -138,6 +146,38 @@ export async function getEventPosts({ regionDong, regionSigungu, limit = 6 } = {
   return data || [];
 }
 
+export async function getMentoringPosts({
+  category = 'all',
+  page = 0,
+  limit = 20,
+  sort = 'latest',
+  withCount = false,
+} = {}) {
+  const selectOpts = withCount ? { count: 'exact' } : undefined;
+  let query = supabase
+    .from('posts')
+    .select(POST_SELECT, selectOpts)
+    .eq('is_deleted', false)
+    .eq('board', 'mentoring');
+
+  if (category !== 'all') query = query.eq('category', category);
+
+  if (sort === 'popular') {
+    query = query.order('like_count', { ascending: false });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
+
+  query = query.range(page * limit, (page + 1) * limit - 1);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  const posts = data || [];
+  if (withCount) return { posts, count: count ?? posts.length };
+  return posts;
+}
+
 export async function getPost(postId, { bumpView = true } = {}) {
   if (bumpView) {
     const ok = await runPostCounterRpc('increment_view_count', postId);
@@ -159,6 +199,7 @@ export async function createPost({
   eventType = null,
   eventEndDate = null,
   regionOverride = null,
+  board = 'community',
 }) {
   const user = await getCurrentUser();
   if (!user) return { error: 'login' };
@@ -166,12 +207,14 @@ export async function createPost({
   const profile = (await ensureUserProfile(user)) || {};
   const region = { ...DEFAULT_PROFILE_REGION, ...profile, ...regionOverride };
 
+  const defaultCategory = board === 'mentoring' ? 'question' : 'info';
   const { data, error } = await supabase
     .from('posts')
     .insert({
       user_id: user.id,
       content: content.trim(),
-      category: category === 'all' ? 'info' : category,
+      board,
+      category: category === 'all' ? defaultCategory : category,
       title,
       images,
       region_sido: region?.region_sido || '경기',

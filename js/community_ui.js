@@ -20,7 +20,7 @@ import {
   getFollowingIds,
   getHotPosts,
   getPopularAreas,
-} from './community.js?v=20260665';
+} from './community.js?v=20260710';
 import { uploadImages, createImagePreview } from './upload.js';
 import { sendCommentNotification } from './fcm.js';
 import { waitForShell } from './shell_boot.js';
@@ -38,6 +38,7 @@ let currentPage = 0;
 let isLoading = false;
 let hasMore = true;
 let selectedWriteCategory = 'qna';
+let currentWriteBoard = 'community';
 let replyTargetId = null;
 let userRegion = { ...DEFAULT_REGION };
 let selectedImages = [];
@@ -74,6 +75,10 @@ function getCategoryLabel(category) {
     startup: '창업준비',
     issue: '이슈',
     event: '이벤트',
+    question: '질문',
+    knowhow: '노하우',
+    success: '성공사례',
+    failure: '실패담',
   };
   return labels[category] || '전체';
 }
@@ -85,8 +90,43 @@ function getCategoryStyle(category) {
     startup: 'background:#EEEDFE;color:#3C3489;',
     issue: 'background:#FFF1F1;color:#E24B4A;',
     event: 'background:#EBF4FF;color:#0C447C;',
+    question: 'background:#EBF4FF;color:#0C447C;',
+    knowhow: 'background:#E1F5EE;color:#085041;',
+    success: 'background:#FFF8E7;color:#8B5A10;',
+    failure: 'background:#FFF1F1;color:#E24B4A;',
   };
   return styles[category] || 'background:#F5F1E8;color:#555;';
+}
+
+function golmokScoreBadgeHtml(score) {
+  const n = Number(score) || 0;
+  if (n <= 0) return '';
+  return `<span class="golmok-score-badge" title="골목지수">${n}</span>`;
+}
+
+function resolveWriteBoard() {
+  if (window.__golmokWriteBoard) return window.__golmokWriteBoard;
+  const active = document.body?.dataset?.gmActive;
+  if (active === 'mentoring') return 'mentoring';
+  return 'community';
+}
+
+function syncWriteCategoryPanels() {
+  const board = resolveWriteBoard();
+  currentWriteBoard = board;
+  const genericCats = document.querySelector('.write-cats:not(.mentoring-write-cats)');
+  const mentoringCats = document.querySelector('.mentoring-write-cats');
+  if (mentoringCats) {
+    const isMentoring = board === 'mentoring';
+    mentoringCats.style.display = isMentoring ? 'flex' : 'none';
+    if (genericCats) genericCats.style.display = isMentoring ? 'none' : 'flex';
+  }
+  if (board === 'mentoring' && window.__golmokSelectedMentoringCategory) {
+    selectedWriteCategory = window.__golmokSelectedMentoringCategory;
+    document.querySelectorAll('.mentoring-write-cats .cat-select-btn').forEach((btn) => {
+      btn.classList.toggle('act', btn.dataset.cat === selectedWriteCategory);
+    });
+  }
 }
 
 function parseRangeLabel(label) {
@@ -199,6 +239,8 @@ function getWriteOverlay() {
 async function openWriteOverlay() {
   const ov = getWriteOverlay();
   if (!ov) return;
+  currentWriteBoard = resolveWriteBoard();
+  syncWriteCategoryPanels();
   await resolveUserRegion();
   updateWriteAutoTagsUI();
   ov.classList.add('open');
@@ -446,6 +488,7 @@ function avatarHtml(user) {
 const SHELL_BOARD_PAGES = {
   'index.html': { listViewId: 'shell-feed-view', defaultPage: 'index.html' },
   'community.html': { listViewId: 'board-list-view', defaultPage: 'community.html' },
+  'mentoring.html': { listViewId: 'board-list-view', defaultPage: 'mentoring.html' },
   'neighborhood.html': { listViewId: 'board-list-view', defaultPage: 'neighborhood.html' },
   'by-industry.html': { listViewId: 'board-list-view', defaultPage: 'by-industry.html' },
   'events.html': { listViewId: 'board-list-view', defaultPage: 'events.html' },
@@ -453,6 +496,7 @@ const SHELL_BOARD_PAGES = {
 
 const POST_LIST_PAGE_MAP = {
   'community-post-list': 'community.html',
+  'mentoring-post-list': 'mentoring.html',
   'post-list': 'index.html',
   'neighborhood-post-list': 'neighborhood.html',
   'industry-post-list': 'by-industry.html',
@@ -686,6 +730,7 @@ function createPostCardV2(post, likedSet, savedSet, listContainerId) {
       <div class="pcv2-info">
         <div class="pcv2-name">
           ${escapeHtml(user.nickname || '대장님')}
+          ${golmokScoreBadgeHtml(user.golmok_score)}
           <span class="pcv2-badge" style="${getCategoryStyle(post.category)}">${escapeHtml(getCategoryLabel(post.category))}</span>
           ${post.is_pinned ? '<span class="pcv2-badge" style="background:#FFF8E7;color:#C17F24;">📌 공지</span>' : ''}
         </div>
@@ -822,6 +867,7 @@ export async function loadHotHighlight() {
 export async function updateWriteInducer() {
   const av = document.getElementById('write-inducer-av') || document.getElementById('write-av');
   const initial = document.getElementById('write-av-initial');
+  const ph = document.querySelector('.write-inducer-ph');
   if (!av) return;
 
   try {
@@ -834,6 +880,11 @@ export async function updateWriteInducer() {
       initial.textContent = profile.nickname.charAt(0);
     } else if (profile?.nickname) {
       av.innerHTML = `<span>${escapeHtml(profile.nickname.charAt(0))}</span>`;
+    }
+
+    if (ph && document.body?.dataset?.gmActive === 'mentoring') {
+      const scoreBadge = golmokScoreBadgeHtml(profile?.golmok_score);
+      ph.innerHTML = `대장님, 오늘 어떠셨나요?${scoreBadge}`;
     }
   } catch (e) {
     console.warn('updateWriteInducer', e);
@@ -1108,7 +1159,7 @@ function mountPostDetailPage(root, post, comments, liked, following = false, { i
       <div class="pd-author">
         ${avatarHtml(user)}
         <div class="pd-author-meta">
-          <div class="pd-author-name">${escapeHtml(user.nickname || '대장님')}</div>
+          <div class="pd-author-name">${escapeHtml(user.nickname || '대장님')}${golmokScoreBadgeHtml(user.golmok_score)}</div>
           <div class="pd-author-info">
             <span class="pcbdg" style="${getCategoryStyle(post.category)}">${escapeHtml(badgeText)}</span>
             ${escapeHtml(user.region_full || post.region_full || '')} · ${getTimeAgo(post.created_at)}
@@ -1226,6 +1277,12 @@ function bindPostDetailEvents(scope, post) {
     const countEl = scope.querySelector('#pd-comment-count');
     if (countEl) countEl.textContent = String(updated.length);
     bindReplyButtons();
+    if (res?.data?.id) {
+      import('./golmok-score.js?v=20260710')
+        .then((m) => m.addGolmokScore('comment_write', res.data.id))
+        .catch(() => {});
+    }
+
     const me = await getCurrentUser();
     if (me && post.user_id && post.user_id !== me.id) {
       const profile = await getUserProfile(me.id);
@@ -1295,12 +1352,19 @@ async function submitNewPost() {
       isEvent,
       eventEndDate,
       regionOverride: userRegion,
+      board: currentWriteBoard,
     });
 
     if (res?.error === 'login') {
       toast('로그인이 필요합니다');
       window.openLoginModal?.('login');
       return;
+    }
+
+    if (res?.data?.id) {
+      import('./golmok-score.js?v=20260710')
+        .then((m) => m.addGolmokScore('post_write', res.data.id))
+        .catch(() => {});
     }
 
     getWriteOverlay()?.classList.remove('open');
@@ -1843,7 +1907,13 @@ window.navigateToPost = navigateToPost;
 window.searchArea = searchArea;
 window.sharePost = sharePost;
 window.openWriteOverlay = openWriteOverlay;
-window.openWriteModal = openWriteOverlay;
+window.openWriteModal = function openWriteModal(board) {
+  if (board) {
+    currentWriteBoard = board;
+    window.__golmokWriteBoard = board;
+  }
+  openWriteOverlay();
+};
 window.renderPostList = renderPostList;
 
 function bootCommunity() {

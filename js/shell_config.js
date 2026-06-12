@@ -12,6 +12,7 @@ export function detectContext() {
     weather: (isM ? 'analysis.html' : 'analysis.html') + '?tab=weather',
     hotplace: (isM ? 'analysis.html' : 'analysis.html') + '?tab=hotplace',
     community: isM ? '../community.html' : 'community.html',
+    mentoring: isM ? 'mentoring.html' : 'mentoring.html',
     neighborhood: isM ? '../neighborhood.html' : 'neighborhood.html',
     byIndustry: isM ? '../by-industry.html' : 'by-industry.html',
     events: isM ? 'events.html' : 'events.html',
@@ -32,6 +33,7 @@ export function applyTokens(html, ctx) {
     .replace(/@@WEATHER@@/g, p.weather)
     .replace(/@@HOTPLACE@@/g, p.hotplace)
     .replace(/@@COMMUNITY@@/g, p.community)
+    .replace(/@@MENTORING@@/g, p.mentoring)
     .replace(/@@NEIGHBORHOOD@@/g, p.neighborhood)
     .replace(/@@BY_INDUSTRY@@/g, p.byIndustry)
     .replace(/@@EVENTS@@/g, p.events)
@@ -47,6 +49,7 @@ export const ACTIVE_MAP = {
   weather: 'weather',
   hotplace: 'hotplace',
   community: 'community',
+  mentoring: 'mentoring',
   neighborhood: 'neighborhood',
   'by-industry': 'byIndustry',
   events: 'events',

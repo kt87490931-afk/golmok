@@ -46,6 +46,7 @@
     'index.html': 'index.html',
     'analysis.html': 'analysis.html',
     'events.html': 'events.html',
+    'mentoring.html': 'mentoring.html',
     'post.html': 'post.html',
     'profile.html': 'profile.html',
     'login.html': 'login.html',

@@ -1,11 +1,11 @@
-﻿import { getAllPosts } from '../community.js?v=20260665';
+﻿import { getAllPosts } from '../community.js?v=20260710';
 import {
   renderPostList,
   renderCommSkeleton,
   loadHotHighlight,
   updateWriteInducer,
   bindCommWriteInducer,
-} from '../community_ui.js?v=20260665';
+} from '../community_ui.js?v=20260710';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
 import { waitForShell } from '../shell_boot.js';
 
