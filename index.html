@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="css/main-v3.css?v=20260672">
-<link rel="stylesheet" href="css/main-v4.css?v=20260001">
+<link rel="stylesheet" href="css/main-v4.css?v=20260002">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260655">
 <link rel="stylesheet" href="css/community.css?v=20260665">
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
@@ -47,7 +47,7 @@
 
       <!-- 채팅창 헤더 -->
       <div class="v4-chat-header">
-        <div class="v4-chat-avatar">🦁</div>
+        <div class="v4-chat-avatar"><img src="assets/gmlogo.png" alt="골목대장" class="v4-av-img"></div>
         <div class="v4-chat-header-info">
           <span class="v4-chat-name">골목대장 AI</span>
           <span class="v4-chat-desc">소상공인 상권 전문 AI</span>
@@ -58,7 +58,7 @@
       <!-- 메시지 영역 -->
       <div class="v4-chat-messages" id="v4ChatMessages">
         <div class="v4-msg-ai">
-          <div class="v4-msg-avatar">🦁</div>
+          <div class="v4-msg-avatar"><img src="assets/gmlogo.png" alt="골목대장" class="v4-av-img"></div>
           <div class="v4-msg-wrap">
             <span class="v4-msg-name">골목대장 AI</span>
             <div class="v4-msg-bubble">
@@ -429,6 +429,8 @@ window.changeRegion = function () { showToast('지역 변경은 프로필 설정
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const v4AvImg = '<img src="assets/gmlogo.png" alt="골목대장" class="v4-av-img">';
+
   function v4AddMsg(text, isUser) {
     const div = document.createElement('div');
     if (isUser) {
@@ -437,7 +439,7 @@ window.changeRegion = function () { showToast('지역 변경은 프로필 설정
     } else {
       div.className = 'v4-msg-ai';
       div.innerHTML =
-        '<div class="v4-msg-avatar">🦁</div>' +
+        '<div class="v4-msg-avatar">' + v4AvImg + '</div>' +
         '<div class="v4-msg-wrap">' +
           '<span class="v4-msg-name">골목대장 AI</span>' +
           '<div class="v4-msg-bubble">' + text + '</div>' +
@@ -452,7 +454,7 @@ window.changeRegion = function () { showToast('지역 변경은 프로필 설정
     div.className = 'v4-msg-ai';
     div.id = 'v4Typing';
     div.innerHTML =
-      '<div class="v4-msg-avatar">🦁</div>' +
+      '<div class="v4-msg-avatar">' + v4AvImg + '</div>' +
       '<div class="v4-typing-dots"><span></span><span></span><span></span></div>';
     v4Msgs.appendChild(div);
     v4Msgs.scrollTop = v4Msgs.scrollHeight;
