@@ -190,9 +190,34 @@ export async function createPost({
 }
 
 export async function deletePost(postId) {
-  const { error } = await supabase.from('posts').update({ is_deleted: true }).eq('id', postId);
+  const user = await getCurrentUser();
+  if (!user) return { error: 'login' };
+
+  const { error } = await supabase
+    .from('posts')
+    .update({ is_deleted: true })
+    .eq('id', postId)
+    .eq('user_id', user.id);
+
   if (error) throw error;
-  return true;
+  return { ok: true };
+}
+
+export async function deleteComment(commentId, postId) {
+  const user = await getCurrentUser();
+  if (!user) return { error: 'login' };
+
+  const { error } = await supabase
+    .from('comments')
+    .update({ is_deleted: true })
+    .eq('id', commentId)
+    .eq('user_id', user.id);
+
+  if (error) throw error;
+
+  const ok = await runPostCounterRpc('decrement_comment_count', postId);
+  if (!ok) await bumpPostField(postId, 'comment_count', -1);
+  return { ok: true };
 }
 
 export async function toggleLike(postId) {

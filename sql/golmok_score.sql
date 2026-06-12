@@ -55,8 +55,10 @@ BEGIN
   END IF;
 
   v_delta := CASE p_action
-    WHEN 'post_write' THEN 10
-    WHEN 'comment_write' THEN 3
+    WHEN 'post_write' THEN 2
+    WHEN 'comment_write' THEN 1
+    WHEN 'post_delete' THEN -2
+    WHEN 'comment_delete' THEN -1
     ELSE 0
   END;
 
@@ -79,7 +81,7 @@ BEGIN
   VALUES (v_user_id, p_action, v_delta, p_target_id);
 
   UPDATE public.users
-  SET golmok_score = golmok_score + v_delta
+  SET golmok_score = GREATEST(0, golmok_score + v_delta)
   WHERE id = v_user_id
   RETURNING golmok_score INTO v_new_score;
 

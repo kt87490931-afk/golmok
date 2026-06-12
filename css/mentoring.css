@@ -100,6 +100,14 @@
   font-size: 16px;
 }
 
+.golmok-score-toast--down {
+  background: #4a3030;
+}
+
+.golmok-score-toast--down i {
+  color: #e24b4a;
+}
+
 .golmok-score-toast strong {
   color: #fac775;
 }

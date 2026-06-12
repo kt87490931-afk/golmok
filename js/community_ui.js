@@ -11,6 +11,8 @@ import {
   toggleBookmark,
   getComments,
   createComment,
+  deletePost,
+  deleteComment,
   toggleFollow,
   getLikedPostIds,
   getBookmarkedPostIds,
@@ -582,7 +584,8 @@ export async function showShellPostDetail(postId, { skipPush = false } = {}) {
     const following = authorId ? await isFollowing(authorId) : false;
     const titleText = post.title || getPostDisplayTitle(post);
     document.title = `${titleText} — 골목대장`;
-    mountPostDetailPage(root, post, comments, liked, following, { inShell: true });
+    const me = await getCurrentUser();
+    mountPostDetailPage(root, post, comments, liked, following, { inShell: true, currentUserId: me?.id });
     root.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) {
     console.error(e);
@@ -1107,7 +1110,8 @@ export async function initPostDetailPage() {
     const following = authorId ? await isFollowing(authorId) : false;
     const titleText = post.title || getPostDisplayTitle(post);
     document.title = `${titleText} — 골목대장`;
-    mountPostDetailPage(root, post, comments, liked, following);
+    const me = await getCurrentUser();
+    mountPostDetailPage(root, post, comments, liked, following, { currentUserId: me?.id });
   } catch (e) {
     console.error(e);
     root.innerHTML =
@@ -1115,7 +1119,7 @@ export async function initPostDetailPage() {
   }
 }
 
-function buildCommentsHtml(comments) {
+function buildCommentsHtml(comments, currentUserId = null) {
   if (!comments.length) {
     return '<div style="color:#999;font-size:13px;text-align:center;padding:20px;">첫 번째 댓글을 남겨보세요!</div>';
   }
@@ -1129,17 +1133,26 @@ function buildCommentsHtml(comments) {
       const repliesHtml = replies
         .map((reply) => {
           const ru = reply.users || {};
-          return `<div style="margin-left:36px;padding:10px 0;border-top:1px solid #F5F5F5;">
-            <div style="font-size:12px;font-weight:500;">${escapeHtml(ru.nickname || '대장님')} <span style="color:#999;font-weight:400;">${getTimeAgo(reply.created_at)}</span></div>
+          const replyDeleteBtn =
+            currentUserId && reply.user_id === currentUserId
+              ? `<button type="button" class="comment-delete-btn" data-comment-id="${reply.id}" style="margin-left:8px;font-size:11px;color:#E24B4A;background:none;border:none;cursor:pointer;">삭제</button>`
+              : '';
+          return `<div style="margin-left:36px;padding:10px 0;border-top:1px solid #F5F5F5;" data-comment-id="${reply.id}">
+            <div style="font-size:12px;font-weight:500;">${escapeHtml(ru.nickname || '대장님')} <span style="color:#999;font-weight:400;">${getTimeAgo(reply.created_at)}</span>${replyDeleteBtn}</div>
             <div style="font-size:13px;color:#333;line-height:1.5;margin-top:4px;">${escapeHtml(reply.content)}</div>
           </div>`;
         })
         .join('');
 
-      return `<div style="padding:12px 0;border-bottom:1px solid #F5F5F5;">
+      const commentDeleteBtn =
+        currentUserId && comment.user_id === currentUserId
+          ? `<button type="button" class="comment-delete-btn" data-comment-id="${comment.id}" style="font-size:11px;color:#E24B4A;background:none;border:none;cursor:pointer;">삭제</button>`
+          : '';
+      return `<div style="padding:12px 0;border-bottom:1px solid #F5F5F5;" data-comment-id="${comment.id}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
           <span style="font-size:13px;font-weight:500;">${escapeHtml(user.nickname || '대장님')}</span>
           <span style="font-size:11px;color:#999;">${getTimeAgo(comment.created_at)}</span>
+          ${commentDeleteBtn}
           <button type="button" data-reply-id="${comment.id}" class="reply-btn" style="margin-left:auto;font-size:11px;color:#F5A623;background:none;border:none;cursor:pointer;">답글</button>
         </div>
         <div style="font-size:13px;color:#333;line-height:1.6;">${escapeHtml(comment.content)}</div>
@@ -1149,8 +1162,16 @@ function buildCommentsHtml(comments) {
     .join('');
 }
 
-function mountPostDetailPage(root, post, comments, liked, following = false, { inShell = false } = {}) {
+function mountPostDetailPage(
+  root,
+  post,
+  comments,
+  liked,
+  following = false,
+  { inShell = false, currentUserId = null } = {}
+) {
   const user = post.users || {};
+  const isOwner = currentUserId && (post.user_id === currentUserId || user.id === currentUserId);
   const badgeText = post.upjong3nm || user.upjong3nm || getCategoryLabel(post.category);
 
   root.innerHTML = `
@@ -1188,9 +1209,16 @@ function mountPostDetailPage(root, post, comments, liked, following = false, { i
         <button type="button" class="detail-share-btn pd-act-btn" data-post-id="${post.id}">
           <i class="ti ti-share"></i> 공유
         </button>
+        ${
+          isOwner
+            ? `<button type="button" class="detail-delete-btn pd-act-btn pd-delete-btn" data-post-id="${post.id}" style="color:#E24B4A;border-color:#F5C6C6;margin-left:auto;">
+          <i class="ti ti-trash"></i> 삭제
+        </button>`
+            : ''
+        }
       </div>
       <div class="pd-comments-head">댓글 <span id="pd-comment-count">${post.comment_count || 0}</span>개</div>
-      <div id="comment-list-${post.id}" class="pd-comment-list">${buildCommentsHtml(comments)}</div>
+      <div id="comment-list-${post.id}" class="pd-comment-list">${buildCommentsHtml(comments, currentUserId)}</div>
     </article>
     <div class="pd-comment-bar${inShell ? ' pd-comment-bar--inline' : ''}">
       <input id="comment-input-${post.id}" type="text" placeholder="댓글을 입력하세요..." class="pd-comment-input">
@@ -1238,6 +1266,28 @@ function bindPostDetailEvents(scope, post) {
 
   scope.querySelector('.detail-share-btn')?.addEventListener('click', () => sharePost(post.id));
 
+  scope.querySelector('.detail-delete-btn')?.addEventListener('click', async () => {
+    if (!window.confirm('게시글을 삭제할까요?')) return;
+    const res = await deletePost(post.id);
+    if (res?.error === 'login') {
+      toast('로그인이 필요합니다');
+      window.openLoginModal?.('login');
+      return;
+    }
+    import('./golmok-score.js?v=20260710')
+      .then((m) => m.addGolmokScore('post_delete', post.id))
+      .catch(() => {});
+    toast('게시글이 삭제되었습니다');
+    if (getShellLayout()) {
+      hideShellPostDetail();
+      window.dispatchEvent(new CustomEvent('golmok:posts-changed'));
+      loadFeed(true).catch(() => {});
+    } else {
+      const back = post.board === 'mentoring' ? 'mentoring.html' : 'community.html';
+      window.location.href = back;
+    }
+  });
+
   scope.querySelector('.detail-follow-btn')?.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1257,6 +1307,39 @@ function bindPostDetailEvents(scope, post) {
     });
   };
 
+  const refreshComments = async () => {
+    const me = await getCurrentUser();
+    const updated = await getComments(post.id);
+    const listEl = scope.querySelector(`#comment-list-${post.id}`);
+    if (listEl) listEl.innerHTML = buildCommentsHtml(updated, me?.id);
+    const countEl = scope.querySelector('#pd-comment-count');
+    if (countEl) countEl.textContent = String(updated.length);
+    bindReplyButtons();
+  };
+
+  const commentListEl = scope.querySelector(`#comment-list-${post.id}`);
+  if (commentListEl && !commentListEl.dataset.deleteBound) {
+    commentListEl.dataset.deleteBound = '1';
+    commentListEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.comment-delete-btn');
+      if (!btn) return;
+      e.stopPropagation();
+      const commentId = btn.dataset.commentId;
+      if (!commentId || !window.confirm('댓글을 삭제할까요?')) return;
+      const res = await deleteComment(commentId, post.id);
+      if (res?.error === 'login') {
+        toast('로그인이 필요합니다');
+        window.openLoginModal?.('login');
+        return;
+      }
+      import('./golmok-score.js?v=20260710')
+        .then((m) => m.addGolmokScore('comment_delete', commentId))
+        .catch(() => {});
+      await refreshComments();
+      toast('댓글이 삭제되었습니다');
+    });
+  }
+
   bindReplyButtons();
 
   const submitComment = async () => {
@@ -1272,18 +1355,14 @@ function bindPostDetailEvents(scope, post) {
     input.value = '';
     replyTargetId = null;
     input.placeholder = '댓글을 입력하세요...';
-    const updated = await getComments(post.id);
-    scope.querySelector(`#comment-list-${post.id}`).innerHTML = buildCommentsHtml(updated);
-    const countEl = scope.querySelector('#pd-comment-count');
-    if (countEl) countEl.textContent = String(updated.length);
-    bindReplyButtons();
+    await refreshComments();
+    const me = await getCurrentUser();
     if (res?.data?.id) {
       import('./golmok-score.js?v=20260710')
         .then((m) => m.addGolmokScore('comment_write', res.data.id))
         .catch(() => {});
     }
 
-    const me = await getCurrentUser();
     if (me && post.user_id && post.user_id !== me.id) {
       const profile = await getUserProfile(me.id);
       sendCommentNotification(post.user_id, profile?.nickname || '대장님', post.id);

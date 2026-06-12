@@ -15,13 +15,13 @@ export async function addGolmokScore(action, targetId) {
     return { error: error.message };
   }
 
-  if (data?.delta > 0) showGolmokScoreToast(data.delta);
+  if (data?.delta) showGolmokScoreToast(data.delta);
   return data;
 }
 
 export function showGolmokScoreToast(delta) {
   const n = Number(delta) || 0;
-  if (n <= 0) return;
+  if (!n) return;
 
   let el = document.getElementById('golmok-score-toast');
   if (!el) {
@@ -31,7 +31,9 @@ export function showGolmokScoreToast(delta) {
     document.body.appendChild(el);
   }
 
-  el.innerHTML = `<i class="ti ti-trophy"></i> 골목지수 <strong>+${n}</strong>`;
+  const label = n > 0 ? `+${n}` : String(n);
+  el.classList.toggle('golmok-score-toast--down', n < 0);
+  el.innerHTML = `<i class="ti ti-trophy"></i> 골목지수 <strong>${label}</strong>`;
   el.classList.add('show');
   window.clearTimeout(el._hideTimer);
   el._hideTimer = window.setTimeout(() => el.classList.remove('show'), 2800);
