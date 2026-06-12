@@ -54,6 +54,8 @@
     'index.html': 'index.html',
     'community.html': 'index.html',
     'mentoring.html': 'mentoring.html',
+    'promo.html': 'promo.html',
+    'promo-write.html': 'promo-write.html',
     'neighborhood.html': 'index.html',
     'by-industry.html': 'index.html',
     'analysis.html': 'analysis.html',

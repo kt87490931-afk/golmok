@@ -47,6 +47,8 @@
     'analysis.html': 'analysis.html',
     'events.html': 'events.html',
     'mentoring.html': 'mentoring.html',
+    'promo.html': 'promo.html',
+    'promo-write.html': 'promo-write.html',
     'post.html': 'post.html',
     'profile.html': 'profile.html',
     'login.html': 'login.html',

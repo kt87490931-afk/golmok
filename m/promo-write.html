@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="js/desktop-route.js"></script>
+<title>홍보 등록 - 골목대장</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/main-v3.css?v=20260710">
+<link rel="stylesheet" href="../css/shell-pages.css?v=20260702">
+<link rel="stylesheet" href="../css/main-v3-m.css?v=20260702">
+<link rel="stylesheet" href="../css/promo.css?v=20260711">
+</head>
+<body class="m-shell gm-shell-loaded gm-shell-minimal" data-gm-active="promo" data-gm-shell="minimal">
+
+<header class="hd">
+  <a href="index.html" class="hd-logo">
+    <img src="assets/gmlogo.png" alt="골목대장">
+    <div>
+      <div class="hd-logo-text">골목대장</div>
+      <div class="hd-logo-sub">
+        <span class="hd-logo-sub-pc">우리는 모두 골목대장, 데이터로 보는 상권의 힘</span>
+        <span class="hd-logo-sub-m">우리는 모두 골목대장,<br>데이터로 보는 상권의 힘</span>
+      </div>
+    </div>
+  </a>
+  <nav class="hd-nav">
+    <a href="index.html" data-gm-nav="home">홈</a>
+    <a href="analysis.html" data-gm-nav="analysis">상권분석</a>
+    <a href="analysis.html?tab=weather" data-gm-nav="weather">창업기상도</a>
+    <a href="analysis.html?tab=hotplace" data-gm-nav="hotplace">핫플레이스</a>
+    <a href="../policy.html" data-gm-nav="policy">정책·지원</a>
+  </nav>
+  <div class="hd-right">
+    <div class="hd-search-btn" onclick="focusHeroSearch()">
+      <i class="ti ti-search"></i>
+      <span>상권, 업종, 질문 검색...</span>
+    </div>
+    <div class="icobtn nbadge" id="open-notifications" title="알림" style="position:relative"><i class="ti ti-bell"></i></div>
+    <button class="btn-voice" type="button" onclick="startVoice()">
+      <i class="ti ti-microphone"></i>
+      <span>음성검색</span>
+    </button>
+    <div class="hd-user" id="user-chip">
+      <div class="hd-user-av" id="user-pav">?</div>
+      <span id="user-pname" class="pname">로그인</span>
+      <i class="ti ti-chevron-down" style="font-size:13px;color:var(--gray-5)"></i>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+<div class="gm-page-inner">
+
+<div class="promo-write-page" id="promo-write-form">
+  <div class="promo-write-hd">
+    <a href="promo.html" class="promo-write-back" aria-label="뒤로"><i class="ti ti-arrow-left"></i></a>
+    <div class="promo-write-title">홍보 등록</div>
+    <button type="button" class="promo-write-submit" id="btn-submit-promo">홍보 등록</button>
+  </div>
+
+  <div class="promo-limit-banner" id="promo-limit-banner" style="display:none;">
+    <strong>오늘 이미 홍보를 등록했습니다</strong><br>
+    <span style="font-size:12px;color:#888;">내일 00:00 이후 다시 등록할 수 있어요</span>
+  </div>
+
+  <div class="promo-write-section">
+    <div class="promo-write-section-title"><i class="ti ti-building-store"></i> 업체 정보</div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">업체명 <span class="req">*</span></label>
+      <input type="text" id="shop-name" class="promo-write-input" placeholder="가게 이름을 입력해주세요" maxlength="40">
+    </div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">업종 <span class="req">*</span></label>
+      <div class="promo-upjong-grid">
+        <button type="button" class="promo-upjong-btn" data-name="음식" data-code="I2">음식</button>
+        <button type="button" class="promo-upjong-btn" data-name="소매" data-code="G2">소매</button>
+        <button type="button" class="promo-upjong-btn" data-name="카페" data-code="I2">카페</button>
+        <button type="button" class="promo-upjong-btn" data-name="수리" data-code="S2">수리</button>
+        <button type="button" class="promo-upjong-btn" data-name="교육" data-code="P1">교육</button>
+        <button type="button" class="promo-upjong-btn" data-name="예술" data-code="R1">예술</button>
+        <button type="button" class="promo-upjong-btn" data-name="숙박" data-code="I1">숙박</button>
+        <button type="button" class="promo-upjong-btn" data-name="의료" data-code="Q1">의료</button>
+        <button type="button" class="promo-upjong-btn" data-name="기타" data-code="">기타</button>
+      </div>
+    </div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">주소</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="shop-address" class="promo-write-input" placeholder="가게 주소 (선택)" style="flex:1;">
+        <button type="button" id="btn-promo-gps" class="btn-promo-write" style="flex-shrink:0;"><i class="ti ti-current-location"></i> GPS</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="promo-write-section">
+    <div class="promo-write-section-title"><i class="ti ti-message"></i> 홍보 내용</div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">한 줄 소개 <span class="req">*</span></label>
+      <input type="text" id="intro" class="promo-write-input" placeholder="예: 오늘 신메뉴 출시! 첫 방문 10% 할인" maxlength="80">
+      <div class="promo-write-char"><span id="intro-char">0</span>/80</div>
+    </div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">상세 설명</label>
+      <textarea id="detail" class="promo-write-textarea" rows="4" placeholder="할인, 이벤트, 영업시간 변경 등 자세히 적어주세요" maxlength="500"></textarea>
+      <div class="promo-write-char"><span id="detail-char">0</span>/500</div>
+    </div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">영업시간</label>
+      <input type="text" id="open-hours" class="promo-write-input" placeholder="예: 10:00 ~ 22:00 (월요일 휴무)">
+    </div>
+    <div class="promo-write-field">
+      <label class="promo-write-label">연락처</label>
+      <input type="tel" id="shop-phone" class="promo-write-input" placeholder="예: 031-123-4567">
+    </div>
+  </div>
+
+  <div class="promo-write-section">
+    <div class="promo-write-section-title"><i class="ti ti-photo"></i> 사진 (최대 3장)</div>
+    <input type="file" id="promo-photo-input" accept="image/*" multiple style="display:none;">
+    <div class="promo-photo-grid" id="promo-photo-grid"></div>
+  </div>
+</div>
+</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+</script>
+<script src="js/shell_globals.js?v=20260657"></script>
+<script type="module" src="js/profile_ui.js?v=20260615"></script>
+<script type="module" src="js/auth.js?v=20260628"></script>
+<script type="module" src="../js/pages/promo-write.js?v=20260711"></script>
+</body>
+</html>

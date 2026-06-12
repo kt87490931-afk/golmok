@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/mobile-route.js"></script>
-<title>전체 게시판 - 골목대장</title>
+<title>우리동네 무료홍보 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -422,8 +422,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link rel="stylesheet" href="css/main-v3.css?v=20260710">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260702">
 <link rel="stylesheet" href="css/community.css?v=20260710">
+<link rel="stylesheet" href="css/promo.css?v=20260711">
 </head>
-<body class="gm-shell-loaded" data-gm-active="community" data-gm-shell="standard">
+<body class="gm-shell-loaded" data-gm-active="promo" data-gm-shell="standard">
 
 <header class="hd">
   <a href="index.html" class="hd-logo">
@@ -472,12 +473,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
   <div class="sb-sec">
     <div class="sb-label">커뮤니티</div>
-    <a href="community.html" class="sb-a act" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
+    <a href="community.html" class="sb-a" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
     <a href="neighborhood.html" class="sb-a" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
     <a href="mentoring.html" class="sb-a" data-gm-nav="mentoring"><i class="ti ti-users"></i> 대장님들의 멘토링</a>
-    <a href="promo.html" class="sb-a" data-gm-nav="promo"><i class="ti ti-speakerphone"></i> 우리동네 무료홍보 <span class="sb-promo-free">무료</span></a>
     <a href="by-industry.html" class="sb-a" data-gm-nav="by-industry"><i class="ti ti-tag"></i> 업종별</a>
-    <a href="events.html" class="sb-a" data-gm-nav="events"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
+    <a href="promo.html" class="sb-a act" data-gm-nav="promo"><i class="ti ti-speakerphone"></i> 우리동네 무료홍보 <span class="sb-promo-free">무료</span></a>
+    <a href="events.html" class="sb-a" data-gm-nav="events"><i class="ti ti-calendar-event"></i> 이벤트·행사</a>
     <a href="policy.html" class="sb-a" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책·지원</a>
   </div>
   <div class="sb-sec">
@@ -496,50 +497,36 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <main class="main">
 <div class="gm-page-inner">
 <div class="main-content" id="board-list-view">
-        <div class="comm-wrap">
-          <div class="comm-page-hd">
-            <h2 class="comm-page-title">전체 게시판</h2>
-            <p class="comm-page-sub">전국 소상공인 대장님들의 이야기</p>
-          </div>
-
-          <div class="write-inducer">
-            <div class="write-inducer-av" id="write-inducer-av">
-              <span id="write-av-initial">?</span>
-            </div>
-            <div class="write-inducer-ph">대장님, 오늘 어떠셨나요?</div>
-            <div class="write-inducer-actions">
-              <span class="write-inducer-act" data-action="photo"><i class="ti ti-photo"></i> 사진</span>
-              <span class="write-inducer-act"><i class="ti ti-map-pin"></i> 위치</span>
-            </div>
-            <button type="button" class="write-inducer-btn">게시하기</button>
-          </div>
-
-          <div class="hot-highlight" id="hot-highlight-section">
-            <div class="hot-highlight-hd">
-              <div class="hot-highlight-title"><i class="ti ti-flame"></i> 지금 뜨는 글</div>
-              <button type="button" class="hot-highlight-more">전체보기</button>
-            </div>
-            <div id="hot-highlight-list"></div>
-          </div>
-
-          <div class="comm-cat-wrap">
-            <button type="button" class="comm-cat-tab" data-cat="all">전체</button>
-            <button type="button" class="comm-cat-tab" data-cat="qna">질문·고민</button>
-            <button type="button" class="comm-cat-tab" data-cat="info">정보공유</button>
-            <button type="button" class="comm-cat-tab" data-cat="startup">창업준비</button>
-            <button type="button" class="comm-cat-tab" data-cat="issue">이슈</button>
-            <button type="button" class="comm-cat-tab" data-cat="event">이벤트</button>
-          </div>
-
-          <div class="comm-list-hd">
-            <div class="comm-total">전체 <strong id="post-total-count">-</strong>개</div>
-            <div class="comm-sort">
-              <button type="button" class="comm-sort-btn act" data-sort="latest">최신순</button>
-              <button type="button" class="comm-sort-btn" data-sort="popular">인기순</button>
+                <div class="promo-wrap">
+          <div class="promo-banner">
+            <div class="promo-banner-content">
+              <div class="promo-banner-eyebrow"><i class="ti ti-speakerphone"></i> 매일 1회 · 완전 무료</div>
+              <div class="promo-banner-title">우리동네 <em>무료</em>홍보</div>
+              <div class="promo-banner-sub">동네 이웃 대장님들에게 오늘의 가게를 알려보세요</div>
             </div>
           </div>
 
-          <div id="community-post-list" class="comm-board-list"></div>
+          <div class="promo-toolbar">
+            <div class="promo-range-tabs">
+              <button type="button" class="promo-range-tab act" data-range="dong"><i class="ti ti-map-pin"></i> 우리동네</button>
+              <button type="button" class="promo-range-tab" data-range="all"><i class="ti ti-world"></i> 전국</button>
+            </div>
+            <a href="promo-write.html" class="btn-promo-write" id="btn-write-promo"><i class="ti ti-plus"></i> 홍보 등록</a>
+          </div>
+
+          <div class="promo-done-banner" id="promo-done-banner">
+            <i class="ti ti-circle-check"></i>
+            <span>오늘 <strong>홍보 완료!</strong> 내일 00:00 이후 다시 등록할 수 있어요</span>
+          </div>
+
+          <div class="promo-list" id="promo-list"></div>
+
+          <div class="promo-cta-card" id="promo-cta" style="display:none;">
+            <i class="ti ti-speakerphone"></i>
+            <div class="promo-cta-card-title">첫 번째 홍보의 주인공이 되어보세요</div>
+            <div class="promo-cta-card-sub">매일 1회 무료로 우리동네 이웃에게<br>가게를 알릴 수 있어요</div>
+            <a href="promo-write.html" class="btn-promo-write"><i class="ti ti-plus"></i> 홍보 등록하기</a>
+          </div>
         </div>
       </div>
       <div class="main-content" id="shell-post-detail" style="display:none;"></div>
@@ -620,12 +607,18 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <span class="modal-title">게시글 작성</span>
       <button class="modal-close" id="close-modal"><i class="ti ti-x"></i></button>
     </div>
-    <div class="write-cats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+    <div class="write-cats" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
       <button type="button" class="cat-select-btn" data-cat="info">정보공유</button>
-      <button type="button" class="cat-select-btn act" data-cat="qna">질문·고민</button>
+      <button type="button" class="cat-select-btn" data-cat="qna">질문·고민</button>
       <button type="button" class="cat-select-btn" data-cat="startup">창업준비</button>
       <button type="button" class="cat-select-btn" data-cat="issue">이슈</button>
       <button type="button" class="cat-select-btn" data-cat="event">이벤트</button>
+    </div>
+    <div class="write-cats mentoring-write-cats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+      <button type="button" class="cat-select-btn act" data-cat="question">질문</button>
+      <button type="button" class="cat-select-btn" data-cat="knowhow">노하우</button>
+      <button type="button" class="cat-select-btn" data-cat="success">성공사례</button>
+      <button type="button" class="cat-select-btn" data-cat="failure">실패담</button>
     </div>
     <input id="post-title" type="text" placeholder="제목 (선택)" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:8px;outline:none;font-family:inherit;">
     <textarea id="post-content" placeholder="대장님들과 이야기를 나눠보세요..."></textarea>
@@ -776,11 +769,11 @@ document.querySelectorAll('.ni').forEach(ni=>{
 </script>
 <script type="module" src="js/profile_ui.js?v=20260615"></script>
 <script type="module" src="js/auth.js?v=20260628"></script>
-<script type="module" src="js/golmok-score.js?v=20260710"></script>
-<script type="module" src="js/community_ui.js?v=20260710"></script>
+
+
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/community.js?v=20260710"></script>
+<script type="module" src="js/pages/promo.js?v=20260711"></script>
 </body>
 </html>
