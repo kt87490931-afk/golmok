@@ -743,7 +743,71 @@ body.gm-shell-ai.m-shell .ai-page {
 }
 
 body.gm-shell-ai.m-shell .ai-input-area {
-  padding-bottom: calc(14px + var(--bn-h, 56px) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 모바일 AI 채팅 — 프로모 타이틀 숨김, 채팅 영역 전체 높이 활용 */
+body.m-shell.gm-shell-ai .ai-hd-title {
+  display: none;
+}
+
+body.m-shell.gm-shell-ai .ai-hd {
+  padding: 12px 14px;
+}
+
+body.m-shell.gm-shell-ai .ai-hd-top {
+  margin-bottom: 0;
+}
+
+body.m-shell.gm-shell-ai {
+  height: 100dvh;
+  height: 100svh;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+body.m-shell.gm-shell-ai .layout {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+}
+
+body.m-shell.gm-shell-ai .main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0 !important;
+}
+
+body.m-shell.gm-shell-ai .gm-page-inner,
+body.m-shell.gm-shell-ai .ai-page-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+body.m-shell.gm-shell-ai .ai-page-wrap {
+  min-height: 0;
+}
+
+body.m-shell.gm-shell-ai .ai-page {
+  flex: 1;
+  min-height: 0 !important;
+  height: auto;
+  max-height: none;
+}
+
+body.m-shell.gm-shell-ai .ai-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 768px) {
@@ -753,4 +817,6 @@ body.gm-shell-ai.m-shell .ai-input-area {
   .ai-input-area { padding: 12px 14px; }
   .msg-user-bubble { max-width: 88%; }
   .ai-hd { padding: 16px 16px 0; }
+  body.m-shell.gm-shell-ai .ai-hd { padding: 12px 14px; }
+  body.m-shell.gm-shell-ai .ai-messages { min-height: 0; }
 }

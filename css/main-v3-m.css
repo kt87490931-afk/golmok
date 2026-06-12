@@ -3,11 +3,11 @@
  * (PC 반응형 통합 없이 /m 경로만 모바일 UI)
  */
 body.m-shell {
-  --mb-bar-h: 56px;
+  --mb-bar-h: 0px;
   --mb-float-gap: 0px;
   --bn-h: var(--mb-bar-h);
   --mb-map-reserve: 0px;
-  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   max-width: 430px;
   margin: 0 auto;
   background: #f7f3eb;
@@ -23,8 +23,8 @@ body.m-shell .layout {
   grid-template-columns: 1fr !important;
   grid-template-areas: 'main' !important;
   padding-top: 0 !important;
-  padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom, 0px)) !important;
-  min-height: calc(100dvh - var(--bn-h) - env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  min-height: calc(100dvh - env(safe-area-inset-bottom, 0px));
 }
 
 body.m-shell .main {
@@ -83,7 +83,7 @@ body.m-shell .btn-voice {
 
 /* 하단 바 — 화면 맨 아래 일체형 (플로팅 캡슐 제거) */
 body.m-shell .mobile-tabs {
-  display: flex !important;
+  display: none !important;
   position: fixed;
   bottom: 0;
   left: 50%;

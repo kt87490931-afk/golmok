@@ -117,7 +117,7 @@ body.gm-shell-auth {
 }
 
 body.gm-shell-auth.m-shell .mobile-tabs {
-  display: flex;
+  display: none !important;
 }
 
 body.gm-shell-loaded {
