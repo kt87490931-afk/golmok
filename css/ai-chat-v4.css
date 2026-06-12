@@ -1,0 +1,437 @@
+/* ================================================
+   골목대장 ai-chat-v4.css
+   ai-search.html V4 레이아웃 + 히스토리 패널
+   ================================================ */
+
+/* ── 전체 래퍼: 가로 분할 레이아웃 ── */
+.ai-page-wrap {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  justify-content: flex-start;
+}
+
+/* ── 좌측 히스토리 패널 ── */
+.ai-history-panel {
+  width: 260px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid #E8E4DC;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: width 0.2s ease, opacity 0.2s ease;
+}
+
+.ai-history-panel.collapsed {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ai-hist-hd {
+  padding: 16px 14px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #E8E4DC;
+  flex-shrink: 0;
+}
+
+.ai-hist-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-hist-title .ti {
+  font-size: 15px;
+  color: #F5A623;
+}
+
+.ai-hist-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #F5A623;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1A1A1A;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: background 0.12s;
+}
+
+.ai-hist-new-btn:hover { background: #C17F24; }
+.ai-hist-new-btn .ti  { font-size: 13px; }
+
+.ai-hist-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.ai-hist-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #CCC;
+  padding: 10px 14px 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ai-hist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.12s;
+  position: relative;
+}
+
+.ai-hist-item:hover { background: #F7F3EB; }
+
+.ai-hist-item.active {
+  background: #FFF8E7;
+  border-right: 3px solid #F5A623;
+}
+
+.ai-hist-item-icon {
+  width: 28px;
+  height: 28px;
+  background: #F5F1E8;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  color: #888;
+}
+
+.ai-hist-item.active .ai-hist-item-icon {
+  background: #FFF8E7;
+  color: #C17F24;
+}
+
+.ai-hist-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-hist-item-title {
+  font-size: 13px;
+  color: #444;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.ai-hist-item.active .ai-hist-item-title { color: #1A1A1A; font-weight: 500; }
+
+.ai-hist-item-time {
+  font-size: 11px;
+  color: #CCC;
+  margin-top: 1px;
+}
+
+.ai-hist-item-del {
+  display: none;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: #CCC;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.ai-hist-item:hover .ai-hist-item-del { display: flex; }
+
+.ai-hist-item-del:hover {
+  background: #FDECEA;
+  color: #E24B4A;
+}
+
+.ai-hist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  gap: 8px;
+  color: #CCC;
+  font-size: 13px;
+}
+
+.ai-hist-empty .ti { font-size: 28px; }
+
+.ai-hist-login-cta {
+  margin: 16px 12px;
+  background: #F7F3EB;
+  border: 1px solid #E8E4DC;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+
+.ai-hist-login-cta p {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.ai-hist-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #1A1A1A;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: background 0.12s;
+}
+
+.ai-hist-login-btn:hover { background: #333; }
+
+/* ── 우측 채팅 영역 ── */
+.ai-page {
+  flex: 1;
+  min-width: 0;
+  max-width: none !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: #F7F3EB;
+}
+
+.ai-messages {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 24px 32px 16px !important;
+  max-width: 860px;
+  width: 100%;
+  align-self: center;
+  box-sizing: border-box;
+}
+
+.ai-examples {
+  max-width: 860px;
+  width: 100%;
+  align-self: center;
+  padding: 0 32px 20px;
+  box-sizing: border-box;
+}
+
+.ai-hd {
+  width: 100% !important;
+  max-width: none !important;
+  flex-shrink: 0;
+}
+
+.ai-input-area {
+  width: 100% !important;
+  max-width: none !important;
+  flex-shrink: 0;
+  border-top: 1px solid #E8E4DC;
+  background: #fff !important;
+}
+
+.ai-input-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.ai-input-hint {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.ai-hist-toggle {
+  display: none;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid #E8E4DC;
+  border-radius: 7px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+  margin-right: 8px;
+}
+
+.ai-hist-toggle:hover {
+  background: #F7F3EB;
+  color: #F5A623;
+}
+
+.ai-hd-top {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+}
+
+.ai-hd-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.ai-hd-logo-av img {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+
+.ai-hd-logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ai-hd-logo-sub {
+  font-size: 11px;
+  color: #888;
+}
+
+.ai-hd-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-hd-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 7px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #ccc;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.ai-hd-btn:hover {
+  background: rgba(245,166,35,0.15);
+  border-color: rgba(245,166,35,0.4);
+  color: #F5A623;
+}
+
+.ai-typing-indicator {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.ai-typing-dots {
+  background: #fff;
+  border: 1px solid #E8E4DC;
+  border-radius: 0 12px 12px 12px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.ai-typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #CCC;
+  border-radius: 50%;
+  animation: aidots 1.2s infinite;
+}
+
+.ai-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes aidots {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-5px); opacity: 1; }
+}
+
+@media (max-width: 1024px) {
+  .ai-history-panel { width: 220px; }
+  .ai-messages      { padding: 20px 24px 12px !important; }
+  .ai-examples      { padding: 0 24px 16px; }
+}
+
+@media (max-width: 768px) {
+  .ai-page-wrap {
+    position: relative;
+    height: calc(100vh - 60px - 64px);
+  }
+
+  .ai-history-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 50;
+    width: 280px;
+    box-shadow: 4px 0 16px rgba(0,0,0,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.22s ease, opacity 0.22s ease;
+    opacity: 0;
+  }
+
+  .ai-history-panel.open {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .ai-hist-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 49;
+  }
+
+  .ai-hist-overlay.open { display: block; }
+
+  .ai-hist-toggle { display: flex; }
+
+  .ai-messages { padding: 16px 16px 12px !important; }
+  .ai-examples { padding: 0 16px 12px; }
+}
+
+@media (max-width: 480px) {
+  .ai-hd-title h1 { font-size: 20px; }
+  .ai-hd-title p  { font-size: 13px; }
+}

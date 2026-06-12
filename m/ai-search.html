@@ -14,15 +14,39 @@
 <link rel="stylesheet" href="../css/main-v3-m.css?v=20260680">
 <link rel="stylesheet" href="../css/shell-pages.css?v=20260680">
 <link rel="stylesheet" href="../css/ai-chat.css?v=20260690">
+<link rel="stylesheet" href="../css/ai-chat-v4.css?v=20260001">
 </head>
 <body class="m-shell gm-shell-ai" data-gm-active="ai" data-gm-shell="ai">
 
 <template id="gm-page-tpl">
   <div class="ai-page-wrap">
-    <div class="ai-page">
+
+    <aside class="ai-history-panel" id="aiHistPanel">
+      <div class="ai-hist-hd">
+        <span class="ai-hist-title">
+          <i class="ti ti-history" aria-hidden="true"></i>
+          채팅 기록
+        </span>
+        <button class="ai-hist-new-btn" id="aiHistNewBtn" type="button" aria-label="새 채팅">
+          <i class="ti ti-edit" aria-hidden="true"></i>
+          새 채팅
+        </button>
+      </div>
+      <div class="ai-hist-list" id="aiHistList">
+        <div class="ai-hist-empty" id="aiHistEmpty">
+          <i class="ti ti-message-off" aria-hidden="true"></i>
+          <span>채팅 기록이 없습니다</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="ai-page" id="ai-page">
       <div id="ai-status-banner" class="ai-status-banner" hidden role="status"></div>
       <div class="ai-hd">
         <div class="ai-hd-top">
+          <button class="ai-hist-toggle" id="aiHistToggle" type="button" aria-label="채팅 기록 열기">
+            <i class="ti ti-layout-sidebar" aria-hidden="true"></i>
+          </button>
           <div class="ai-hd-logo">
             <div class="ai-hd-logo-av"><img src="assets/gmlogo.png" alt="골목대장"></div>
             <div>
@@ -97,5 +121,6 @@
 <script type="module" src="../js/shell_loader.js?v=20260680"></script>
 <script type="module" src="js/auth.js?v=20260680"></script>
 <script type="module" src="../js/ai-chat.js?v=20260690"></script>
+<script src="../js/ai-chat-history.js?v=20260001"></script>
 </body>
 </html>
