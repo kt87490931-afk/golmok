@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="../css/main-v3.css?v=20260672">
+<link rel="stylesheet" href="../css/main-v4.css?v=20260001">
 <link rel="stylesheet" href="../css/shell-pages.css?v=20260663">
 <link rel="stylesheet" href="../css/main-v3-m.css?v=20260663">
 <link rel="stylesheet" href="../css/community.css?v=20260665">
@@ -22,48 +23,141 @@
 <template id="gm-page-tpl">
 <main class="main">
 
-  <!-- ① 히어로 — AI 검색 + 지도 배경 -->
-  <section class="hero" id="hero">
-    <div class="hero-map-bg"></div>
-    <iframe class="hero-map-iframe" id="hero-map-iframe"
-      src="about:blank"
-      title="상권지도 배경" allow="geolocation">
-    </iframe>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <div class="hero-eyebrow">
-        <i class="ti ti-robot" style="font-size:14px"></i>
-        <span>골목대장 AI 검색</span>
+  <!-- =============================================
+       V4 HERO — AI 채팅 중심 히어로
+       ============================================= -->
+  <section class="hero v4-hero" id="hero">
+
+    <div class="v4-hero-eyebrow">
+      <i class="ti ti-sparkles" aria-hidden="true"></i>
+      골목대장 AI
+    </div>
+
+    <h1 class="v4-hero-title">
+      상권·창업, 무엇이든<br>
+      <span class="v4-hero-accent">물어보세요</span>
+    </h1>
+    <p class="v4-hero-sub">
+      소상공인진흥공단·기업마당 데이터 기반 상권·통계·정책 AI
+    </p>
+
+    <div class="v4-chat-box" id="v4ChatBox">
+      <div class="v4-chat-header">
+        <div class="v4-chat-avatar">🦁</div>
+        <div class="v4-chat-header-info">
+          <span class="v4-chat-name">골목대장 AI</span>
+          <span class="v4-chat-desc">소상공인 상권 전문 AI</span>
+        </div>
+        <span class="v4-chat-online">● 온라인</span>
       </div>
-      <h1 class="hero-title">
-        <em>상권·창업</em>, 무엇이든<br>물어보세요
-      </h1>
-      <p class="hero-sub">우리는 모두 골목대장, 데이터로 보는 상권의 힘</p>
-      <div class="hero-search">
-        <i class="ti ti-search" style="font-size:17px;color:#CCC;flex-shrink:0"></i>
-        <input type="text" id="ai-input"
+
+      <div class="v4-chat-messages" id="v4ChatMessages">
+        <div class="v4-msg-ai">
+          <div class="v4-msg-avatar">🦁</div>
+          <div class="v4-msg-wrap">
+            <span class="v4-msg-name">골목대장 AI</span>
+            <div class="v4-msg-bubble">
+              안녕하세요, 대장님! 저는 <strong>골목대장 소상공인 AI</strong>입니다 😊<br><br>
+              소상공인진흥공단·기업마당 데이터를 근거로 상권·통계·정책 질문에 답변드려요.
+              <div class="v4-examples">
+                <div class="v4-ex-label">
+                  <i class="ti ti-stars" aria-hidden="true"></i>
+                  이렇게 물어보세요
+                </div>
+                <button class="v4-ex-item" data-q="동탄2동 카페 매출이 궁금해!">
+                  <i class="ti ti-building-store" aria-hidden="true"></i>
+                  상권: "동탄2동 카페 매출이 궁금해!"
+                </button>
+                <button class="v4-ex-item" data-q="소상공인 지원금 신청 방법 알려줘">
+                  <i class="ti ti-coin" aria-hidden="true"></i>
+                  정책: "소상공인 지원금 신청 방법"
+                </button>
+                <button class="v4-ex-item" data-q="수원에서 경쟁 낮은 업종 찾아줘">
+                  <i class="ti ti-chart-bar" aria-hidden="true"></i>
+                  통계: "수원 경쟁 낮은 업종 찾아줘"
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v4-chat-input-area">
+        <input
+          class="v4-chat-input"
+          id="v4ChatInput"
+          type="text"
           placeholder="예: 동탄에서 카페 창업하면 어떨까요?"
-          onkeydown="if(event.key==='Enter')doSearch()">
-        <button class="hero-search-go" onclick="doSearch()">분석하기</button>
-      </div>
-      <div class="hero-chips">
-        <div class="hero-chip" onclick="setQ('유동인구 많은 상권 찾아줘')">
-          <i class="ti ti-users"></i> 유동인구 많은 곳
-        </div>
-        <div class="hero-chip" onclick="setQ('음식점 창업 성공률 높은 동네')">
-          <i class="ti ti-chart-bar"></i> 창업 성공률
-        </div>
-        <div class="hero-chip" onclick="setQ('경쟁이 낮은 업종 추천해줘')">
-          <i class="ti ti-bulb"></i> 경쟁 낮은 업종
-        </div>
-        <div class="hero-chip" onclick="setQ('소상공인 지원금 신청 방법')">
-          <i class="ti ti-file-invoice"></i> 지원금 신청
-        </div>
+          autocomplete="off"
+        />
+        <button class="v4-btn-mic" id="v4MicBtn" aria-label="음성 입력">
+          <i class="ti ti-microphone" aria-hidden="true"></i>
+        </button>
+        <button class="v4-btn-send" id="v4SendBtn" aria-label="전송">
+          <i class="ti ti-send" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
+
+    <div class="v4-quick-chips">
+      <button class="v4-chip" data-q="유동인구 많은 상권 추천해줘">
+        <i class="ti ti-map-pin" aria-hidden="true"></i> 유동인구 많은 곳
+      </button>
+      <button class="v4-chip" data-q="창업 성공률 높은 업종 알려줘">
+        <i class="ti ti-trending-up" aria-hidden="true"></i> 창업 성공률
+      </button>
+      <button class="v4-chip" data-q="경쟁 낮은 업종 찾아줘">
+        <i class="ti ti-shield" aria-hidden="true"></i> 경쟁 낮은 업종
+      </button>
+      <button class="v4-chip" data-q="받을 수 있는 지원금 알려줘">
+        <i class="ti ti-coin" aria-hidden="true"></i> 지원금 신청
+      </button>
+    </div>
+
   </section>
 
-  <!-- ② 빠른 상권분석 -->
+  <!-- ② 우리동네 현황 -->
+  <div class="stat-wrap">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="ti ti-map-pin"></i>
+        <span id="stat-region-label">우리동네 현황</span>
+      </div>
+      <span class="sec-more" onclick="changeRegion()">지역 변경</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card blue">
+        <div class="stat-lbl">
+          <i class="ti ti-users" style="color:var(--blue)"></i> 일 평균 유동인구
+        </div>
+        <div class="stat-val" id="sv-pop">31.6만명</div>
+        <div class="stat-ch up" id="sc-pop">▲ +17.7% 전월 대비</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-lbl">
+          <i class="ti ti-chart-bar" style="color:var(--gold)"></i> 월 평균 매출
+        </div>
+        <div class="stat-val" id="sv-rev">1,316만원</div>
+        <div class="stat-ch dn" id="sc-rev">▼ -2.2% 전년 대비</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-lbl">
+          <i class="ti ti-store" style="color:var(--red)"></i> 동종 업소수
+        </div>
+        <div class="stat-val" id="sv-store">175개</div>
+        <div class="stat-ch dn" id="sc-store">▼ -17.8% 전년 대비</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-lbl">
+          <i class="ti ti-heart-rate" style="color:var(--green)"></i> 창업 생존율
+        </div>
+        <div class="stat-val" id="sv-surv">68%</div>
+        <div class="stat-ch up" id="sc-surv">▲ +3% 전년 대비</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 빠른 상권분석 -->
   <div class="quick-wrap">
     <div class="sec-hd">
       <div class="sec-title">
@@ -105,48 +199,7 @@
     </div>
   </div>
 
-  <!-- ③ 통계 카드 -->
-  <div class="stat-wrap">
-    <div class="sec-hd">
-      <div class="sec-title">
-        <i class="ti ti-map-pin"></i>
-        <span id="stat-region-label">우리동네 현황</span>
-      </div>
-      <span class="sec-more" onclick="changeRegion()">지역 변경</span>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card blue">
-        <div class="stat-lbl">
-          <i class="ti ti-users" style="color:var(--blue)"></i> 일 평균 유동인구
-        </div>
-        <div class="stat-val" id="sv-pop">31.6만명</div>
-        <div class="stat-ch up" id="sc-pop">▲ +17.7% 전월 대비</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-lbl">
-          <i class="ti ti-chart-bar" style="color:var(--gold)"></i> 월 평균 매출
-        </div>
-        <div class="stat-val" id="sv-rev">1,316만원</div>
-        <div class="stat-ch dn" id="sc-rev">▼ -2.2% 전년 대비</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-lbl">
-          <i class="ti ti-store" style="color:var(--red)"></i> 동종 업소수
-        </div>
-        <div class="stat-val" id="sv-store">175개</div>
-        <div class="stat-ch dn" id="sc-store">▼ -17.8% 전년 대비</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-lbl">
-          <i class="ti ti-heart-rate" style="color:var(--green)"></i> 창업 생존율
-        </div>
-        <div class="stat-val" id="sv-surv">68%</div>
-        <div class="stat-ch up" id="sc-surv">▲ +3% 전년 대비</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ④ 인기상권 + AI 채팅 -->
+  <!-- ④ 인기 검색 상권 -->
   <div class="two-col">
     <div class="card">
       <div class="card-title">
@@ -159,23 +212,6 @@
         <div class="rank-row"><span class="rank-n">3</span><span class="rank-name">화성 봉담읍</span><span class="rank-tag new">신규</span></div>
         <div class="rank-row"><span class="rank-n">4</span><span class="rank-name">수원 인계동</span></div>
         <div class="rank-row"><span class="rank-n">5</span><span class="rank-name">오산 세마동</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">
-        <i class="ti ti-robot"></i> AI 검색 미리보기
-      </div>
-      <div class="chat-msgs" id="ai-messages">
-        <div class="chat-b ai">안녕하세요 대장님! 상권·창업에 대해 궁금한 것 물어보세요.</div>
-        <div class="chat-b user">유동인구 많은 곳 찾아줘</div>
-        <div class="chat-b ai">업종이 어떻게 되세요? 음식점, 카페, 소매 중 선택해 주시면 맞춤 분석 드릴게요!</div>
-      </div>
-      <div class="chat-inp">
-        <input type="text" placeholder="메시지 입력..." id="ai-input-preview"
-          onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){setQ(v);this.value='';doSearch();}}">
-        <button type="button" class="chat-send" id="ai-send-preview" onclick="doSearch()">
-          <i class="ti ti-send"></i>
-        </button>
       </div>
     </div>
   </div>
@@ -330,25 +366,147 @@ document.getElementById('write-btn-m')?.addEventListener('click', () => document
 <script type="module" src="../js/hero_map.js?v=20260662"></script>
 <script type="module">
 window.setQ = function (q) {
-  const inp = document.getElementById('ai-input');
+  const inp = document.getElementById('v4ChatInput');
   if (inp) { inp.value = q; inp.focus(); }
 };
 window.doSearch = function () {
-  const v = document.getElementById('ai-input')?.value?.trim();
+  const v = document.getElementById('v4ChatInput')?.value?.trim();
   if (!v) return;
   window.location.href = `ai-search.html?q=${encodeURIComponent(v)}`;
 };
 window.focusHeroSearch = function () {
-  const v = document.getElementById('ai-input')?.value?.trim();
+  const v = document.getElementById('v4ChatInput')?.value?.trim();
   if (v) {
     window.location.href = `ai-search.html?q=${encodeURIComponent(v)}`;
     return;
   }
-  document.getElementById('ai-input')?.focus();
+  document.getElementById('v4ChatInput')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 window.startVoice = function () { window.location.href = 'ai-search.html'; };
 window.changeRegion = function () { showToast('지역 변경은 프로필 설정에서 가능합니다'); };
+</script>
+<script>
+(function() {
+  'use strict';
+
+  function v4Boot() {
+  const v4Input  = document.getElementById('v4ChatInput');
+  const v4Send   = document.getElementById('v4SendBtn');
+  const v4Mic    = document.getElementById('v4MicBtn');
+  const v4Msgs   = document.getElementById('v4ChatMessages');
+  if (!v4Input || !v4Send || !v4Msgs) return;
+
+  window.setQ = function (q) { v4Input.value = q; v4Input.focus(); };
+  window.doSearch = function () {
+    const v = v4Input.value.trim();
+    if (!v) return;
+    window.location.href = 'ai-search.html?q=' + encodeURIComponent(v);
+  };
+  window.focusHeroSearch = function () {
+    const v = v4Input.value.trim();
+    if (v) {
+      window.location.href = 'ai-search.html?q=' + encodeURIComponent(v);
+      return;
+    }
+    v4Input.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  function v4AddMsg(text, isUser) {
+    const div = document.createElement('div');
+    if (isUser) {
+      div.className = 'v4-msg-user';
+      div.innerHTML = '<div class="v4-msg-user-bubble">' + text + '</div>';
+    } else {
+      div.className = 'v4-msg-ai';
+      div.innerHTML =
+        '<div class="v4-msg-avatar">🦁</div>' +
+        '<div class="v4-msg-wrap">' +
+          '<span class="v4-msg-name">골목대장 AI</span>' +
+          '<div class="v4-msg-bubble">' + text + '</div>' +
+        '</div>';
+    }
+    v4Msgs.appendChild(div);
+    v4Msgs.scrollTop = v4Msgs.scrollHeight;
+  }
+
+  function v4ShowTyping() {
+    const div = document.createElement('div');
+    div.className = 'v4-msg-ai';
+    div.id = 'v4Typing';
+    div.innerHTML =
+      '<div class="v4-msg-avatar">🦁</div>' +
+      '<div class="v4-typing-dots"><span></span><span></span><span></span></div>';
+    v4Msgs.appendChild(div);
+    v4Msgs.scrollTop = v4Msgs.scrollHeight;
+  }
+
+  function v4RemoveTyping() {
+    const el = document.getElementById('v4Typing');
+    if (el) el.remove();
+  }
+
+  function v4HandleSend(presetText) {
+    const text = presetText || v4Input.value.trim();
+    if (!text) return;
+    v4AddMsg(text, true);
+    v4Input.value = '';
+    v4ShowTyping();
+
+    setTimeout(function() {
+      v4RemoveTyping();
+      window.location.href = 'ai-search.html?q=' + encodeURIComponent(text);
+    }, 800);
+  }
+
+  v4Send.addEventListener('click', function() { v4HandleSend(); });
+  v4Input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') v4HandleSend();
+  });
+
+  document.querySelectorAll('.v4-ex-item').forEach(function(btn) {
+    btn.addEventListener('click', function() { v4HandleSend(btn.dataset.q); });
+  });
+
+  document.querySelectorAll('.v4-chip').forEach(function(btn) {
+    btn.addEventListener('click', function() { v4HandleSend(btn.dataset.q); });
+  });
+
+  if (v4Mic) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      const recog = new SR();
+      recog.lang = 'ko-KR';
+      recog.interimResults = false;
+      recog.onresult = function(e) {
+        v4Input.value = e.results[0][0].transcript;
+        v4Mic.classList.remove('active');
+      };
+      recog.onend = function() { v4Mic.classList.remove('active'); };
+      v4Mic.addEventListener('click', function() {
+        v4Mic.classList.toggle('active');
+        if (v4Mic.classList.contains('active')) {
+          recog.start();
+          v4Input.placeholder = '음성 인식 중...';
+        } else {
+          recog.stop();
+          v4Input.placeholder = '예: 동탄에서 카페 창업하면 어떨까요?';
+        }
+      });
+    } else {
+      v4Mic.style.display = 'none';
+    }
+  }
+  }
+
+  if (document.body.dataset.gmShellDone === '1') {
+    v4Boot();
+  } else {
+    document.addEventListener('gm-shell-ready', v4Boot, { once: true });
+  }
+
+})();
 </script>
 </body>
 </html>
