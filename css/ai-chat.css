@@ -650,7 +650,7 @@
 .ai-input-hint {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 8px;
   font-size: 11px;
   color: #888;
