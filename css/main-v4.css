@@ -3,6 +3,9 @@
    V4 히어로 + 우리동네현황 + 레이아웃 override
    ================================================ */
 
+/* V4: 우측 AI 검색 위젯 전역 제거 (잔여·캐시 대비) */
+.ai-widget { display: none !important; }
+
 /* ── V4 히어로 ── */
 .v4-hero {
   background: #1A1A1A;

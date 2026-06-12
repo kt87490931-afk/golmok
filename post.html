@@ -148,29 +148,6 @@ document.getElementById('post-back')?.addEventListener('click',function(e){
 </main>
 <!-- ── 우측 위젯 (PC) ── -->
 <aside class="aside">
-
-  <!-- AI 위젯 -->
-  <div class="ai-widget">
-    <div class="ai-widget-hd">
-      <i class="ti ti-robot" style="color:var(--gold);font-size:16px"></i>
-      <span>골목대장 AI 검색</span>
-    </div>
-    <div class="ai-widget-sub">상권·창업 무엇이든 물어보세요</div>
-    <div class="ai-chips">
-      <span class="ai-chip" onclick="setQ('유동인구 많은 곳')">유동인구 많은 곳</span>
-      <span class="ai-chip" onclick="setQ('창업 성공률')">창업 성공률</span>
-      <span class="ai-chip" onclick="setQ('지원금 신청')">지원금 신청</span>
-    </div>
-    <div class="ai-inp-row">
-      <input type="text" placeholder="메시지 입력..." id="ai-widget-input"
-        onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){setQ(v);this.value='';doSearch();}}">
-      <button type="button" class="ai-send" id="ai-widget-send"
-        onclick="const v=document.getElementById('ai-widget-input')?.value?.trim();if(v){setQ(v);document.getElementById('ai-widget-input').value='';doSearch();}">
-        <i class="ti ti-send"></i>
-      </button>
-    </div>
-  </div>
-
   <!-- 인기 검색 상권 -->
   <div class="widget">
     <div class="widget-title">
