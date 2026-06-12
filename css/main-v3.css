@@ -1,4 +1,4 @@
-﻿
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TOKENS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -762,12 +762,12 @@ input,textarea,select{font-family:inherit}
 
   /* 모바일 하단 탭바 — 화면 맨 아래 일체형 (main-v3-m.css와 동일) */
   :root{
-    --mb-bar-h:56px;
+    --mb-bar-h:0px;
     --mb-float-gap:0px;
     --bn-h:var(--mb-bar-h);
   }
   .mobile-tabs{
-    display:flex;
+    display:none !important;
     position:fixed;
     bottom:0;
     left:50%;
@@ -850,7 +850,7 @@ input,textarea,select{font-family:inherit}
     border:none;box-shadow:none;
   }
   .mb-fab i{font-size:22px;line-height:1}
-  body{padding-bottom:calc(var(--bn-h) + env(safe-area-inset-bottom,0px))}
+  body{padding-bottom:env(safe-area-inset-bottom,0px)}
   .toast{bottom:calc(var(--bn-h) + env(safe-area-inset-bottom,0px) + 12px)}
 }
 

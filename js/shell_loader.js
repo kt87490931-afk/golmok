@@ -18,10 +18,16 @@ async function fetchPartial(name, ctx) {
 function ensureStyles(ctx) {
   const head = document.head;
   const add = (href) => {
-    if ([...head.querySelectorAll('link[rel="stylesheet"]')].some((l) => l.href.includes(href.split('/').pop().split('?')[0]))) return;
+    const file = href.split('/').pop().split('?')[0];
+    const full = `${ctx.css}${href}?v=${SHELL_VER}`;
+    const existing = [...head.querySelectorAll('link[rel="stylesheet"]')].find((l) => l.href.includes(file));
+    if (existing) {
+      if (!existing.href.includes(`v=${SHELL_VER}`)) existing.href = full;
+      return;
+    }
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = `${ctx.css}${href}?v=${SHELL_VER}`;
+    link.href = full;
     head.appendChild(link);
   };
   add('main-v3.css');

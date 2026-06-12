@@ -1,5 +1,5 @@
 /**
- * golmokmaster.com — 모바일 접속 시 구 golmok-mobile 코드(/m/)로 이동
+ * golmokmaster.com ??모바???�속 ??�?golmok-mobile 코드(/m/)�??�동
  * PC 강제: ?desktop=1
  */
 (function () {
@@ -56,6 +56,7 @@
     'neighborhood.html': 'index.html',
     'by-industry.html': 'index.html',
     'analysis.html': 'analysis.html',
+    'ai-search.html': 'ai-search.html',
     'events.html': 'events.html',
     'policy.html': 'index.html',
     'post.html': 'post.html',

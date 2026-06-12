@@ -516,3 +516,6 @@ body.m-shell.gm-shell-ai .ai-page {
   height: auto;
   max-height: none;
 }
+@media (max-width: 768px) {
+  body.gm-shell-ai .ai-hd-title { display: none !important; }
+}

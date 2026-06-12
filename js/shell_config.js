@@ -1,5 +1,5 @@
-/** 골목대장 v3 공통 셸 — 경로·토큰·활성 메뉴 */
-export const SHELL_VER = '20260701';
+/** 골목?�??v3 공통 ????경로·?�큰·?�성 메뉴 */
+export const SHELL_VER = '20260702';
 
 export function detectContext() {
   const path = window.location.pathname || '';
@@ -40,7 +40,7 @@ export function applyTokens(html, ctx) {
     .replace(/@@AI_SEARCH@@/g, p.aiSearch);
 }
 
-/** data-gm-active → href 키 */
+/** data-gm-active ??href ??*/
 export const ACTIVE_MAP = {
   home: 'home',
   analysis: 'analysis',

@@ -820,3 +820,6 @@ body.m-shell.gm-shell-ai .ai-messages {
   body.m-shell.gm-shell-ai .ai-hd { padding: 12px 14px; }
   body.m-shell.gm-shell-ai .ai-messages { min-height: 0; }
 }
+@media (max-width: 768px) {
+  body.gm-shell-ai .ai-hd-title { display: none !important; }
+}
