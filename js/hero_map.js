@@ -27,7 +27,6 @@ export async function loadHeroMap() {
 
 async function bootHeroMap() {
   await waitForShell();
-  /* V4: hero map removed */
   if (!document.getElementById('hero-map-iframe')) return;
   await loadHeroMap();
 }

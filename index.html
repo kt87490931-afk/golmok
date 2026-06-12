@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="css/main-v3.css?v=20260672">
-<link rel="stylesheet" href="css/main-v4.css?v=20260002">
+<link rel="stylesheet" href="css/main-v4.css?v=20260003">
 <link rel="stylesheet" href="css/shell-pages.css?v=20260655">
 <link rel="stylesheet" href="css/community.css?v=20260665">
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
@@ -26,6 +26,15 @@
        V4 HERO — AI 채팅 중심 히어로
        ============================================= -->
   <section class="hero v4-hero" id="hero">
+
+    <div class="hero-map-bg" aria-hidden="true"></div>
+    <iframe class="hero-map-iframe" id="hero-map-iframe"
+      src="about:blank"
+      title="상권지도 배경" allow="geolocation">
+    </iframe>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="v4-hero-content">
 
     <!-- 배지 -->
     <div class="v4-hero-eyebrow">
@@ -121,6 +130,8 @@
         <i class="ti ti-coin" aria-hidden="true"></i> 지원금 신청
       </button>
     </div>
+
+    </div><!-- /v4-hero-content -->
 
   </section>
   <!-- ============ /V4 HERO ============ -->
@@ -379,7 +390,7 @@ document.getElementById('write-btn-m')?.addEventListener('click', () => document
 <script type="module" src="js/analysis.js?v=20260655"></script>
 <script type="module" src="js/notifications_ui.js?v=20260655"></script>
 <script type="module" src="js/fcm.js?v=20260655"></script>
-<script type="module" src="js/hero_map.js?v=20260662"></script>
+<script type="module" src="js/hero_map.js?v=20260663"></script>
 <script type="module">
 window.setQ = function (q) {
   const inp = document.getElementById('v4ChatInput');

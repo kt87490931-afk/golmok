@@ -6,11 +6,25 @@
 /* V4: 우측 AI 검색 위젯 전역 제거 (잔여·캐시 대비) */
 .ai-widget { display: none !important; }
 
-/* ── V4 히어로 ── */
-.v4-hero {
+/* ── V4 히어로 (V3 지도 배경 + 어두운 오버레이) ── */
+.hero.v4-hero {
+  position: relative;
+  overflow: hidden;
   background: #1A1A1A;
-  padding: 72px 24px 60px;
+  padding: 0 !important;
+  justify-content: flex-start;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 420px;
+}
+
+.v4-hero-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  padding: 72px 24px 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -397,7 +411,7 @@
 }
 
 @media (max-width: 768px) {
-  .v4-hero {
+  .v4-hero-content {
     padding: 48px 16px 40px;
   }
 
