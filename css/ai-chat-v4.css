@@ -3,14 +3,32 @@
    ai-search.html V4 레이아웃 + 히스토리 패널
    ================================================ */
 
+/* ── PC 셸: main 열이 남은 너비 전부 사용 ── */
+body.gm-shell-ai:not(.m-shell) .main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+body.gm-shell-ai:not(.m-shell) .layout {
+  min-height: 0;
+}
+
 /* ── 전체 래퍼: 가로 분할 레이아웃 ── */
 .ai-page-wrap {
   display: flex;
   flex-direction: row;
+  flex: 1;
   width: 100%;
-  height: calc(100vh - 60px);
+  min-width: 0;
+  min-height: calc(100dvh - var(--hd-h, 60px));
+  height: auto;
   overflow: hidden;
   justify-content: flex-start;
+  align-items: stretch;
 }
 
 /* ── 좌측 히스토리 패널 ── */
@@ -217,16 +235,19 @@
 
 .ai-hist-login-btn:hover { background: #333; }
 
-/* ── 우측 채팅 영역 ── */
+/* ── 우측 채팅 영역: 사이드바 사이 남은 공간 전체 ── */
 .ai-page {
   flex: 1;
   min-width: 0;
+  width: 100% !important;
   max-width: none !important;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0 !important;
   overflow: hidden;
   background: #F7F3EB;
+  box-shadow: none !important;
 }
 
 .ai-messages {
@@ -234,18 +255,18 @@
   overflow-y: auto !important;
   height: auto !important;
   max-height: none !important;
-  padding: 24px 32px 16px !important;
-  max-width: 860px;
-  width: 100%;
-  align-self: center;
+  padding: 24px 28px 16px !important;
+  width: 100% !important;
+  max-width: none !important;
+  align-self: stretch !important;
   box-sizing: border-box;
 }
 
 .ai-examples {
-  max-width: 860px;
-  width: 100%;
-  align-self: center;
-  padding: 0 32px 20px;
+  width: 100% !important;
+  max-width: none !important;
+  align-self: stretch !important;
+  padding: 0 28px 20px;
   box-sizing: border-box;
 }
 
@@ -261,16 +282,25 @@
   flex-shrink: 0;
   border-top: 1px solid #E8E4DC;
   background: #fff !important;
+  padding-left: 28px;
+  padding-right: 28px;
+  box-sizing: border-box;
 }
 
 .ai-input-wrap {
-  max-width: 860px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none !important;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .ai-input-hint {
-  max-width: 860px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none !important;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+  box-sizing: border-box;
 }
 
 .ai-hist-toggle {
@@ -387,8 +417,10 @@
 
 @media (max-width: 1024px) {
   .ai-history-panel { width: 220px; }
-  .ai-messages      { padding: 20px 24px 12px !important; }
-  .ai-examples      { padding: 0 24px 16px; }
+  .ai-messages      { padding: 20px 20px 12px !important; }
+  .ai-examples      { padding: 0 20px 16px; }
+  .ai-input-area    { padding-left: 20px; padding-right: 20px; }
+  .ai-input-hint    { padding-left: 20px; padding-right: 20px; }
 }
 
 @media (max-width: 768px) {
