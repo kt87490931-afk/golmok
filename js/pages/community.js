@@ -1,16 +1,18 @@
-﻿import { getAllPosts } from '../community.js?v=20260710';
+﻿import { getStoriesPosts, getStoriesCombinedFeed } from '../community.js?v=20260716';
 import {
   renderPostList,
   renderCommSkeleton,
   loadHotHighlight,
   updateWriteInducer,
   bindCommWriteInducer,
-} from '../community_ui.js?v=20260710';
+  openPostDetail,
+} from '../community_ui.js?v=20260716';
 import { initPageShell, bootPage, bindInfiniteScroll, activateTabs } from '../page_common.js';
 import { waitForShell } from '../shell_boot.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const initialPostId = urlParams.get('id') || urlParams.get('post');
+const storiesScope = urlParams.get('scope') || 'all';
 let currentCategory = urlParams.get('category') || 'all';
 let currentSort = 'latest';
 let currentPage = 0;
@@ -21,6 +23,63 @@ function normalizePosts(result) {
   if (Array.isArray(result)) return result;
   if (result && Array.isArray(result.posts)) return result.posts;
   return [];
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderPromoFeedCard(promo) {
+  const card = document.createElement('article');
+  card.className = 'comm-post-card promo-feed-card';
+  card.dataset.promoId = promo.id;
+  card.innerHTML = `
+    <div class="comm-post-hd">
+      <span class="pcb-badge" style="background:#E8F8F0;color:#1D9E75;">무료홍보</span>
+      <strong>${escapeHtml(promo.shop_name || '우리 가게')}</strong>
+    </div>
+    <p class="comm-post-body">${escapeHtml(promo.intro || '')}</p>
+    <div class="comm-post-meta">
+      <span><i class="ti ti-map-pin"></i> ${escapeHtml(promo.region_dong || promo.address || '')}</span>
+      <span><i class="ti ti-heart"></i> ${promo.like_count || 0}</span>
+    </div>`;
+  card.addEventListener('click', () => {
+    window.location.href = `promo.html#promo-${promo.id}`;
+  });
+  return card;
+}
+
+async function renderStoriesFeed(items, containerId, { reset = true, append = false } = {}) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const list = Array.isArray(items) ? items : [];
+  if (reset && !append) {
+    if (!list.length) {
+      container.innerHTML = `<div style="padding:40px;text-align:center;color:#999;background:#fff;">
+        <div style="font-size:32px;margin-bottom:10px;">📝</div>
+        <div>아직 게시글이 없습니다.</div>
+        <div style="font-size:12px;margin-top:4px;">첫 번째 대장님이 되어보세요!</div>
+      </div>`;
+      return;
+    }
+    container.innerHTML = '';
+  }
+
+  const posts = list.filter((i) => i._feedKind !== 'promo');
+  const promos = list.filter((i) => i._feedKind === 'promo');
+
+  if (posts.length) {
+    await renderPostList(posts, containerId, { reset: false, append: true });
+  }
+  promos.forEach((promo) => {
+    container.appendChild(renderPromoFeedCard(promo));
+  });
 }
 
 async function loadCommunityFeed(reset = true) {
@@ -36,15 +95,27 @@ async function loadCommunityFeed(reset = true) {
       renderCommSkeleton('community-post-list');
     }
 
-    const result = await getAllPosts({
-      category: currentCategory,
-      page: currentPage,
-      limit: 20,
-      sort: currentSort,
-      withCount: reset,
-    });
+    let result;
+    if (storiesScope === 'all') {
+      result = await getStoriesCombinedFeed({
+        category: currentCategory,
+        page: currentPage,
+        limit: 20,
+        sort: currentSort,
+        withCount: reset,
+      });
+    } else {
+      result = await getStoriesPosts({
+        scope: storiesScope,
+        category: currentCategory,
+        page: currentPage,
+        limit: 20,
+        sort: currentSort,
+        withCount: reset,
+      });
+    }
 
-    const posts = normalizePosts(result);
+    const items = normalizePosts(result);
     const totalCount = Array.isArray(result) ? null : result?.count;
 
     if (reset && totalCount != null) {
@@ -52,8 +123,13 @@ async function loadCommunityFeed(reset = true) {
       if (totalEl) totalEl.textContent = String(totalCount);
     }
 
-    await renderPostList(posts, 'community-post-list', { reset, append: !reset });
-    hasMore = posts.length >= 20;
+    if (storiesScope === 'all') {
+      await renderStoriesFeed(items, 'community-post-list', { reset, append: !reset });
+    } else {
+      await renderPostList(items, 'community-post-list', { reset, append: !reset });
+    }
+
+    hasMore = items.length >= 20;
     if (hasMore) currentPage += 1;
   } catch (e) {
     console.error('loadCommunityFeed', e);
@@ -102,9 +178,28 @@ function bindHotHighlightMore() {
 }
 
 async function startCommunityPage() {
-  const params = new URLSearchParams(window.location.search);
-  const qs = params.toString();
-  window.location.replace(qs ? `index.html?${qs}` : 'index.html');
+  await waitForShell();
+  initPageShell('community');
+  bindCommWriteInducer();
+  activateTabs('.comm-cat-tab, .cat-tab[data-cat]', currentCategory);
+  bindCategoryTabs();
+  bindSortButtons();
+  bindHotHighlightMore();
+  updateWriteInducer().catch(() => {});
+  loadHotHighlight().catch(() => {});
+
+  if (initialPostId) {
+    openPostDetail(initialPostId).catch(() => {});
+  } else {
+    await loadCommunityFeed(true);
+    bindInfiniteScroll(() => {
+      if (hasMore && !isLoading) loadCommunityFeed(false);
+    });
+  }
+
+  window.addEventListener('golmok:posts-changed', () => {
+    if (!new URLSearchParams(window.location.search).get('id')) loadCommunityFeed(true);
+  });
 }
 
 bootPage(() => {

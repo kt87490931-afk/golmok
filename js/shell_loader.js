@@ -4,8 +4,8 @@
  * - template: #gm-page-tpl
  * - minimal: 게시글·프로필 등 단독 페이지
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260715';
-import { mountSiteFooter } from './footer_ui.js?v=20260715';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260716';
+import { mountSiteFooter } from './footer_ui.js?v=20260716';
 
 function bindSidebarGroups() {
   document.querySelectorAll('.sb-group-toggle').forEach((btn) => {

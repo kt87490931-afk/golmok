@@ -1,5 +1,5 @@
 /** 골목대장 v3 공통 셸 — 경로·토큰·활성 메뉴 */
-export const SHELL_VER = '20260715';
+export const SHELL_VER = '20260716';
 
 const analysisBase = (isM) => (isM ? 'analysis.html' : 'analysis.html');
 
@@ -16,7 +16,7 @@ export function detectContext() {
     analysisTheme: `${aBase}?tab=theme`,
     weather: `${aBase}?tab=weather`,
     hotplace: `${aBase}?tab=hotplace`,
-    community: isM ? '../index.html' : 'index.html',
+    community: isM ? '../community.html' : 'community.html',
     mentoring: isM ? 'mentoring.html' : 'mentoring.html',
     promo: isM ? 'promo.html' : 'promo.html',
     promoWrite: isM ? 'promo-write.html' : 'promo-write.html',
@@ -52,7 +52,7 @@ export function applyTokens(html, ctx) {
 /** data-gm-active → pages 키 */
 export const ACTIVE_MAP = {
   home: 'home',
-  community: 'home',
+  community: 'community',
   analysis: 'analysis',
   simple: 'analysisSimple',
   weather: 'weather',

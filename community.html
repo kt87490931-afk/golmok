@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/mobile-route.js"></script>
-<title>전체 게시판 - 골목대장</title>
+<title>대장님들의 이야기 - 골목대장</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -424,7 +424,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link rel="stylesheet" href="css/community.css?v=20260710">
 </head>
 <body class="gm-shell-loaded" data-gm-active="community" data-gm-shell="standard">
-<script type="module" src="js/shell_loader.js?v=20260715"></script>
+<script type="module" src="js/shell_loader.js?v=20260716"></script>
 
 <header class="hd">
   <a href="index.html" class="hd-logo">
@@ -499,8 +499,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <div class="main-content" id="board-list-view">
         <div class="comm-wrap">
           <div class="comm-page-hd">
-            <h2 class="comm-page-title">전체 게시판</h2>
-            <p class="comm-page-sub">전국 소상공인 대장님들의 이야기</p>
+            <h2 class="comm-page-title">대장님들의 이야기</h2>
+            <p class="comm-page-sub">우리동네 · 무료홍보 · 멘토링 전체 게시판</p>
+          </div>
+
+          <div class="feed-tabs stories-filter-tabs" style="margin-bottom:12px;">
+            <a href="community.html" class="feed-tab act" data-stories-filter="all">전체</a>
+            <a href="neighborhood.html" class="feed-tab" data-stories-filter="neighborhood">우리동네</a>
+            <a href="promo.html" class="feed-tab" data-stories-filter="promo">무료홍보</a>
+            <a href="mentoring.html" class="feed-tab" data-stories-filter="mentoring">멘토링</a>
           </div>
 
           <div class="write-inducer">
@@ -780,6 +787,6 @@ document.querySelectorAll('.ni').forEach(ni=>{
 <script type="module" src="js/analysis.js?v=20260629"></script>
 <script type="module" src="js/notifications_ui.js?v=20260615"></script>
 <script type="module" src="js/fcm.js?v=20260615"></script>
-<script type="module" src="js/pages/community.js?v=20260710"></script>
+<script type="module" src="js/pages/community.js?v=20260716"></script>
 </body>
 </html>

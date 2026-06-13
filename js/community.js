@@ -11,6 +11,80 @@ const POST_SELECT = `
 
 const COMMUNITY_BOARD_FILTER = 'board.eq.community,board.is.null';
 
+/** 우리동네(community) + 멘토링 게시글 */
+const STORIES_BOARD_FILTER = 'board.eq.community,board.is.null,board.eq.mentoring';
+
+export async function getStoriesPosts({
+  scope = 'all',
+  category = 'all',
+  page = 0,
+  limit = 20,
+  sort = 'latest',
+  withCount = false,
+} = {}) {
+  const selectOpts = withCount ? { count: 'exact' } : undefined;
+  let query = supabase
+    .from('posts')
+    .select(POST_SELECT, selectOpts)
+    .eq('is_deleted', false);
+
+  if (scope === 'mentoring') {
+    query = query.eq('board', 'mentoring');
+  } else if (scope === 'neighborhood') {
+    query = query.or(COMMUNITY_BOARD_FILTER);
+  } else {
+    query = query.or(STORIES_BOARD_FILTER);
+  }
+
+  if (category !== 'all') query = query.eq('category', category);
+
+  if (sort === 'popular') {
+    query = query.order('like_count', { ascending: false });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
+
+  query = query.range(page * limit, (page + 1) * limit - 1);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  const posts = data || [];
+  if (withCount) return { posts, count: count ?? posts.length };
+  return posts;
+}
+
+/** 우리동네·무료홍보·멘토링 통합 피드 (전체 탭) */
+export async function getStoriesCombinedFeed({
+  category = 'all',
+  page = 0,
+  limit = 20,
+  sort = 'latest',
+  withCount = false,
+} = {}) {
+  const postLimit = Math.max(limit, 12);
+  const promoLimit = Math.max(6, Math.floor(limit / 3));
+
+  const { getPromos } = await import('./promo.js?v=20260716');
+
+  const [postsResult, promos] = await Promise.all([
+    getStoriesPosts({ scope: 'all', category, page, limit: postLimit, sort, withCount }),
+    getPromos({ range: 'all', page: 0, limit: promoLimit }),
+  ]);
+
+  const posts = Array.isArray(postsResult) ? postsResult : postsResult.posts || [];
+  const merged = [
+    ...posts.map((p) => ({ ...p, _feedKind: 'post' })),
+    ...promos.map((p) => ({ ...p, _feedKind: 'promo', board: 'promo', created_at: p.created_at || p.promo_date })),
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  const sliced = merged.slice(0, limit);
+  if (withCount && !Array.isArray(postsResult)) {
+    return { posts: sliced, count: (postsResult.count ?? posts.length) + promos.length };
+  }
+  return sliced;
+}
+
 export async function getCurrentUser() {
   const {
     data: { user },

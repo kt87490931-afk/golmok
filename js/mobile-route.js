@@ -50,9 +50,11 @@
   var file = parts.length ? parts[parts.length - 1] : 'index.html';
   if (!/\.html$/i.test(file)) file = 'index.html';
 
+  /* 대장님들의 이야기 전체게시판 — 모바일도 community.html 유지(반응형) */
+  if (file === 'community.html') return;
+
   var map = {
     'index.html': 'index.html',
-    'community.html': 'index.html',
     'mentoring.html': 'mentoring.html',
     'promo.html': 'promo.html',
     'promo-write.html': 'promo-write.html',
