@@ -181,6 +181,8 @@ input,textarea,select{font-family:inherit}
 .sb-group.has-active > .sb-group-hd .sb-group-title{color:var(--gold-d)}
 .stories-filter-tabs{margin-bottom:0;border-bottom:1px solid var(--border)}
 .stories-filter-tabs .feed-tab{text-decoration:none;display:inline-flex;align-items:center}
+body.gm-shell-fallback .main{max-width:1200px;margin:0 auto;padding:0 16px 80px}
+body.gm-shell-fallback{padding-top:0}
 .sb-badge{
   margin-left:auto;background:var(--red);color:var(--white);
   font-size:10px;font-weight:700;padding:1px 6px;

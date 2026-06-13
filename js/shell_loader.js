@@ -4,9 +4,63 @@
  * - template: #gm-page-tpl
  * - minimal: 게시글·프로필 등 단독 페이지
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js';
-import { bindSidebarGroups, bindStoriesFilterTabs } from './shell_nav.js';
-import { mountSiteFooter } from './footer_ui.js';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260713';
+import { mountSiteFooter } from './footer_ui.js?v=20260713';
+
+function bindSidebarGroups() {
+  document.querySelectorAll('.sb-group-toggle').forEach((btn) => {
+    if (btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const group = btn.closest('.sb-group');
+      if (!group) return;
+      const open = group.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  document.querySelectorAll('.sb-group .sb-a.act').forEach((link) => {
+    link.closest('.sb-group')?.classList.add('open');
+  });
+}
+
+function bindStoriesFilterTabs() {
+  const path = window.location.pathname.split('/').pop() || 'index.html';
+  const map = {
+    'index.html': 'all',
+    'community.html': 'all',
+    'neighborhood.html': 'neighborhood',
+    'promo.html': 'promo',
+    'mentoring.html': 'mentoring',
+  };
+  const current = map[path];
+  if (!current) return;
+  document.querySelectorAll('.stories-filter-tabs [data-stories-filter]').forEach((el) => {
+    el.classList.toggle('act', el.dataset.storiesFilter === current);
+  });
+}
+
+function emergencyUnwrapTemplate(shellType) {
+  const tpl = document.getElementById('gm-page-tpl');
+  if (!tpl || document.querySelector('.layout')) return false;
+  const content = document.createDocumentFragment();
+  content.appendChild(tpl.content.cloneNode(true));
+  tpl.remove();
+  if (shellType === 'home') {
+    document.body.appendChild(content);
+  } else {
+    const inner = document.createElement('div');
+    inner.className = 'gm-page-inner gm-shell-fallback';
+    while (content.firstChild) inner.appendChild(content.firstChild);
+    const main = document.createElement('main');
+    main.className = 'main';
+    main.appendChild(inner);
+    document.body.appendChild(main);
+  }
+  document.body.classList.add('gm-shell-fallback');
+  return true;
+}
 
 const PARTIALS = ['header-v3.html', 'sidebar-v3.html', 'mobile-tabs-v3.html', 'modals-v3.html'];
 
@@ -312,13 +366,24 @@ export async function initShell() {
     bindShellGlobals(ctx);
     bindWriteModalFallback();
     await mountSiteFooter(ctx).catch((e) => console.warn('footer', e));
+  } else if (document.getElementById('gm-page-tpl')) {
+    emergencyUnwrapTemplate(shellType);
+    bindShellGlobals(ctx);
   }
   document.body.dataset.gmShellDone = '1';
 }
 
+function finishShellBoot(shellType) {
+  if (!document.querySelector('.layout') && document.getElementById('gm-page-tpl')) {
+    emergencyUnwrapTemplate(shellType || document.body.dataset.gmShell || 'standard');
+  }
+  document.dispatchEvent(new CustomEvent('gm-shell-ready'));
+}
+
 initShell()
-  .then(() => document.dispatchEvent(new CustomEvent('gm-shell-ready')))
+  .then(() => finishShellBoot(document.body.dataset.gmShell))
   .catch((err) => {
     console.error('[shell_loader]', err);
-    document.dispatchEvent(new CustomEvent('gm-shell-ready'));
+    emergencyUnwrapTemplate(document.body.dataset.gmShell || 'home');
+    finishShellBoot(document.body.dataset.gmShell);
   });
