@@ -102,26 +102,9 @@ function bindHotHighlightMore() {
 }
 
 async function startCommunityPage() {
-  await waitForShell();
-  initPageShell('community');
-  bindCommWriteInducer();
-  activateTabs('.comm-cat-tab, .cat-tab[data-cat]', currentCategory);
-  bindCategoryTabs();
-  bindSortButtons();
-  bindHotHighlightMore();
-  updateWriteInducer().catch(() => {});
-  loadHotHighlight().catch(() => {});
-
-  if (!initialPostId) {
-    await loadCommunityFeed(true);
-    bindInfiniteScroll(() => {
-      if (hasMore && !isLoading) loadCommunityFeed(false);
-    });
-  }
-
-  window.addEventListener('golmok:posts-changed', () => {
-    if (!new URLSearchParams(window.location.search).get('id')) loadCommunityFeed(true);
-  });
+  const params = new URLSearchParams(window.location.search);
+  const qs = params.toString();
+  window.location.replace(qs ? `index.html?${qs}` : 'index.html');
 }
 
 bootPage(() => {

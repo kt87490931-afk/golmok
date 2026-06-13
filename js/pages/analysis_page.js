@@ -422,7 +422,11 @@ async function initSbizAnalysisPage() {
 bootPage(() => {
   const start = () => {
     const isMobileApp = document.body.classList.contains('m-shell');
-    if (!isMobileApp) initPageShell('analysis');
+    if (!isMobileApp) {
+      const tab = new URLSearchParams(window.location.search).get('tab') || 'map';
+      const navMap = { map: 'analysis', simple: 'simple', weather: 'weather', hotplace: 'hotplace', theme: 'theme' };
+      initPageShell(navMap[tab] || 'analysis');
+    }
     initSbizAnalysisPage();
   };
   if (document.body.dataset.gmShellDone === '1') start();

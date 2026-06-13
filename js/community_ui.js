@@ -1482,8 +1482,6 @@ function bindFeedTabs() {
       if (id === 'tab-all') btn.classList.toggle('act', type === 'all');
       if (id === 'tab-dong') btn.classList.toggle('act', type !== 'all');
     });
-    document.getElementById('nav-all')?.classList.toggle('act', type === 'all');
-    document.getElementById('nav-dong')?.classList.toggle('act', type !== 'all');
     if (rbar) rbar.style.display = type === 'all' ? 'none' : 'block';
     if (eventSec) eventSec.style.display = type === 'all' ? 'none' : 'block';
     loadFeed(true);
@@ -1499,8 +1497,6 @@ function bindFeedTabs() {
       if (tabDong && tabAll) {
         tabDong.classList.add('act');
         tabAll.classList.remove('act');
-        document.getElementById('nav-dong')?.classList.add('act');
-        document.getElementById('nav-all')?.classList.remove('act');
       }
       if (rbar) rbar.style.display = 'block';
       if (eventSec) eventSec.style.display = 'block';

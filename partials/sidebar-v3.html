@@ -1,22 +1,48 @@
 <aside class="sidebar">
-  <div class="sb-sec">
-    <div class="sb-label">메뉴</div>
-    <a href="@@HOME@@" class="sb-a" data-gm-nav="home"><i class="ti ti-home"></i> 홈 피드</a>
-    <a href="@@ANALYSIS@@" class="sb-a" data-gm-nav="analysis"><i class="ti ti-map"></i> 상권분석</a>
-    <a href="@@AI_SEARCH@@" class="sb-a" data-gm-nav="ai"><i class="ti ti-robot"></i> AI 검색</a>
-    <a href="@@WEATHER@@" class="sb-a" data-gm-nav="weather"><i class="ti ti-cloud"></i> 창업기상도</a>
-    <a href="@@HOTPLACE@@" class="sb-a" data-gm-nav="hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
+  <!-- 대장님들의 이야기 -->
+  <div class="sb-sec sb-group open" data-sb-group="stories">
+    <div class="sb-group-hd">
+      <a href="@@HOME@@" class="sb-a sb-group-title" data-gm-nav="home" id="nav-stories-all">
+        <i class="ti ti-messages"></i>
+        <span>대장님들의 이야기</span>
+      </a>
+      <button type="button" class="sb-group-toggle" aria-label="대장님들의 이야기 메뉴 펼치기" aria-expanded="true">
+        <i class="ti ti-chevron-down"></i>
+      </button>
+    </div>
+    <div class="sb-group-body">
+      <a href="@@NEIGHBORHOOD@@" class="sb-a sb-sub" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
+      <a href="@@PROMO@@" class="sb-a sb-sub" data-gm-nav="promo"><i class="ti ti-speakerphone"></i> 무료홍보 <span class="sb-promo-free">무료</span></a>
+      <a href="@@MENTORING@@" class="sb-a sb-sub" data-gm-nav="mentoring"><i class="ti ti-users"></i> 멘토링</a>
+    </div>
   </div>
-  <div class="sb-sec">
-    <div class="sb-label">커뮤니티</div>
-    <a href="@@COMMUNITY@@" class="sb-a" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
-    <a href="@@NEIGHBORHOOD@@" class="sb-a" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
-    <a href="@@MENTORING@@" class="sb-a" data-gm-nav="mentoring"><i class="ti ti-users"></i> 대장님들의 멘토링</a>
-    <a href="@@PROMO@@" class="sb-a" data-gm-nav="promo"><i class="ti ti-speakerphone"></i> 우리동네 무료홍보 <span class="sb-promo-free">무료</span></a>
-    <a href="@@BY_INDUSTRY@@" class="sb-a" data-gm-nav="by-industry"><i class="ti ti-tag"></i> 업종별</a>
-    <a href="@@EVENTS@@" class="sb-a" data-gm-nav="events"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
-    <a href="@@POLICY@@" class="sb-a" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책·지원</a>
+
+  <!-- 상권분석 -->
+  <div class="sb-sec sb-group open" data-sb-group="analysis">
+    <div class="sb-group-hd">
+      <a href="@@ANALYSIS@@" class="sb-a sb-group-title" data-gm-nav="analysis">
+        <i class="ti ti-chart-bar"></i>
+        <span>상권분석</span>
+      </a>
+      <button type="button" class="sb-group-toggle" aria-label="상권분석 메뉴 펼치기" aria-expanded="true">
+        <i class="ti ti-chevron-down"></i>
+      </button>
+    </div>
+    <div class="sb-group-body">
+      <a href="@@ANALYSIS_SIMPLE@@" class="sb-a sb-sub" data-gm-nav="simple"><i class="ti ti-bolt"></i> 간단분석</a>
+      <a href="@@WEATHER@@" class="sb-a sb-sub" data-gm-nav="weather"><i class="ti ti-cloud"></i> 창업기상도</a>
+      <a href="@@HOTPLACE@@" class="sb-a sb-sub" data-gm-nav="hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
+      <a href="@@ANALYSIS_THEME@@" class="sb-a sb-sub" data-gm-nav="theme"><i class="ti ti-building-store"></i> 테마상권</a>
+      <a href="@@POLICY@@" class="sb-a sb-sub" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책지원</a>
+    </div>
   </div>
+
+  <!-- 골목대장 AI -->
+  <div class="sb-sec">
+    <a href="@@AI_SEARCH@@" class="sb-a" data-gm-nav="ai"><i class="ti ti-robot"></i> 골목대장 AI</a>
+  </div>
+
+  <!-- 내 활동 -->
   <div class="sb-sec">
     <div class="sb-label">내 활동</div>
     <a href="@@PROFILE@@" class="sb-a" id="sb-profile-link" data-gm-nav="profile">

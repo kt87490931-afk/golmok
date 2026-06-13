@@ -11,9 +11,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="css/main-v3.css?v=20260702">
+<link rel="stylesheet" href="css/main-v3.css?v=20260613">
 <link rel="stylesheet" href="css/main-v4.css?v=20260003">
-<link rel="stylesheet" href="css/shell-pages.css?v=20260702">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260613">
 <link rel="stylesheet" href="css/community.css?v=20260665">
 <link rel="icon" href="assets/gmlogo.png" type="image/png">
 </head>
@@ -288,7 +288,14 @@
       <div class="sec-title">
         <i class="ti ti-messages"></i> 대장님들의 이야기
       </div>
-      <a href="community.html" class="sec-more">전체보기</a>
+    </div>
+
+    <!-- 소분류 필터 -->
+    <div class="feed-tabs stories-filter-tabs">
+      <a href="index.html" class="feed-tab act" data-stories-filter="all">전체</a>
+      <a href="neighborhood.html" class="feed-tab" data-stories-filter="neighborhood">우리동네</a>
+      <a href="promo.html" class="feed-tab" data-stories-filter="promo">무료홍보</a>
+      <a href="mentoring.html" class="feed-tab" data-stories-filter="mentoring">멘토링</a>
     </div>
 
     <!-- 글쓰기 바 -->
@@ -302,9 +309,9 @@
       <button type="button" class="btn-post" id="open-write-btn">게시하기</button>
     </div>
 
-    <!-- 피드 탭 -->
-    <div class="feed-tabs">
-      <button type="button" class="feed-tab" id="tab-all">전체글</button><button type="button" class="feed-tab act" id="tab-dong">우리동네</button>
+    <!-- 지역 범위 필터 (전체 보기) -->
+    <div class="feed-tabs feed-geo-tabs">
+      <button type="button" class="feed-tab" id="tab-all">전국</button><button type="button" class="feed-tab act" id="tab-dong">우리동네</button>
     </div>
 
     <!-- 게시글 목록 -->
@@ -334,7 +341,7 @@
   <div class="widget">
     <div class="widget-title">
       <i class="ti ti-flame"></i> 지금 뜨는 글
-      <a href="community.html" class="widget-more">전체보기</a>
+      <a href="index.html" class="widget-more">전체보기</a>
     </div>
     <div id="hot-posts-list">
       <div style="text-align:center;padding:16px;color:var(--gray-5);font-size:12px;">불러오는 중...</div>
@@ -355,7 +362,7 @@
 </aside>
 </template>
 
-<script type="module" src="js/shell_loader.js?v=20260702"></script>
+<script type="module" src="js/shell_loader.js?v=20260613"></script>
 <script>
 function showToast(msg){
   const t=document.getElementById('toast');

@@ -4,7 +4,8 @@
  * - template: #gm-page-tpl
  * - minimal: 게시글·프로필 등 단독 페이지
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive } from './shell_config.js';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js';
+import { bindSidebarGroups, bindStoriesFilterTabs } from './shell_nav.js';
 import { mountSiteFooter } from './footer_ui.js';
 
 const PARTIALS = ['header-v3.html', 'sidebar-v3.html', 'mobile-tabs-v3.html', 'modals-v3.html'];
@@ -42,14 +43,20 @@ function parseHtmlFragment(html) {
 }
 
 function applyActiveNav(active) {
-  if (!active) return;
+  const navActive = resolveActiveNav(active);
+  if (!navActive) return;
   document.querySelectorAll('[data-gm-nav]').forEach((el) => {
-    el.classList.toggle('act', el.dataset.gmNav === active);
+    el.classList.toggle('act', el.dataset.gmNav === navActive);
   });
-  const mtab = ['home', 'analysis', 'ai', 'profile'].includes(active) ? active : null;
+  document.querySelectorAll('.sb-group').forEach((group) => {
+    group.classList.toggle('has-active', !!group.querySelector('.sb-a.act'));
+  });
+  const mtab = resolveMobileTab(navActive);
   document.querySelectorAll('[data-gm-mtab]').forEach((el) => {
-    if (mtab) el.classList.toggle('act', el.dataset.gmMtab === mtab);
+    el.classList.toggle('act', mtab ? el.dataset.gmMtab === mtab : false);
   });
+  bindSidebarGroups();
+  bindStoriesFilterTabs();
 }
 
 function bindShellGlobals(ctx) {
