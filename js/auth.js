@@ -809,6 +809,27 @@ window.showForgotPassword = showForgotPassword;
 window.showLoginTab = showLoginTab;
 window.signOut = signOut;
 
+async function syncAuthUIFromSession() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (session?.user) {
+    try {
+      const profile = await fetchUserProfile(session.user.id);
+      updateAuthUI(profile, session);
+    } catch (e) {
+      console.warn('syncAuthUIFromSession', e);
+      updateAuthUI(null, session);
+    }
+  } else {
+    updateAuthUI(null, null);
+  }
+}
+
+document.addEventListener('gm-shell-ready', () => {
+  syncAuthUIFromSession().catch((e) => console.warn('auth after shell', e));
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
   mountAuthModals();
   bindAuthUI();

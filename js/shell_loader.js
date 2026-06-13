@@ -4,8 +4,8 @@
  * - template: #gm-page-tpl
  * - minimal: 게시글·프로필 등 단독 페이지
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260713';
-import { mountSiteFooter } from './footer_ui.js?v=20260713';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260714';
+import { mountSiteFooter } from './footer_ui.js?v=20260714';
 
 function bindSidebarGroups() {
   document.querySelectorAll('.sb-group-toggle').forEach((btn) => {
@@ -323,16 +323,53 @@ async function modeMinimal(ctx, parts) {
   return true;
 }
 
+async function refreshEmbeddedChrome(ctx, shellType, active) {
+  const parts = await loadPartials(ctx, shellType);
+
+  document.querySelector('header.hd')?.replaceWith(parts.header.cloneNode(true));
+
+  const layout = document.querySelector('.layout');
+  const oldSidebar = layout?.querySelector('aside.sidebar, .sidebar');
+  if (oldSidebar) {
+    oldSidebar.replaceWith(parts.sidebar.cloneNode(true));
+  } else if (layout) {
+    layout.insertBefore(parts.sidebar.cloneNode(true), layout.firstChild);
+  }
+
+  const oldTabs = document.querySelector('nav.mobile-tabs, .mobile-tabs');
+  if (oldTabs) {
+    oldTabs.replaceWith(parts.mobileTabs.cloneNode(true));
+  } else {
+    document.body.appendChild(parts.mobileTabs.cloneNode(true));
+  }
+
+  if (!document.getElementById('write-modal')) {
+    document.body.appendChild(parts.modals.cloneNode(true));
+  }
+
+  ensureStyles(ctx);
+  if (ctx.isM) document.body.classList.add('m-shell');
+  document.body.classList.add('gm-shell-loaded', `gm-shell-${shellType}`);
+
+  applyActiveNav(active);
+  bindShellGlobals(ctx);
+  bindWriteModalFallback();
+  await mountSiteFooter(ctx).catch((e) => console.warn('footer', e));
+}
+
 export async function initShell() {
   if (document.body.dataset.gmShellDone === '1') return;
-  if (document.querySelector('header.hd') && !document.getElementById('gm-page-tpl')) {
-    document.body.dataset.gmShellDone = '1';
-    return;
-  }
 
   const ctx = detectContext();
   const shellType = document.body.dataset.gmShell || 'standard';
   const active = document.body.dataset.gmActive || '';
+
+  /* 레거시 HTML에 박힌 헤더·사이드바 → partials(sidebar-v3.html)로 통일 */
+  if (document.querySelector('header.hd') && !document.getElementById('gm-page-tpl')) {
+    await refreshEmbeddedChrome(ctx, shellType, active);
+    document.body.dataset.gmShellDone = '1';
+    return;
+  }
 
   ensureStyles(ctx);
   if (ctx.isM) document.body.classList.add('m-shell');

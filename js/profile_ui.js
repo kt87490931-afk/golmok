@@ -184,16 +184,21 @@ function bindActivityModal() {
     });
   });
 
-  document.getElementById('nav-my-posts')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openMyActivity('my-posts');
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#nav-my-posts')) {
+      e.preventDefault();
+      e.stopPropagation();
+      openMyActivity('my-posts');
+      return;
+    }
+    if (e.target.closest('#nav-saved-posts')) {
+      e.preventDefault();
+      e.stopPropagation();
+      openMyActivity('saved-posts');
+    }
   });
-  document.getElementById('nav-saved-posts')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openMyActivity('saved-posts');
-  });  document.getElementById('pm-my-posts')?.addEventListener('click', () => openMyActivity('my-posts'));
+
+  document.getElementById('pm-my-posts')?.addEventListener('click', () => openMyActivity('my-posts'));
   document.getElementById('pm-saved-posts')?.addEventListener('click', () => openMyActivity('saved-posts'));
 }
 
@@ -202,4 +207,9 @@ export function initProfileUI() {
   window.openMyActivity = openMyActivity;
 }
 
-document.addEventListener('DOMContentLoaded', initProfileUI);
+function bootProfileUI() {
+  initProfileUI();
+}
+
+document.addEventListener('DOMContentLoaded', bootProfileUI);
+document.addEventListener('gm-shell-ready', bootProfileUI);
