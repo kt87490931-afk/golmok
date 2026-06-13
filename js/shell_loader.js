@@ -4,8 +4,8 @@
  * - template: #gm-page-tpl
  * - minimal: 게시글·프로필 등 단독 페이지
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260714';
-import { mountSiteFooter } from './footer_ui.js?v=20260714';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260715';
+import { mountSiteFooter } from './footer_ui.js?v=20260715';
 
 function bindSidebarGroups() {
   document.querySelectorAll('.sb-group-toggle').forEach((btn) => {
@@ -323,6 +323,14 @@ async function modeMinimal(ctx, parts) {
   return true;
 }
 
+function hasStaleEmbeddedChrome() {
+  if (!document.querySelector('header.hd') || document.getElementById('gm-page-tpl')) return false;
+  const nav = document.querySelector('header.hd .hd-nav');
+  if (nav && !nav.querySelector('[data-gm-nav="ai"]')) return true;
+  const sidebar = document.querySelector('.layout aside.sidebar, .layout > .sidebar');
+  return !!(sidebar && !sidebar.querySelector('.sb-group[data-sb-group="stories"]'));
+}
+
 async function refreshEmbeddedChrome(ctx, shellType, active) {
   const parts = await loadPartials(ctx, shellType);
 
@@ -358,7 +366,8 @@ async function refreshEmbeddedChrome(ctx, shellType, active) {
 }
 
 export async function initShell() {
-  if (document.body.dataset.gmShellDone === '1') return;
+  const staleChrome = hasStaleEmbeddedChrome();
+  if (document.body.dataset.gmShellDone === '1' && !staleChrome) return;
 
   const ctx = detectContext();
   const shellType = document.body.dataset.gmShell || 'standard';
@@ -366,7 +375,9 @@ export async function initShell() {
 
   /* 레거시 HTML에 박힌 헤더·사이드바 → partials(sidebar-v3.html)로 통일 */
   if (document.querySelector('header.hd') && !document.getElementById('gm-page-tpl')) {
-    await refreshEmbeddedChrome(ctx, shellType, active);
+    if (staleChrome || document.body.dataset.gmShellDone !== '1') {
+      await refreshEmbeddedChrome(ctx, shellType, active);
+    }
     document.body.dataset.gmShellDone = '1';
     return;
   }

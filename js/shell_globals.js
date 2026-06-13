@@ -42,6 +42,4 @@
     document.getElementById('open-write')?.click()
       || document.getElementById('write-modal')?.classList.add('open');
   });
-  document.body.dataset.gmShellDone = '1';
-  document.dispatchEvent(new CustomEvent('gm-shell-ready'));
 })();
