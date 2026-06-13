@@ -1,5 +1,5 @@
 /** 골목대장 v3 공통 셸 — 경로·토큰·활성 메뉴 */
-export const SHELL_VER = '20260716';
+export const SHELL_VER = '20260717';
 
 const analysisBase = (isM) => (isM ? 'analysis.html' : 'analysis.html');
 

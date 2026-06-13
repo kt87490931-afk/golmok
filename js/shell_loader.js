@@ -4,8 +4,8 @@
  * - template: #gm-page-tpl
  * - minimal: 게시글·프로필 등 단독 페이지
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260716';
-import { mountSiteFooter } from './footer_ui.js?v=20260716';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260717';
+import { mountSiteFooter } from './footer_ui.js?v=20260717';
 
 function bindSidebarGroups() {
   document.querySelectorAll('.sb-group-toggle').forEach((btn) => {
@@ -375,8 +375,17 @@ export async function initShell() {
 
   /* 레거시 HTML에 박힌 헤더·사이드바 → partials(sidebar-v3.html)로 통일 */
   if (document.querySelector('header.hd') && !document.getElementById('gm-page-tpl')) {
-    if (staleChrome || document.body.dataset.gmShellDone !== '1') {
+    const alreadyV3 = document.querySelector('.sb-group[data-sb-group="stories"]');
+    if (!alreadyV3 || staleChrome) {
       await refreshEmbeddedChrome(ctx, shellType, active);
+    } else {
+      ensureStyles(ctx);
+      if (ctx.isM) document.body.classList.add('m-shell');
+      document.body.classList.add('gm-shell-loaded', `gm-shell-${shellType}`);
+      applyActiveNav(active);
+      bindShellGlobals(ctx);
+      bindWriteModalFallback();
+      await mountSiteFooter(ctx).catch((e) => console.warn('footer', e));
     }
     document.body.dataset.gmShellDone = '1';
     return;

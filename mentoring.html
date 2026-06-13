@@ -419,13 +419,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <link rel="stylesheet" href="css/responsive.css?v=20260642">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/main-v3.css?v=20260710">
-<link rel="stylesheet" href="css/shell-pages.css?v=20260702">
+<link rel="stylesheet" href="css/main-v3.css?v=20260717">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260717">
 <link rel="stylesheet" href="css/community.css?v=20260710">
 <link rel="stylesheet" href="css/mentoring.css?v=20260710">
 </head>
 <body class="gm-shell-loaded" data-gm-active="mentoring" data-gm-shell="standard">
-<script type="module" src="js/shell_loader.js?v=20260715"></script>
+<script type="module" src="js/shell_loader.js?v=20260717"></script>
 
 <header class="hd">
   <a href="index.html" class="hd-logo">
@@ -439,11 +439,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
   </a>
   <nav class="hd-nav">
-    <a href="index.html" data-gm-nav="home">홈</a>
+    <a href="community.html" data-gm-nav="community">대장님들의 이야기</a>
     <a href="analysis.html" data-gm-nav="analysis">상권분석</a>
-    <a href="analysis.html?tab=weather" data-gm-nav="weather">창업기상도</a>
-    <a href="analysis.html?tab=hotplace" data-gm-nav="hotplace">핫플레이스</a>
-    <a href="policy.html" data-gm-nav="policy">정책·지원</a>
+    <a href="ai-search.html" data-gm-nav="ai">골목대장 AI</a>
   </nav>
   <div class="hd-right">
     <div class="hd-search-btn" onclick="focusHeroSearch()">
@@ -465,23 +463,50 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <div class="layout">
 <aside class="sidebar">
-  <div class="sb-sec">
-    <div class="sb-label">메뉴</div>
-    <a href="index.html" class="sb-a" data-gm-nav="home"><i class="ti ti-home"></i> 홈 피드</a>
-    <a href="analysis.html" class="sb-a" data-gm-nav="analysis"><i class="ti ti-map"></i> 상권분석</a>
-    <a href="analysis.html?tab=weather" class="sb-a" data-gm-nav="weather"><i class="ti ti-cloud"></i> 창업기상도</a>
-    <a href="analysis.html?tab=hotplace" class="sb-a" data-gm-nav="hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
+  <!-- 대장님들의 이야기 -->
+  <div class="sb-sec sb-group open" data-sb-group="stories">
+    <div class="sb-group-hd">
+      <a href="community.html" class="sb-a sb-group-title" data-gm-nav="community" id="nav-stories-all">
+        <i class="ti ti-messages"></i>
+        <span>대장님들의 이야기</span>
+      </a>
+      <button type="button" class="sb-group-toggle" aria-label="대장님들의 이야기 메뉴 펼치기" aria-expanded="true">
+        <i class="ti ti-chevron-down"></i>
+      </button>
+    </div>
+    <div class="sb-group-body">
+      <a href="neighborhood.html" class="sb-a sb-sub" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
+      <a href="promo.html" class="sb-a sb-sub" data-gm-nav="promo"><i class="ti ti-speakerphone"></i> 무료홍보 <span class="sb-promo-free">무료</span></a>
+      <a href="mentoring.html" class="sb-a sb-sub act" data-gm-nav="mentoring"><i class="ti ti-users"></i> 멘토링</a>
+    </div>
   </div>
-  <div class="sb-sec">
-    <div class="sb-label">커뮤니티</div>
-    <a href="community.html" class="sb-a" id="nav-all" data-gm-nav="community"><i class="ti ti-world"></i> 전체 게시판</a>
-    <a href="neighborhood.html" class="sb-a" id="nav-dong" data-gm-nav="neighborhood"><i class="ti ti-map-pin"></i> 우리동네</a>
-    <a href="mentoring.html" class="sb-a act" data-gm-nav="mentoring"><i class="ti ti-users"></i> 대장님들의 멘토링</a>
-    <a href="promo.html" class="sb-a" data-gm-nav="promo"><i class="ti ti-speakerphone"></i> 우리동네 무료홍보 <span class="sb-promo-free">무료</span></a>
-    <a href="by-industry.html" class="sb-a" data-gm-nav="by-industry"><i class="ti ti-tag"></i> 업종별</a>
-    <a href="events.html" class="sb-a" data-gm-nav="events"><i class="ti ti-speakerphone"></i> 이벤트·행사</a>
-    <a href="policy.html" class="sb-a" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책·지원</a>
+
+  <!-- 상권분석 -->
+  <div class="sb-sec sb-group open" data-sb-group="analysis">
+    <div class="sb-group-hd">
+      <a href="analysis.html" class="sb-a sb-group-title" data-gm-nav="analysis">
+        <i class="ti ti-chart-bar"></i>
+        <span>상권분석</span>
+      </a>
+      <button type="button" class="sb-group-toggle" aria-label="상권분석 메뉴 펼치기" aria-expanded="true">
+        <i class="ti ti-chevron-down"></i>
+      </button>
+    </div>
+    <div class="sb-group-body">
+      <a href="analysis.html?tab=simple" class="sb-a sb-sub" data-gm-nav="simple"><i class="ti ti-bolt"></i> 간단분석</a>
+      <a href="analysis.html?tab=weather" class="sb-a sb-sub" data-gm-nav="weather"><i class="ti ti-cloud"></i> 창업기상도</a>
+      <a href="analysis.html?tab=hotplace" class="sb-a sb-sub" data-gm-nav="hotplace"><i class="ti ti-flame"></i> 핫플레이스</a>
+      <a href="analysis.html?tab=theme" class="sb-a sb-sub" data-gm-nav="theme"><i class="ti ti-building-store"></i> 테마상권</a>
+      <a href="policy.html" class="sb-a sb-sub" data-gm-nav="policy"><i class="ti ti-file-text"></i> 정책지원</a>
+    </div>
   </div>
+
+  <!-- 골목대장 AI -->
+  <div class="sb-sec">
+    <a href="ai-search.html" class="sb-a" data-gm-nav="ai"><i class="ti ti-robot"></i> 골목대장 AI</a>
+  </div>
+
+  <!-- 내 활동 -->
   <div class="sb-sec">
     <div class="sb-label">내 활동</div>
     <a href="profile.html" class="sb-a" id="sb-profile-link" data-gm-nav="profile">
@@ -594,24 +619,20 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <nav class="mobile-tabs" aria-label="하단 메뉴">
   <div class="mobile-tabs-pill">
-    <a href="index.html" class="mb-tab" data-gm-mtab="home" aria-label="홈">
-      <i class="ti ti-home"></i>
-      <span class="mb-tab-label">홈</span>
+    <a href="community.html" class="mb-tab" data-gm-mtab="home" aria-label="대장님들의 이야기">
+      <i class="ti ti-messages"></i>
+      <span class="mb-tab-label">이야기</span>
     </a>
     <a href="analysis.html" class="mb-tab" data-gm-mtab="analysis" aria-label="상권분석">
-      <i class="ti ti-map"></i>
+      <i class="ti ti-chart-bar"></i>
       <span class="mb-tab-label">상권분석</span>
     </a>
     <button type="button" class="mb-tab mb-fab" id="write-btn-m" aria-label="글쓰기">
       <i class="ti ti-plus"></i>
     </button>
-    <a href="index.html#hero" class="mb-tab" data-gm-mtab="ai" aria-label="AI검색" onclick="setTimeout(function(){focusHeroSearch()},80);return true;">
+    <a href="ai-search.html" class="mb-tab" data-gm-mtab="ai" aria-label="골목대장 AI">
       <i class="ti ti-robot"></i>
-      <span class="mb-tab-label">AI검색</span>
-    </a>
-    <a href="profile.html" class="mb-tab" data-gm-mtab="profile" aria-label="내정보">
-      <i class="ti ti-user"></i>
-      <span class="mb-tab-label">내정보</span>
+      <span class="mb-tab-label">AI</span>
     </a>
   </div>
 </nav>
