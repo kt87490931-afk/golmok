@@ -1,6 +1,6 @@
-import { askGemini, getChatExamples } from './gemini.js?v=20260690';
+import { askGemini, getChatExamples } from './gemini.js?v=20260623';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260690';
+import { searchRelatedPosts } from './community.js?v=20260623';
 
 let isThinking = false;
 let recognition = null;
@@ -35,6 +35,101 @@ function escHtml(s) {
 function escAttr(s) {
   return String(s || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 }
+
+function formatDataTimestamp(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleString('ko-KR', {
+      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    }) + ' 기준';
+  } catch {
+    return '';
+  }
+}
+
+function formatPlaceDistance(distance) {
+  const n = Number(distance);
+  if (!Number.isFinite(n) || n <= 0) return '';
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}km`;
+  return `${Math.round(n)}m`;
+}
+
+function renderKakaoPlaceCard(kakaoCard) {
+  const { brand, totalCount, places } = kakaoCard || {};
+  if (!places?.length) return '';
+
+  const VISIBLE_COUNT = 5;
+  const visiblePlaces = places.slice(0, VISIBLE_COUNT);
+  const hiddenPlaces = places.slice(VISIBLE_COUNT);
+  const hasMore = hiddenPlaces.length > 0;
+  const cardId = `kakaoCard_${Math.random().toString(36).slice(2, 9)}`;
+
+  const itemsHTML = visiblePlaces.map((p) => _renderPlaceItem(p)).join('');
+  const hiddenHTML = hasMore ? hiddenPlaces.map((p) => _renderPlaceItem(p)).join('') : '';
+
+  return `
+    <div class="kakao-place-card">
+      <div class="kakao-place-card-hd">
+        <i class="ti ti-map-pin-filled" aria-hidden="true"></i>
+        <span>${escHtml(brand || '매장')}</span>
+        <span class="kakao-place-count">총 ${totalCount ?? places.length}곳</span>
+      </div>
+      <div class="kakao-place-list" id="${cardId}_visible">
+        ${itemsHTML}
+      </div>
+      ${hasMore ? `
+        <div class="kakao-place-list kakao-place-hidden" id="${cardId}_hidden" style="display:none;">
+          ${hiddenHTML}
+        </div>
+        <button type="button" class="kakao-place-more-btn"
+          data-more-label="나머지 ${hiddenPlaces.length}곳 더보기"
+          onclick="window.toggleKakaoPlaceMore('${cardId}', this)">
+          나머지 ${hiddenPlaces.length}곳 더보기
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </button>
+      ` : ''}
+    </div>
+  `;
+}
+
+function _renderPlaceItem(place) {
+  const distanceText = formatPlaceDistance(place.distance);
+  const phoneHTML = place.phone
+    ? `<a href="tel:${escAttr(place.phone)}" class="kakao-place-phone" onclick="event.stopPropagation()">
+         <i class="ti ti-phone" aria-hidden="true"></i> ${escHtml(place.phone)}
+       </a>`
+    : '';
+  const mapHTML = place.placeUrl
+    ? `<a href="${escAttr(place.placeUrl)}" target="_blank" rel="noopener" class="kakao-place-map-link" onclick="event.stopPropagation()">
+         지도 보기 <i class="ti ti-external-link" aria-hidden="true"></i>
+       </a>`
+    : '';
+
+  return `
+    <div class="kakao-place-item">
+      <div class="kakao-place-item-top">
+        <span class="kakao-place-name">${escHtml(place.name)}</span>
+        ${distanceText ? `<span class="kakao-place-distance">${distanceText}</span>` : ''}
+      </div>
+      <div class="kakao-place-addr">${escHtml(place.address || '')}</div>
+      <div class="kakao-place-actions">
+        ${phoneHTML}
+        ${mapHTML}
+      </div>
+    </div>
+  `;
+}
+
+window.toggleKakaoPlaceMore = function toggleKakaoPlaceMore(cardId, btn) {
+  const hidden = document.getElementById(`${cardId}_hidden`);
+  if (!hidden || !btn) return;
+  const isHidden = hidden.style.display === 'none';
+  hidden.style.display = isHidden ? 'block' : 'none';
+  const moreLabel = btn.getAttribute('data-more-label') || '더보기';
+  btn.innerHTML = isHidden
+    ? `접기 <i class="ti ti-chevron-up" aria-hidden="true"></i>`
+    : `${moreLabel} <i class="ti ti-chevron-down" aria-hidden="true"></i>`;
+};
 
 function aiLogoSrc() {
   return document.body.classList.contains('m-shell') ? 'assets/gmlogo.png' : 'assets/gmlogo.png';
@@ -272,6 +367,44 @@ function renderPolicyCards(programs = []) {
   </ul>`;
 }
 
+
+async function appendKakaoMsg(result, question) {
+  const msgs = document.getElementById('ai-messages');
+  if (!msgs) return;
+  const intent = result.intent || {};
+  const regionLabel = intent.region || '';
+  const brand = intent.brand || '';
+  const ts = formatDataTimestamp(result.dataFetchedAt);
+  const cardData = result.cardData || {};
+
+  const div = document.createElement('div');
+  div.className = 'msg-ai';
+  div.innerHTML = `
+    <div class="msg-ai-av">${aiAvatarHtml()}</div>
+    <div class="msg-ai-body">
+      <div class="msg-ai-name">골목대장 AI</div>
+      <div class="msg-ai-bubble">
+        ${regionLabel ? `
+          <div class="ai-data-source">
+            📍 <strong>${escHtml(regionLabel)}${brand ? ` · ${escHtml(brand)}` : ''}</strong>
+            카카오 장소 검색${ts ? ` · ${escHtml(ts)}` : ''}
+          </div>` : ''}
+        <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '')}</div>
+        ${renderKakaoPlaceCard({
+          brand,
+          totalCount: cardData.totalCount,
+          places: cardData.places || [],
+        })}
+        ${renderRelatedPosts([])}
+        ${renderSuggestions(result.suggestions || getChatExamples())}
+      </div>
+    </div>
+  `;
+  msgs.appendChild(div);
+  scrollMessages();
+  await hydrateRelatedPosts(div.querySelector('.ai-related-body'), question, intent);
+}
+
 async function appendPolicyMsg(result, question) {
   const msgs = document.getElementById('ai-messages');
   if (!msgs) return;
@@ -308,6 +441,10 @@ async function appendDataMsg(result, question) {
   const intent = result.intent || {};
   const regionLabel = intent.region || d.region || '';
   const upjongLabel = intent.upjong || d.upjong || '';
+  const ts = formatDataTimestamp(result.dataFetchedAt);
+  const sourceLabel = result.dataSource === 'mock'
+    ? '<span class="ai-data-mock"> · 데모 모드</span>'
+    : (ts ? `<span class="ai-data-ts"> · ${escHtml(ts)}</span>` : '');
 
   const div = document.createElement('div');
   div.className = 'msg-ai';
@@ -319,8 +456,7 @@ async function appendDataMsg(result, question) {
         ${regionLabel ? `
           <div class="ai-data-source">
             📍 <strong>${escHtml(regionLabel)}${upjongLabel ? ` · ${escHtml(upjongLabel)}` : ''}</strong>
-            기준 소진공 데이터
-            ${result.dataSource === 'mock' || result.dataSource === 'mock_fallback' ? '<span class="ai-data-mock"> · 샘플</span>' : ''}
+            기준 소진공 데이터${sourceLabel}
           </div>` : ''}
         ${renderDataCards(d)}
         <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '답변을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.')}</div>
@@ -400,8 +536,13 @@ window.sendAIMessage = async function sendAIMessage() {
     return;
   }
 
-  if (result.blocked || result.needMoreInfo) {
+  if (result.blocked || result.needMoreInfo || result.apiError) {
     await appendBlockedMsg(result.answer, result.suggestions || getChatExamples(), q, result.intent);
+    return;
+  }
+
+  if (result.cardType === 'kakao_places' && result.cardData) {
+    await appendKakaoMsg(result, q);
     return;
   }
 
