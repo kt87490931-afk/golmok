@@ -519,3 +519,150 @@ body.m-shell.gm-shell-ai .ai-page {
 @media (max-width: 768px) {
   body.gm-shell-ai .ai-hd-title { display: none !important; }
 }
+
+/* ================================================
+   카카오 장소 검색 결과 카드
+   ================================================ */
+
+.kakao-place-card {
+  margin-top: 12px;
+  background: #fff;
+  border: 1px solid #E8E4DC;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.kakao-place-card-hd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #FFF8E7;
+  border-bottom: 1px solid rgba(245,166,35,0.25);
+  font-size: 13px;
+  font-weight: 700;
+  color: #C17F24;
+}
+
+.kakao-place-card-hd .ti {
+  font-size: 15px;
+  color: #F5A623;
+}
+
+.kakao-place-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: #F5A623;
+  background: rgba(245,166,35,0.12);
+  padding: 2px 9px;
+  border-radius: 10px;
+}
+
+.kakao-place-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.kakao-place-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid #F0ECE4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kakao-place-list:last-child .kakao-place-item:last-child,
+.kakao-place-hidden .kakao-place-item:last-child {
+  border-bottom: none;
+}
+
+.kakao-place-item-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kakao-place-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.kakao-place-distance {
+  font-size: 11px;
+  font-weight: 700;
+  color: #F5A623;
+  flex-shrink: 0;
+}
+
+.kakao-place-addr {
+  font-size: 12px;
+  color: #888;
+}
+
+.kakao-place-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.kakao-place-phone,
+.kakao-place-map-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #444;
+  text-decoration: none;
+  transition: color .12s;
+}
+
+.kakao-place-phone .ti,
+.kakao-place-map-link .ti {
+  font-size: 13px;
+  color: #888;
+}
+
+.kakao-place-phone:hover { color: #F5A623; }
+.kakao-place-phone:hover .ti { color: #F5A623; }
+
+.kakao-place-map-link:hover { color: #185FA5; }
+.kakao-place-map-link:hover .ti { color: #185FA5; }
+
+.kakao-place-more-btn {
+  width: 100%;
+  background: #F7F3EB;
+  border: none;
+  border-top: 1px solid #E8E4DC;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: background .12s, color .12s;
+}
+
+.kakao-place-more-btn:hover {
+  background: #FFF8E7;
+  color: #C17F24;
+}
+
+.ai-data-ts {
+  color: #888;
+  font-size: 11px;
+}
+
+@media (max-width: 768px) {
+  .kakao-place-card-hd { padding: 9px 12px; font-size: 12px; }
+  .kakao-place-item    { padding: 10px 12px; }
+  .kakao-place-name    { font-size: 13px; }
+  .kakao-place-actions { gap: 10px; flex-wrap: wrap; }
+}
