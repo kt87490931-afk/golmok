@@ -1,6 +1,6 @@
-import { askGemini, getChatExamples } from './gemini.js?v=20260623';
+import { askGemini, getChatExamples } from './gemini.js?v=20260624';
 import { supabase } from './supabase_client.js';
-import { searchRelatedPosts } from './community.js?v=20260623';
+import { searchRelatedPosts } from './community.js?v=20260624';
 
 let isThinking = false;
 let recognition = null;
@@ -373,7 +373,7 @@ async function appendKakaoMsg(result, question) {
   if (!msgs) return;
   const intent = result.intent || {};
   const regionLabel = intent.region || '';
-  const brand = intent.brand || '';
+  const brand = intent.brand || intent.upjong || '';
   const ts = formatDataTimestamp(result.dataFetchedAt);
   const cardData = result.cardData || {};
 
@@ -391,7 +391,7 @@ async function appendKakaoMsg(result, question) {
           </div>` : ''}
         <div class="ai-answer-box">${escHtml(normalizeAnswerText(result.answer) || '')}</div>
         ${renderKakaoPlaceCard({
-          brand,
+          brand: intent.brand || intent.upjong || brand,
           totalCount: cardData.totalCount,
           places: cardData.places || [],
         })}
