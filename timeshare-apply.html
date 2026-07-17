@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F5A623">
+<link rel="icon" href="assets/gmlogo.png" type="image/png">
+<title>타임셰어 신청하기 — 골목대장</title>
+<script src="js/mobile-route.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/main-v3.css?v=20260711">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260711">
+<link rel="stylesheet" href="css/timeshare.css?v=20260711">
+</head>
+<body data-gm-active="timeshare" data-gm-shell="standard">
+
+<template id="gm-page-tpl">
+  <div class="ts-page ts-page--form">
+    <div class="ts-breadcrumb">
+      <a href="timeshare.html">타임셰어</a> &nbsp;›&nbsp; <b>본주인 신청서 작성</b>
+    </div>
+    <h1 class="ts-page-title"><i class="ti ti-clock-hour-4"></i> 내 매장 타임셰어 등록</h1>
+    <p class="ts-page-sub">매장 정보와 셰어 조건을 입력해주세요. 제출 후에도 채팅을 통해 조건을 조율할 수 있습니다.</p>
+
+    <div class="ts-steps" aria-hidden="true">
+      <div class="ts-step active"><div class="ts-step-num">1</div><div class="ts-step-label">매장정보</div></div>
+      <div class="ts-step"><div class="ts-step-num">2</div><div class="ts-step-label">셰어조건</div></div>
+      <div class="ts-step"><div class="ts-step-num">3</div><div class="ts-step-label">금기사항</div></div>
+      <div class="ts-step"><div class="ts-step-num">4</div><div class="ts-step-label">필수확인</div></div>
+    </div>
+
+    <div class="ts-guide-banner">
+      <b><i class="ti ti-alert-triangle"></i> 작성 전 꼭 확인하세요</b>
+      타임셰어는 건물주 동의, 식품 업종의 경우 공유주방 등록 등 확인이 필요한 사항이 있습니다.
+      자세한 내용은 <a href="timeshare-guide.html">타임셰어 가이드라인</a>에서 확인해주세요.
+    </div>
+
+    <form id="ts-apply-form" novalidate>
+      <div class="ts-form-card">
+        <h2><span class="ts-step-chip">STEP 1</span>매장 기본 정보</h2>
+        <p class="ts-hint">공개되는 정보이니 정확하게 작성해주세요.</p>
+
+        <div class="ts-field">
+          <label for="ts-store-name">매장명</label>
+          <input id="ts-store-name" name="store_name" type="text" placeholder="예: 인계동 OO카페" autocomplete="organization">
+        </div>
+
+        <div class="ts-row-2">
+          <div class="ts-field">
+            <label for="ts-category">업종</label>
+            <select id="ts-category" name="category">
+              <option value="음식점">음식점</option>
+              <option value="카페">카페</option>
+              <option value="베이커리">베이커리</option>
+              <option value="기타">기타 (현재 식품접객업만 가능)</option>
+            </select>
+          </div>
+          <div class="ts-field">
+            <label for="ts-address">주소 (동 단위 공개)</label>
+            <input id="ts-address" name="address" type="text" placeholder="예: 수원시 팔달구 인계동">
+            <div class="ts-sub-hint">정확한 지번은 채팅 연결 후 공유하세요.</div>
+          </div>
+        </div>
+
+        <div class="ts-field">
+          <label for="ts-intro">매장 소개 (300자 이내)</label>
+          <textarea id="ts-intro" name="intro" maxlength="300" placeholder="매장 컨셉, 시설(주방기기, 좌석 수 등), 어떤 분과 함께하고 싶은지 자유롭게 적어주세요."></textarea>
+        </div>
+
+        <div class="ts-field">
+          <label>대표 사진 (최대 5장)</label>
+          <div class="ts-upload-box">
+            <i class="ti ti-camera"></i>
+            내부·주방·좌석 사진을 올려주시면 매칭 확률이 높아집니다<br>
+            <span style="font-size:11px;opacity:.8">(사진 업로드는 곧 연동됩니다)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ts-form-card">
+        <h2><span class="ts-step-chip">STEP 2</span>셰어 조건</h2>
+        <p class="ts-hint">아래 조건은 희망 조건이며, 채팅으로 조율할 수 있습니다.</p>
+
+        <div class="ts-field">
+          <label>셰어 가능 요일</label>
+          <div class="ts-weekday" id="ts-weekdays" role="group" aria-label="요일 선택">
+            <button type="button" class="on" data-day="월">월</button>
+            <button type="button" class="on" data-day="화">화</button>
+            <button type="button" class="on" data-day="수">수</button>
+            <button type="button" class="on" data-day="목">목</button>
+            <button type="button" class="on" data-day="금">금</button>
+            <button type="button" data-day="토">토</button>
+            <button type="button" data-day="일">일</button>
+          </div>
+        </div>
+
+        <div class="ts-row-2">
+          <div class="ts-field">
+            <label for="ts-time-start">셰어 시작 시간</label>
+            <input id="ts-time-start" name="time_start" type="text" placeholder="예: 21:00">
+          </div>
+          <div class="ts-field">
+            <label for="ts-time-end">셰어 종료 시간</label>
+            <input id="ts-time-end" name="time_end" type="text" placeholder="예: 익일 05:00">
+          </div>
+        </div>
+
+        <div class="ts-field">
+          <label for="ts-period">계약 희망 기간</label>
+          <select id="ts-period" name="period">
+            <option value="3개월">3개월</option>
+            <option value="6개월" selected>6개월</option>
+            <option value="협의 가능">협의 가능</option>
+          </select>
+        </div>
+
+        <div class="ts-row-2">
+          <div class="ts-field">
+            <label for="ts-deposit">희망 보증금 (원)</label>
+            <input id="ts-deposit" name="deposit" type="number" min="0" placeholder="예: 10000000">
+            <div class="ts-sub-hint">계약 종료 시 반환되는 금액입니다.</div>
+          </div>
+          <div class="ts-field">
+            <label for="ts-monthly">희망 월 부담금 (원)</label>
+            <input id="ts-monthly" name="monthly" type="number" min="0" placeholder="예: 1500000">
+          </div>
+        </div>
+
+        <div class="ts-field">
+          <label>월 이용료 유무</label>
+          <div class="ts-radio-row">
+            <label><input type="radio" name="fee_type" value="deposit_only" checked> 보증금만</label>
+            <label><input type="radio" name="fee_type" value="deposit_monthly"> 보증금 + 월 이용료</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="ts-form-card">
+        <h2><span class="ts-step-chip">STEP 3</span>금기사항 및 제한사항</h2>
+        <p class="ts-hint">체크한 항목은 이용자에게 미리 공개됩니다. 법적 효력을 가지려면 계약서에도 명시해야 합니다.</p>
+        <div class="ts-checklist">
+          <label><input type="checkbox" name="restrict" value="same_biz"> 특정 업종 제한 있음 (동일 업종·경쟁 메뉴 불가)</label>
+          <label><input type="checkbox" name="restrict" value="no_alcohol"> 주류 취급 불가</label>
+          <label><input type="checkbox" name="restrict" value="no_delivery"> 배달 영업 불가</label>
+          <label><input type="checkbox" name="restrict" value="no_outdoor"> 실외 좌석·간판 변경 불가</label>
+          <label><input type="checkbox" name="restrict" value="no_move"> 기존 집기·장비 임의 이동 불가</label>
+          <label><input type="checkbox" name="restrict" value="no_pet"> 반려동물 동반 불가</label>
+        </div>
+        <div class="ts-field" style="margin-top:12px;">
+          <label for="ts-restrict-etc">기타 (직접 입력)</label>
+          <input id="ts-restrict-etc" name="restrict_etc" type="text" placeholder="예: 심야 시간 소음에 유의해주세요">
+        </div>
+      </div>
+
+      <div class="ts-required-box">
+        <h2>STEP 4 · 필수 확인 사항</h2>
+        <p class="ts-hint">체크하지 않으면 신청서를 제출할 수 없습니다.</p>
+        <div class="ts-checklist">
+          <label>
+            <input type="checkbox" class="ts-required-check" name="req_landlord">
+            <span>저는 이 매장의 임대차 계약자이며, <b>건물주(임대인)로부터 제3자에게 시간제로 사용하게 하는 것에 대한 동의</b>를 받았거나 받을 예정임을 확인합니다.</span>
+          </label>
+          <label>
+            <input type="checkbox" class="ts-required-check" name="req_platform">
+            <span>골목대장은 계약 당사자가 아니며, <b>계약 및 보증금 관련 책임은 본주인과 이용자 양측</b>에 있음을 확인합니다.</span>
+          </label>
+          <label>
+            <input type="checkbox" class="ts-required-check" name="req_legal">
+            <span>표준 계약서는 <b>법률 자문을 대체하지 않으며</b>, 필요 시 별도 법률 검토를 진행할 것을 권장받았음을 확인합니다.</span>
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="ts-submit-bar">
+    <div class="ts-inner">
+      <button type="button" class="ts-btn-submit" id="ts-submit-btn">모든 필수 항목 확인 후 제출 가능</button>
+      <div class="ts-submit-note">제출 후 리스트 페이지에 공개되며, 언제든 수정·비공개 전환이 가능합니다</div>
+    </div>
+  </div>
+</template>
+
+<script type="module" src="js/shell_loader.js?v=20260711"></script>
+<script type="module" src="js/auth.js?v=20260711"></script>
+<script type="module" src="js/pages/timeshare-apply.js?v=20260711"></script>
+</body>
+</html>

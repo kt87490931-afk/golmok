@@ -1,11 +1,11 @@
 /**
- * 골목대장 v3 공통 셸 로더 (B방식)
- * - transform: 레거시 .topnav 페이지
+ * ???? v3 ?? ? ?? (B??)
+ * - transform: ??? .topnav ???
  * - template: #gm-page-tpl
- * - minimal: 게시글·프로필 등 단독 페이지
+ * - minimal: ???�??? ? ?? ???
  */
-import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260717';
-import { mountSiteFooter } from './footer_ui.js?v=20260717';
+import { SHELL_VER, detectContext, applyTokens, hrefForActive, resolveActiveNav, resolveMobileTab } from './shell_config.js?v=20260717b';
+import { mountSiteFooter } from './footer_ui.js?v=20260717b';
 
 function bindSidebarGroups() {
   document.querySelectorAll('.sb-group-toggle').forEach((btn) => {
@@ -373,7 +373,7 @@ export async function initShell() {
   const shellType = document.body.dataset.gmShell || 'standard';
   const active = document.body.dataset.gmActive || '';
 
-  /* 레거시 HTML에 박힌 헤더·사이드바 → partials(sidebar-v3.html)로 통일 */
+  /* ??? HTML? ?? ??�???? ? partials(sidebar-v3.html)? ?? */
   if (document.querySelector('header.hd') && !document.getElementById('gm-page-tpl')) {
     const alreadyV3 = document.querySelector('.sb-group[data-sb-group="stories"]');
     if (!alreadyV3 || staleChrome) {

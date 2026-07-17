@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F5A623">
+<link rel="icon" href="assets/gmlogo.png" type="image/png">
+<title>매장 타임셰어 — 골목대장</title>
+<script src="js/mobile-route.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/main-v3.css?v=20260711">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260711">
+<link rel="stylesheet" href="css/timeshare.css?v=20260711">
+</head>
+<body data-gm-active="timeshare" data-gm-shell="standard">
+
+<template id="gm-page-tpl">
+  <div class="ts-page">
+    <div class="ts-breadcrumb">커뮤니티 &nbsp;›&nbsp; <b>매장 타임셰어</b></div>
+
+    <div class="ts-page-head">
+      <div>
+        <h1 class="ts-page-title"><i class="ti ti-clock-hour-4"></i> 매장 타임셰어</h1>
+        <p class="ts-page-sub">영업이 끝난 시간, 필요한 분에게 이어드립니다. 조건은 채팅으로 협의할 수 있어요.</p>
+      </div>
+      <div class="ts-head-actions">
+        <a class="ts-btn ts-btn-outline" href="timeshare-guide.html">가이드라인 보기</a>
+        <a class="ts-btn ts-btn-primary" href="timeshare-apply.html"><i class="ti ti-plus"></i> 내 매장 등록하기</a>
+      </div>
+    </div>
+
+    <div class="ts-notice">
+      <i class="ti ti-alert-triangle"></i>
+      <span>리스트의 보증금·월 부담금은 <b>희망 조건</b>입니다. 계약 전 <a href="timeshare-guide.html">법적 안내사항</a>을 꼭 확인하세요.</span>
+    </div>
+
+    <div class="ts-filters" id="ts-filters" role="group" aria-label="필터">
+      <button type="button" class="ts-chip active" data-filter="all">전체</button>
+      <button type="button" class="ts-chip" data-filter="카페">카페</button>
+      <button type="button" class="ts-chip" data-filter="음식점">음식점</button>
+      <button type="button" class="ts-chip" data-filter="베이커리">베이커리</button>
+      <button type="button" class="ts-chip" data-filter="인계동">인계동</button>
+      <button type="button" class="ts-chip" data-filter="정자동">정자동</button>
+      <button type="button" class="ts-chip" data-filter="동탄">동탄</button>
+    </div>
+
+    <div class="ts-grid" id="ts-grid">
+
+      <article class="ts-card" data-tags="카페 인계동">
+        <div class="ts-card-photo ts-photo-1">
+          <i class="ti ti-coffee" style="font-size:42px;color:#fff;opacity:.9"></i>
+          <div class="ts-card-badges"><span class="ts-badge">카페</span><span class="ts-badge">인계동</span></div>
+        </div>
+        <div class="ts-card-body">
+          <div>
+            <p class="ts-card-title">OO카페 (인계동)</p>
+            <p class="ts-card-loc">인계동 · 유동인구 많은 도보 상권</p>
+          </div>
+          <div class="ts-time-row"><i class="ti ti-clock"></i> 매일 21:00 ~ 익일 05:00</div>
+          <div class="ts-cond-grid">
+            <div><span class="ts-cond-label">계약기간</span><span class="ts-cond-value">6개월 <small>협의</small></span></div>
+            <div><span class="ts-cond-label">보증금</span><span class="ts-cond-value">1,000만 <small>협의</small></span></div>
+            <div><span class="ts-cond-label">월 부담금</span><span class="ts-cond-value">150만 <small>협의</small></span></div>
+          </div>
+          <p class="ts-card-desc">인계동 상권, 유동인구 많고 늦게까지 영업하는 매장이 많은 지역입니다. 내 가게처럼 애정을 갖고 운영해주실 분을 찾습니다.</p>
+          <button type="button" class="ts-card-cta" data-ts-chat><i class="ti ti-message-circle"></i> 채팅으로 문의하기</button>
+        </div>
+      </article>
+
+      <article class="ts-card" data-tags="음식점 정자동">
+        <div class="ts-card-photo ts-photo-2">
+          <i class="ti ti-tools-kitchen-2" style="font-size:42px;color:#fff;opacity:.9"></i>
+          <div class="ts-card-badges"><span class="ts-badge">음식점</span><span class="ts-badge">정자동</span></div>
+        </div>
+        <div class="ts-card-body">
+          <div>
+            <p class="ts-card-title">정자동 부대찌개</p>
+            <p class="ts-card-loc">정자동 · 저녁 상권 밀집 지역</p>
+          </div>
+          <div class="ts-time-row"><i class="ti ti-clock"></i> 매일 22:00 ~ 익일 02:00</div>
+          <div class="ts-cond-grid">
+            <div><span class="ts-cond-label">계약기간</span><span class="ts-cond-value">6개월</span></div>
+            <div><span class="ts-cond-label">보증금</span><span class="ts-cond-value">500만</span></div>
+            <div><span class="ts-cond-label">월 부담금</span><span class="ts-cond-value">없음</span></div>
+          </div>
+          <p class="ts-card-desc">주방 시설 깨끗하게 관리하고 있습니다. 분식·야식 아이템으로 첫 창업하시는 분 환영합니다.</p>
+          <button type="button" class="ts-card-cta" data-ts-chat><i class="ti ti-message-circle"></i> 채팅으로 문의하기</button>
+        </div>
+      </article>
+
+      <article class="ts-card" data-tags="베이커리 동탄">
+        <div class="ts-card-photo ts-photo-3">
+          <i class="ti ti-cake" style="font-size:42px;color:#fff;opacity:.9"></i>
+          <div class="ts-card-badges"><span class="ts-badge">베이커리</span><span class="ts-badge">동탄</span></div>
+        </div>
+        <div class="ts-card-body">
+          <div>
+            <p class="ts-card-title">동탄 센트럴 베이커리</p>
+            <p class="ts-card-loc">동탄 센트럴파크 인근</p>
+          </div>
+          <div class="ts-time-row"><i class="ti ti-clock"></i> 매일 20:00 ~ 24:00</div>
+          <div class="ts-cond-grid">
+            <div><span class="ts-cond-label">계약기간</span><span class="ts-cond-value">3개월 <small>협의</small></span></div>
+            <div><span class="ts-cond-label">보증금</span><span class="ts-cond-value">700만</span></div>
+            <div><span class="ts-cond-label">월 부담금</span><span class="ts-cond-value">100만</span></div>
+          </div>
+          <p class="ts-card-desc">오븐·발효기 완비. 디저트·베이커리 브랜드로 저녁 시간대 운영해보실 분을 찾습니다.</p>
+          <button type="button" class="ts-card-cta" data-ts-chat><i class="ti ti-message-circle"></i> 채팅으로 문의하기</button>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="ts-disclaimer">
+      골목대장은 본주인과 이용자 간 계약의 당사자가 아니며, 매칭 및 표준 계약서 양식만 제공합니다. 실제 계약 전 건물주 동의 여부, 인허가 사항을 반드시 확인하세요. 자세한 내용은 <a href="timeshare-guide.html">타임셰어 가이드라인</a>을 참고하세요.
+    </div>
+  </div>
+
+  <div class="ts-mobile-cta">
+    <a class="ts-btn ts-btn-primary" href="timeshare-apply.html"><i class="ti ti-plus"></i> 내 매장 등록하기</a>
+  </div>
+</template>
+
+<script type="module" src="js/shell_loader.js?v=20260711"></script>
+<script type="module" src="js/auth.js?v=20260711"></script>
+<script type="module" src="js/pages/timeshare.js?v=20260711"></script>
+</body>
+</html>

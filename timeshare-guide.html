@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F5A623">
+<link rel="icon" href="assets/gmlogo.png" type="image/png">
+<title>타임셰어 가이드라인 — 골목대장</title>
+<script src="js/mobile-route.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/main-v3.css?v=20260711">
+<link rel="stylesheet" href="css/shell-pages.css?v=20260711">
+<link rel="stylesheet" href="css/timeshare.css?v=20260711">
+</head>
+<body data-gm-active="timeshare" data-gm-shell="standard">
+
+<template id="gm-page-tpl">
+  <div class="ts-page ts-page--narrow">
+    <div class="ts-hero">
+      <div class="ts-hero-badge"><i class="ti ti-clock-hour-4"></i> 매장 타임셰어</div>
+      <h1>시작하기 전에<br>꼭 읽어주세요</h1>
+      <p>골목대장 타임셰어는 영업이 끝난 매장 공간을, 그 시간대에 필요한 다른 사장님과 연결해드리는 매칭 서비스입니다.</p>
+    </div>
+
+    <div class="ts-breadcrumb" style="margin-top:20px">
+      <a href="timeshare.html">타임셰어</a> &nbsp;›&nbsp; <b>가이드라인</b>
+    </div>
+
+    <section class="ts-section">
+      <h2 class="ts-sec-title"><i class="ti ti-pin"></i> 타임셰어란?</h2>
+      <div class="ts-info-card">
+        <p class="ts-lead">
+          내 매장 영업이 끝난 이후 시간(예: 밤 10시~새벽 2시), 공간이 비어있는 그 시간을 다른 분이 보증금을 걸고 사용하실 수 있도록 연결해드리는 매칭 서비스입니다. 임대료 계약이 아니라 <b>시간제 공간 사용 계약</b>입니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="ts-section">
+      <h2 class="ts-sec-title"><i class="ti ti-search"></i> 골목대장이 하는 일 / 하지 않는 일</h2>
+      <div class="ts-compare">
+        <div class="ts-compare-col ts-compare-do">
+          <h3><i class="ti ti-circle-check"></i> 골목대장이 합니다</h3>
+          <ul>
+            <li>본주인·이용희망자 매칭 연결</li>
+            <li>표준 계약서 양식 및 체크리스트 제공</li>
+            <li>채팅 연결</li>
+            <li>신청 내용 리스트 페이지 노출</li>
+          </ul>
+        </div>
+        <div class="ts-compare-col ts-compare-dont">
+          <h3><i class="ti ti-ban"></i> 골목대장이 하지 않습니다</h3>
+          <ul>
+            <li>계약 당사자가 되는 것</li>
+            <li>법률 자문 및 분쟁의 법적 대리</li>
+            <li>보증금 보관 (은행·PG 에스크로 이용 권장)</li>
+            <li>신청 내용의 사실 여부 검증</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="ts-section">
+      <h2 class="ts-sec-title"><i class="ti ti-alert-triangle"></i> 매칭 전 반드시 확인해야 할 3가지</h2>
+      <div class="ts-check-list">
+        <div class="ts-check-item">
+          <div class="ts-check-num">1</div>
+          <div>
+            <b>건물주(임대인) 동의 여부</b>
+            <span>임차한 매장이라면 제3자 사용 전 건물주 동의가 필요합니다. 동의 없이 진행 시 임대차 계약이 해지될 수 있습니다. (민법 제629조)</span>
+          </div>
+        </div>
+        <div class="ts-check-item">
+          <div class="ts-check-num">2</div>
+          <div>
+            <b>사업자등록 및 인허가</b>
+            <span>이용자는 별도 사업자등록이 필요하며, 식품 관련 업종은 관할 구청·보건소에 공유주방 등록 등 사전 확인이 필요합니다.</span>
+          </div>
+        </div>
+        <div class="ts-check-item">
+          <div class="ts-check-num">3</div>
+          <div>
+            <b>보증금 및 계약서</b>
+            <span>표준 계약서는 법률 자문을 대체하지 않습니다. 고액 보증금 거래 시 변호사 검토를 권장합니다.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ts-section">
+      <h2 class="ts-sec-title"><i class="ti ti-tools-kitchen-2"></i> 지금은 어떤 업종부터 가능한가요?</h2>
+      <div class="ts-info-card">
+        <span class="ts-badge-limit">현재 식품접객업(음식점·카페 등)만 시범 운영</span>
+        <p class="ts-lead">
+          '공유주방' 제도가 이미 법적으로 인정된 시간구분형 공간 사용 모델이기 때문입니다. 그 외 업종은 순차 확대 예정입니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="ts-section">
+      <h2 class="ts-sec-title"><i class="ti ti-map"></i> 타임셰어, 이렇게 진행됩니다</h2>
+      <div class="ts-info-card">
+        <div class="ts-timeline">
+          <div class="ts-t-item"><div class="ts-t-dot">1</div><div class="ts-t-text"><b>본주인 신청서 작성</b><span>매장 정보와 셰어 조건 입력</span></div></div>
+          <div class="ts-t-item"><div class="ts-t-dot">2</div><div class="ts-t-text"><b>리스트 페이지에 공개</b><span>누구나 열람 가능한 카드로 노출</span></div></div>
+          <div class="ts-t-item"><div class="ts-t-dot">3</div><div class="ts-t-text"><b>관심 있는 분과 채팅 연결</b><span>조건은 협의로 조정 가능</span></div></div>
+          <div class="ts-t-item"><div class="ts-t-dot">4</div><div class="ts-t-text"><b>표준 계약서로 조건 협의</b><span>최종 조건을 문서로 확정</span></div></div>
+          <div class="ts-t-item"><div class="ts-t-dot">5</div><div class="ts-t-text"><b>계약 체결</b><span>건물주 동의서 확인 필수</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ts-section">
+      <h2 class="ts-sec-title"><i class="ti ti-scale"></i> 법적 절차 자세히 보기</h2>
+
+      <details class="ts-details" open>
+        <summary>계약 체결 전 체크리스트</summary>
+        <div class="ts-details-body">
+          <ol>
+            <li>임대차계약서 상 "전대 금지" 조항 확인 → 있다면 건물주 서면 동의 필수</li>
+            <li>이용자(임대운영자)의 사업자등록 가능 여부 관할 세무서 확인</li>
+            <li>식품 관련 업종은 관할 보건소·구청에 시간구분형 운영 가능 여부 사전 문의</li>
+            <li>보증금 지급 방법 (가급적 제3자 계좌 경유 권장)</li>
+            <li>원상복구 범위를 계약서에 사진과 함께 첨부</li>
+            <li>시설 파손 시 배상 범위와 한도를 사전에 금액으로 명시</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="ts-details">
+        <summary>보증금 반환 규정</summary>
+        <div class="ts-details-body">
+          계약이 정상 종료되면 원상복구 확인 후 <b>7일 이내</b> 보증금을 반환하는 것이 원칙입니다. 파손 등 공제 사유가 있는 경우, 항목과 금액을 서면으로 통보한 후 잔액을 반환합니다. 근거 없는 지연·감액 반환은 허용되지 않습니다.
+        </div>
+      </details>
+
+      <details class="ts-details">
+        <summary>계약 해지 규정</summary>
+        <div class="ts-details-body">
+          본주인과 이용자 모두 계약을 해지할 권리가 있습니다.
+          <ul>
+            <li><b>일반 해지</b>: 최소 30일 전 서면 통보, 위약금 없음</li>
+            <li><b>귀책사유 해지</b>: 무단사용·연체 2회 이상·시설파손 등은 시정요구(7일) 후에도 개선되지 않으면 즉시 해지 가능</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="ts-details">
+        <summary>기물 파손 및 트러블 처리</summary>
+        <div class="ts-details-body">
+          입주 전/후 사진 기록을 근거로 책임 소재를 판단합니다. 배상액은 보증금 범위 내에서 우선 공제하며, 초과 손해는 별도 청구할 수 있습니다. 분쟁 발생 시 ① 당사자 협의 → ② 골목대장 중재 요청(강제력 없음) → ③ 외부 조정기관·법률 전문가 상담 순으로 진행합니다.
+        </div>
+      </details>
+    </section>
+
+    <section class="ts-section">
+      <div class="ts-disclaimer-box">
+        <b>면책 고지</b>
+        골목대장이 제공하는 표준 계약서, 체크리스트, 안내 문구는 일반적인 참고 정보이며 법률 자문이 아닙니다. 개별 계약의 법적 효력, 세무·인허가 문제는 반드시 변호사·세무사 등 전문가와 상담하시기 바랍니다. 골목대장은 본주인과 이용자 간 계약의 당사자가 아니며, 계약 이행·분쟁에 대한 법적 책임을 지지 않습니다.
+        <div class="ts-cta-row">
+          <a class="ts-btn ts-btn-ghost" href="timeshare.html">리스트 보기</a>
+          <a class="ts-btn ts-btn-primary" href="timeshare-apply.html">신청하기</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script type="module" src="js/shell_loader.js?v=20260711"></script>
+<script type="module" src="js/auth.js?v=20260711"></script>
+</body>
+</html>

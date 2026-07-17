@@ -52,6 +52,8 @@
 
   /* 대장님들의 이야기 전체게시판 — 모바일도 community.html 유지(반응형) */
   if (file === 'community.html') return;
+  /* 타임셰어는 PC 셸 반응형으로 공통 제공 (m/ 복제 전) */
+  if (/^timeshare/i.test(file)) return;
 
   var map = {
     'index.html': 'index.html',

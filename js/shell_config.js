@@ -1,5 +1,5 @@
 /** 골목대장 v3 공통 셸 — 경로·토큰·활성 메뉴 */
-export const SHELL_VER = '20260717';
+export const SHELL_VER = '20260717b';
 
 const analysisBase = (isM) => (isM ? 'analysis.html' : 'analysis.html');
 
@@ -25,6 +25,9 @@ export function detectContext() {
     profile: isM ? 'profile.html' : 'profile.html',
     post: isM ? 'post.html' : 'post.html',
     aiSearch: isM ? 'ai-search.html' : 'ai-search.html',
+    timeshare: isM ? '../timeshare.html' : 'timeshare.html',
+    timeshareApply: isM ? '../timeshare-apply.html' : 'timeshare-apply.html',
+    timeshareGuide: isM ? '../timeshare-guide.html' : 'timeshare-guide.html',
   };
   return { isM, root, assets, css: root + 'css/', js: root + 'js/', partials: root + 'partials/', pages };
 }
@@ -46,7 +49,10 @@ export function applyTokens(html, ctx) {
     .replace(/@@NEIGHBORHOOD@@/g, p.neighborhood)
     .replace(/@@POLICY@@/g, p.policy)
     .replace(/@@PROFILE@@/g, p.profile)
-    .replace(/@@AI_SEARCH@@/g, p.aiSearch);
+    .replace(/@@AI_SEARCH@@/g, p.aiSearch)
+    .replace(/@@TIMESHARE@@/g, p.timeshare)
+    .replace(/@@TIMESHARE_APPLY@@/g, p.timeshareApply)
+    .replace(/@@TIMESHARE_GUIDE@@/g, p.timeshareGuide);
 }
 
 /** data-gm-active → pages 키 */
@@ -65,6 +71,9 @@ export const ACTIVE_MAP = {
   profile: 'profile',
   post: 'post',
   ai: 'aiSearch',
+  timeshare: 'timeshare',
+  'timeshare-apply': 'timeshareApply',
+  'timeshare-guide': 'timeshareGuide',
 };
 
 /** 대장님들의 이야기 → home 탭 */
@@ -94,6 +103,7 @@ export function resolveMobileTab(active) {
   if (STORIES_NAV.has(nav)) return 'home';
   if (ANALYSIS_NAV.has(nav)) return 'analysis';
   if (nav === 'ai' || nav === 'aiSearch') return 'ai';
+  if (nav === 'timeshare' || nav === 'timeshare-apply' || nav === 'timeshare-guide') return null;
   return null;
 }
 
